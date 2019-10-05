@@ -5,12 +5,12 @@
     <div class="card card-login mx-auto mt-5">
       <div class="card-header">Login</div>
       <div class="card-body">
-        <form method="post" action="{{ url('/admin/login') }}">
+        <form method="post" action="{{ url('/admin/user_login') }}">
           {{ csrf_field() }}
           @include('admin.inc.messages')
           <div class="form-group" >
-            <label for="user_name">User name</label>
-            <input class="form-control" name="user_name" id="user_name" type="text" aria-describedby="emailHelp" placeholder="User Name">
+            <label for="user_name">Email</label>
+            <input class="form-control" name="email" id="email" type="text" aria-describedby="emailHelp" placeholder="User Name">
           </div>
           <div class="form-group">
             <label for="exampleInputPassword1">Password</label>

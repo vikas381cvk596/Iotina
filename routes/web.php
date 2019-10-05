@@ -13,5 +13,7 @@
 Route::get('/', 'AuthController@showHomePage');
 Route::get('/admin/login', 'AuthController@showHomePage');
 Route::get('/admin/register', 'AuthController@showRegisterPage');
-Route::post('/admin/login', 'AuthController@loginUser');
+Route::post('/admin/user_login', 'AuthController@loginUser');
+Route::post('/admin/registerUser', 'AuthController@registerUser');
+Route::get('/admin/logout', 'AuthController@logoutUser');
 
