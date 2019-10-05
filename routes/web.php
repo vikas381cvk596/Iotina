@@ -12,5 +12,8 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('admin');
 });
+
+Route::get('/admin/{demopage?}', 'AppController@demo')->name('demo');
+
