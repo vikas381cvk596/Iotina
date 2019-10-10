@@ -49,7 +49,7 @@ class AuthController extends Controller
     {
     	Auth::logout();
     	Session::flush();
-    	return redirect('/admin/login');
+    	return view('/admin/login');
     }
 
     public function showHomePage(Request $request) 
@@ -66,6 +66,14 @@ class AuthController extends Controller
 	    	return redirect('/admin');
     	} else {
 	    	return view('/admin/register');
+    	}
+    }
+
+    public function anyPage($page='index') {
+    	if (Auth::check()) {
+	    	return view('admin.' . $page)->with(['page' => $page]);
+    	} else {
+	    	return view('/admin/login');
     	}
     }
 

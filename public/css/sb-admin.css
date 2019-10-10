@@ -476,3 +476,7 @@ footer.sticky-footer {
     width: calc(100% - 55px);
   }
 }
+
+#navbarResponsive .nav-link-text {
+  padding-left: 10px;
+}

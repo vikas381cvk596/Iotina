@@ -1,17 +1,50 @@
 <!-- Navigation-->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
-    <a class="navbar-brand" href="{{ url('/admin') }}">Start Bootstrap</a>
+    
+    <a class="navbar-brand" href="{{ url('/admin') }}">EAP</a>
     <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
+    
     <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
             <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
                 <a class="nav-link" href="{{ url('/admin') }}">
-                    <i class="fa fa-fw fa-dashboard"></i>
+                    <i class="fa fa-fw fa-tachometer-alt"></i>
                     <span class="nav-link-text">Dashboard</span>
                 </a>
             </li>
+            <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Venues">
+                <a class="nav-link" href="{{ url('/admin/venues') }}">
+                    <i class="fa fa-fw fa-globe"></i>
+                    <span class="nav-link-text">Venues</span>
+                </a>
+            </li>
+            <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Inventory">
+                <a class="nav-link" href="{{ url('/admin/accesspoints') }}">
+                    <i class="fa fa-fw fa-network-wired"></i>
+                    <span class="nav-link-text">Access Points</span>
+                </a>
+            </li>
+            <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Inventory">
+                <a class="nav-link" href="{{ url('/admin/wifi') }}">
+                    <i class="fa fa-fw fa-wifi"></i>
+                    <span class="nav-link-text">Wireless Networks</span>
+                </a>
+            </li>
+            <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Inventory">
+                <a class="nav-link" href="{{ url('/admin/users') }}">
+                    <i class="fa fa-fw fa-users"></i>
+                    <span class="nav-link-text">Users</span>
+                </a>
+            </li>
+            <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Inventory">
+                <a class="nav-link" href="{{ url('/admin/analytics') }}">
+                    <i class="fa fa-fw fa-chart-bar"></i>
+                    <span class="nav-link-text">Analytics</span>
+                </a>
+            </li>
+            <!--
             <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
                 <a class="nav-link" href="{{ url('/admin/charts') }}">
                     <i class="fa fa-fw fa-area-chart"></i>
@@ -95,6 +128,7 @@
                     <span class="nav-link-text">Link</span>
                 </a>
             </li>
+            -->
         </ul>
         <ul class="navbar-nav sidenav-toggler">
             <li class="nav-item">
@@ -104,6 +138,12 @@
             </li>
         </ul>
         <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="modal" data-target="#exampleModal">
+                    <i class="fa fa-fw fa-sign-out"></i>Logout</a>
+            </li>
+        </ul>
+        <ul class="navbar-nav ml-auto" style="display:none;">
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle mr-lg-2" id="messagesDropdown" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fa fa-fw fa-envelope"></i>
