@@ -10,7 +10,7 @@
           @include('admin.inc.messages')
           <div class="form-group" >
             <label for="user_name">Email</label>
-            <input class="form-control" name="email" id="email" type="text" aria-describedby="emailHelp" placeholder="User Name">
+            <input class="form-control" name="email" id="email" type="text" aria-describedby="emailHelp" placeholder="Email Address">
           </div>
           <div class="form-group">
             <label for="exampleInputPassword1">Password</label>
