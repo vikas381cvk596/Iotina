@@ -53,8 +53,8 @@ if (document.getElementById('venue_page'))
       success: function(all_venues) {
         var html_content = '';
         for (var venue in all_venues) {
-          var venue_name = all_venues[venue]['venue_name'];
-          var venue_crt_date = all_venues[venue]['created_at'];
+          $venue_name = all_venues[venue]['venue_name'];
+          $venue_crt_date = all_venues[venue]['created_at'];
           
           $venue_add = '';
           if (all_venues[venue]['venue_description']) {
@@ -80,7 +80,7 @@ if (document.getElementById('venue_page'))
           html_content = html_content+'</tr>';
         }
 
-        $('#venues_tab tbody').html(html_content);        
+        $('#venues_table tbody').html(html_content);        
       }
     }); 
   };
