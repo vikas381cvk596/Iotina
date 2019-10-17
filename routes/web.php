@@ -19,5 +19,7 @@ Route::get('/admin/logout', 'AuthController@logoutUser');
 Route::get('/admin/{page?}', 'AuthController@anyPage')->name('anyPage');
 Route::post('/admin/createVenue', array('as' => 'createVenue', 'uses' => 'AppController@createVenue'));
 Route::post('/admin/getAllVenues', array('as' => 'getAllVenues', 'uses' => 'AppController@getAllVenues'));
+Route::post('/admin/createAccessPoint', array('as' => 'createAccessPoint', 'uses' => 'AppController@createAccessPoint'));
+Route::post('/admin/getAllAccessPoints', array('as' => 'getAllAccessPoints', 'uses' => 'AppController@getAllAccessPoints'));
 
 

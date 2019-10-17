@@ -480,3 +480,9 @@ footer.sticky-footer {
 #navbarResponsive .nav-link-text {
   padding-left: 10px;
 }
+
+#create_ap_block .venue_name .dropdown-toggle::after {
+  position: absolute;
+  right: 10px;
+  top: 40%;
+}

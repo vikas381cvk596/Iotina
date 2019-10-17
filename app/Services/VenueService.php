@@ -62,4 +62,14 @@ class VenueService
         //$venue_raw['2'] = 'aaa';
         return $venue_raw;       
     }
+
+    public function getVenueNameByID ($venue_id) {
+        $venue = DB::table('venue')->where(['venue_id' => $venue_id])->first();
+        $venue_name = '';
+        if (!is_null($venue)) {
+            $venue_name = $venue->venue_name;
+        }
+        
+        return $venue_name;       
+    }
 }

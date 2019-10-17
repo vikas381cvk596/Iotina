@@ -7,7 +7,7 @@
       <!-- Breadcrumbs-->
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
-          <a href="#">Dashboard</a>
+          <a href="{{ url('/admin') }}">Dashboard</a>
         </li>
         <li class="breadcrumb-item active">Venues</li>
       </ol>
@@ -28,12 +28,12 @@
             </div>
             <div id="error_msg_crt" class="row" style="display: none;">
               <div class="col-md-12">
-                <p id="error_text" style="font-size: 14px; color: #840808; padding-left: 30px; padding-top: 20px;"></p>
+                <p id="error_text" style="font-size: 14px; color: #840808; padding-left: 30px; padding-top: 20px; font-weight: 600;"></p>
               </div>
             </div>
             <div id="success_msg_crt" class="row" style="display: none;">
               <div class="col-md-12">
-                <p style="font-size: 14px; color: #636363; padding-left: 30px; padding-top: 20px;">Venue created successfully &#10003;</p>
+                <p style="font-size: 14px; color: #636363; padding-left: 30px; padding-top: 20px; font-weight: 600;">Venue created successfully &#10003;</p>
               </div>
             </div>
             <div id="create-venue-row" class="row" style="padding: 20px;">
@@ -82,10 +82,10 @@
 
       <div class="card mb-3">
         <div class="card-header">
-          <i class="fa fa-table"></i> Venues</div>
+          <i class="fa fa-table"></i>&nbsp;&nbsp;Venues</div>
         <div class="card-body">
           <div class="table-responsive">
-            <table id="venues_tab" class="table table-bordered" id="dataTable" width="100%" cellspacing="0" style="font-size: 13px;">
+            <table id="venues_table" class="table table-bordered" id="dataTable" width="100%" cellspacing="0" style="font-size: 13px;">
               <thead>
                 <tr>
                   <th>Name</th>

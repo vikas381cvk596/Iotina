@@ -2,17 +2,128 @@
 
 @section('content')
 
-  <div class="content-wrapper">
+  <div id="ap_page" class="content-wrapper">
     <div class="container-fluid">
       <!-- Breadcrumbs-->
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
-          <a href="#">Dashboard</a>
+          <a href="{{ url('/admin') }}">Dashboard</a>
         </li>
         <li class="breadcrumb-item active">Access Points</li>
       </ol>
       <!-- Area Chart Example-->
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="form-group" style="text-align: right;">
+            <button type="submit" name="btn_add" id="btn_add_ap" class="btn" style="font-size: 15px;">Add AP</button>
+          </div>
+        </div>
+      </div>
       
+      <div id="create_ap_block" class="row" style="display: none;">
+        <div class="col-lg-12">
+          <div class="card mb-3">
+            <div class="card-header">
+              <i class="fa fa-network-wired"></i>&nbsp;&nbsp;Create AP
+            </div>
+            
+            <div class="row" style="margin-top: 20px;">
+              <div class="col-md-12">
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                  <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; width: 30vw;">
+                    <div class="form-group" style="width: 15vw;">
+                      <input type="hidden" id="venue_id" name="venue_id">
+                      <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600;">* Venue</div>
+                      <div class="dropdown venue_name" style="">
+                            <button class="btn btn-default dropdown-toggle" type="button" id="venue_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size: 14px; background-color: #fff; border: 1px solid #c3c3c3; width: 10vw; color: #696969; width: 15vw; text-align: left;">
+                                Select Venue
+                            </button>
+                            <div class="dropdown-menu" id="venue_dropdown_options" aria-labelledby="venue_dropdown">
+                                <a class="dropdown-item" style="" data-value="HQ">HQ</a>
+                                <a class="dropdown-item" style="" data-value="Warehouse - Fresno">Warehouse - Fresno</a>
+                            </div>
+                        </div>
+                          
+                    </div>  
+                    <div class="form-group" style="padding-left: 20px;width: 15vw;">
+                      <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600;">* AP Name</div>
+                      <div class='input-group'>
+                        <input type="text" id="ap_name" name="ap_name" class="form-control" class="form-control" placeholder="Name" style="font-size: 14px;"/>
+                      </div>
+                    </div>
+                  </div>
+                  <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; width: 30vw;">
+                    <div class="form-group" style="width: 30vw;">
+                      <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600;">Description</div>
+                      <div class='input-group'>
+                        <textarea id="ap_desc" name="ap_desc" class="form-control" class="form-control" placeholder="Description" style="font-size: 14px;"> </textarea>
+                      </div>
+                    </div>  
+                  </div>
+                  <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; width: 30vw;">
+                    <div class="form-group" style="width: 15vw;">
+                      <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600;">* Serial Number</div>
+                      <div class='input-group'>
+                        <input type="text" id="ap_serial" name="ap_serial" class="form-control" class="form-control" placeholder="Serial" style="font-size: 14px;"/>
+                      </div>
+                    </div>  
+                    <div class="form-group" style="padding-left: 20px;width: 15vw;">
+                      <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600;">Tags</div>
+                      <div class='input-group'>
+                        <input type="text" id="ap_tags" name="ap_tags" class="form-control" class="form-control" placeholder="Add a tag" style="font-size: 14px;"/>
+                      </div>
+                    </div>
+                  </div>
+                  <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; width: 30vw;">
+                    <div class="form-group" style="width: 20vw; text-align: center;">
+                      <button type="submit" name="btn_create_ap" value="create" id="btn_create_ap" class="btn btn-secondary btn_ap" style="margin-top:15px">Create Access Point</button>
+                    </div>  
+                  </div>
+                  
+                </div>
+              </div>
+            </div>
+
+            <div id="error_msg_crt" class="row" style="display: none;">
+              <div class="col-md-12">
+                <p id="error_text" style="font-size: 14px; color: #840808; padding-left: 30px; padding-top: 0px; text-align: center;font-weight: 600;"></p>
+              </div>
+            </div>
+            <div id="success_msg_crt" class="row" style="display: none;">
+              <div class="col-md-12">
+                <p style="font-size: 14px; color: #636363; padding-left: 30px; padding-top: 0px; text-align: center; font-weight: 600;">AP created successfully &#10003;</p>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-header">
+          <i class="fa fa-table"></i>&nbsp;&nbsp;Access Points</div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table id="ap_table" class="table table-bordered" id="dataTable" width="100%" cellspacing="0" style="font-size: 13px;">
+              <thead>
+                <tr>
+                  <th>AP</th>
+                  <th>Status</th>
+                  <th>Serial</th>
+                  <th>IP Address</th>
+                  <th>MAC Address</th>
+                  <th>Venue</th>
+                  <th>Tags</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!--<div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div> -->
+      </div>
+
     </div>
     <!-- /.container-fluid-->
     <!-- /.content-wrapper-->

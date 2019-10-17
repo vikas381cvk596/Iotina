@@ -71,7 +71,7 @@
     });
 </script>
 
-<script src="{{ asset("js/eap_venue.js") }}"></script>
+<script src="{{ asset("js/eap.js") }}"></script>
 
 </body>
 </html>
