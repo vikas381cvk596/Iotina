@@ -53,29 +53,29 @@ if (document.getElementById('venue_page'))
       success: function(all_venues) {
         var html_content = '';
         for (var venue in all_venues) {
-          $venue_name = all_venues[venue]['venue_name'];
-          $venue_crt_date = all_venues[venue]['created_at'];
+          var venue_name = all_venues[venue]['venue_name'];
+          var venue_crt_date = all_venues[venue]['created_at'];
           
-          $venue_add = '';
-          if (all_venues[venue]['venue_description']) {
-            $venue_add = all_venues[venue]['venue_address'];
+          var venue_add = '';
+          if (all_venues[venue]['venue_address']) {
+            venue_add = all_venues[venue]['venue_address'];
           }
 
-          $venue_desc = '';
+          var venue_desc = '';
           if (all_venues[venue]['venue_description']) {
-            $venue_desc = all_venues[venue]['venue_description'];
+            venue_desc = all_venues[venue]['venue_description'];
           }
 
-          $venue_add_notes = '';
-          if (all_venues[venue]['venue_description']) {
-            $venue_add_notes = all_venues[venue]['venue_address_notes'];
+          var venue_add_notes = '';
+          if (all_venues[venue]['venue_address_notes']) {
+            venue_add_notes = all_venues[venue]['venue_address_notes'];
           }
 
           html_content = html_content+'<tr>';
-          html_content = html_content+'<td>'+$venue_name+'<br/>Created On: '+$venue_crt_date+'</td>';
-          html_content = html_content+'<td>'+$venue_desc+'</td>';
-          html_content = html_content+'<td>'+$venue_add+'</td>';
-          html_content = html_content+'<td>'+$venue_add_notes+'</td>';
+          html_content = html_content+'<td>'+venue_name+'<br/>Created On: '+venue_crt_date+'</td>';
+          html_content = html_content+'<td>'+venue_desc+'</td>';
+          html_content = html_content+'<td>'+venue_add+'</td>';
+          html_content = html_content+'<td>'+venue_add_notes+'</td>';
           //console.log(all_venues[venue]['venue_id']);
           html_content = html_content+'</tr>';
         }
@@ -240,4 +240,378 @@ if (document.getElementById('venue_page'))
     });
   }
   $.fn.get_all_venues();
+} else if (document.getElementById('wifi_page')) {
+  
+  $.fn.toggle_flow_section = function(flow_class) {
+    $('.flow_section').hide();
+    $('#'+flow_class).show();    
+  }
+
+  $.fn.create_network = function() {
+    var networkData = [];
+    
+    networkData['network_name'] = $('#network_name').val();
+    networkData['network_desc'] = $('#network_desc').val(); 
+    networkData['network_type'] = $('#network_type').val(); 
+
+    networkData['security_protocol'] = $('#security_protocol').val(); 
+    networkData['passphrase_format'] = $('#passphrase_format').val();
+    networkData['passphrase_expiry'] = $('#passphrase_expiry').val();
+    networkData['backup_passphrase'] = $('#backup_passphrase').val();
+    networkData['passphrase_length'] = $('#passphrase_length').val();    
+    alert(networkData['passphrase_length']);
+    
+    $.ajax({
+      url: "createNetwork",
+      type: "POST",
+      data: {
+        networkData: networkData,
+        '_token': window.Laravel.csrfToken
+      },
+      success: function(result) {
+        alert(result);
+        console.log(result);
+        /*if (result == 'success') {
+          $('#error_msg_crt').hide();
+          $('#success_msg_crt').show();
+
+          $.fn.generate_ap_table();
+        } else {
+          $('#error_msg_crt').show();
+          $('#error_text').html('Some unexpected error occured.');
+          $('#success_msg_crt').hide();
+        }*/
+      }
+    });
+  }
+
+  $.fn.navigate = function(this_object) {
+    var navigate_step_form = $(this_object).attr('link');
+
+    if (navigate_step_form == 'form_submit') {
+      $.fn.create_network();
+    } else {
+
+      $('.form_class').hide();
+      $('.form_class').removeClass('active');
+
+      
+      $('.'+navigate_step_form).show();
+      $('.'+navigate_step_form).addClass('active');
+        //ced853
+      if (navigate_step_form == 'form_step_1') {
+        $('#btn_back_step').hide();
+        $('#btn_next_step').html('Next');
+        if ($('#network_type' == "PSK")) {
+          $('#btn_next_step').attr('link','form_step_2');
+        }
+        else if ($('#network_type' == "CaptivePortal")) {
+          $('#btn_next_step').attr('link','form_step_3');
+        }
+        $('.circle_step_1').css('background-color','#b3b3b3');
+        $('.title_step_1').css('color','#696969');
+        
+        $('.circle_step_2').css('background-color','#b3b3b3');
+        $('.title_step_2').css('color','#696969');
+      } else if (navigate_step_form == 'form_step_2') {
+        $('.circle_step_1').css('background-color','#ced853');
+        $('.title_step_1').css('color','#ced853');
+        
+        $('.circle_step_2').css('background-color','#b3b3b3');
+        $('.title_step_2').css('color','#696969');
+        
+        $('#btn_back_step').show();
+        $('#btn_back_step').attr('link', 'form_step_1');
+        $('#btn_next_step').attr('link', 'form_step_6');
+        $('#btn_next_step').html('Next');
+      } else if (navigate_step_form == 'form_step_6') {
+        $('.circle_step_1').css('background-color','#ced853');
+        $('.title_step_1').css('color','#ced853');
+        
+        $('.circle_step_2').css('background-color','#ced853');
+        $('.title_step_2').css('color','#ced853');
+        
+        $('#btn_back_step').show();
+        $('#btn_back_step').attr('link', 'form_step_2');
+        $('#btn_next_step').attr('link', 'form_submit');
+        $('#btn_next_step').html('Create');
+      }
+      $.fn.reset_btn_states();
+    }
+  }
+
+  $.fn.reset_btn_states = function() {
+    $('.form_class').each(function() {
+      if ($(this).hasClass('active')) {
+        if ($(this).attr('form-step') == 'form_step_1') {
+          if ($('#network_type').val() && $('#network_name').val()) {
+            $('#btn_next_step').addClass('active');
+            $('#btn_next_step').removeAttr('disabled');
+          } else {
+            $('#btn_next_step').removeClass('active');
+            $('#btn_next_step').attr('disabled', 'disabled');
+          }
+        } else if ($(this).attr('form-step') == 'form_step_2') {
+          if ($('#security_protocol').val() && $('#passphrase_format').val() && $('#passphrase_expiry').val() && $('#backup_passphrase').val() && $('#passphrase_length').val()) {
+            $('#btn_next_step').addClass('active');
+            $('#btn_next_step').removeAttr('disabled');
+          } else {
+            $('#btn_next_step').removeClass('active');
+            $('#btn_next_step').attr('disabled', 'disabled');
+          }
+        }
+      }
+    });
+    
+    /*if (form_step == 'form_step_1') {
+      
+    }*/
+  }
+
+  $(".left_section").on('change', '.form-fields', function() {
+    $.fn.reset_btn_states();
+  });
+
+  $(".dropdown").on('click', '.dropdown-item', function() {
+    $(this).parents(".dropdown").find('.btn').html($(this).find('.title_text_dropdown').text());
+  });
+
+  $("#network_type_options").on('click', '.dropdown-item', function() {
+    //$(this).parents(".dropdown").find('.btn').html($(this).find('.title_text_dropdown').text());
+    var network_type = $(this).attr('data-value');
+    $('#network_type').val(network_type);
+    
+    if (network_type == 'PSK') {
+      $.fn.toggle_flow_section('right_flow_1');
+      $('#btn_next_step').attr('link','form_step_2');
+    } else if (network_type == 'CaptivePortal') {
+      $.fn.toggle_flow_section('right_flow_2');
+      $('#btn_next_step').attr('link','form_step_3');
+    }
+
+    $.fn.reset_btn_states();
+  });
+
+  $("#sp_dropdown_options").on('click', '.dropdown-item', function() {
+    var security_protocol = $(this).attr('data-value');
+    $('#security_protocol').val(security_protocol);    
+
+    $.fn.reset_btn_states();
+  });
+
+  $("#pf_dropdown_options").on('click', '.dropdown-item', function() {
+    var passphrase_format = $(this).attr('data-value');
+    $('#passphrase_format').val(passphrase_format);    
+
+    $.fn.reset_btn_states();
+  });
+
+  $("#pe_dropdown_options").on('click', '.dropdown-item', function() {
+    var passphrase_expiry = $(this).attr('data-value');
+    $('#passphrase_expiry').val(passphrase_expiry);    
+
+    $.fn.reset_btn_states();
+  });
+
+  $("#wifi_page").on('click', '#btn_next_step', function() {
+    if ($(this).hasClass('active')) {
+      $.fn.navigate(this);
+    }
+  });
+
+  $("#wifi_page").on('click', '#btn_back_step', function() {
+    $.fn.navigate(this);
+  });
+
+  $("#wifi_page").on('click', '#btn_add_wifi', function() {
+    $('#create_network_block').show();
+  });
+
+  $.fn.venues_network_table = function() {
+    $.ajax({
+      url: "getAllVenues",
+      type: "POST",
+      data: {
+        '_token': window.Laravel.csrfToken
+      },
+      success: function(all_venues) {
+        //alert(all_venues);
+        var html_content = '';
+        for (var venue in all_venues) {
+          var venue_name = all_venues[venue]['venue_name'];
+          var venue_id = all_venues[venue]['venue_id'];
+
+          var venue_add = '';
+          if (all_venues[venue]['venue_address']) {
+            venue_add = all_venues[venue]['venue_address'];
+          }
+
+          var network_count = '0';
+          if (all_venues[venue]['network_count']) {
+            network_count = all_venues[venue]['network_count'];
+          }
+
+          var ap_count = '0';
+          if (all_venues[venue]['ap_count']) {
+            ap_count = all_venues[venue]['ap_count'];
+          }
+
+          html_content = html_content+'<tr>';
+          html_content = html_content+'<input type="hidden" class="venue_id" value="'+venue_id+'">';
+          html_content = html_content+'<td align="center" style="border-color: #f2f2f2;">'+venue_name+'</td>';
+          html_content = html_content+'<td align="center" style="border-color: #f2f2f2;">'+venue_add+'</td>';
+          html_content = html_content+'<td align="center" style="border-color: #f2f2f2;">'+network_count+'</td>';
+          html_content = html_content+'<td align="center" style="border-color: #f2f2f2;">'+ap_count+'</td>';
+          html_content = html_content+'<td align="center" style="border-color: #f2f2f2;"><input type="checkbox" class="venue_checkbox"></td>';
+          //console.log(all_venues[venue]['venue_id']);
+          html_content = html_content+'</tr>';
+        }
+
+        $('#venues_network_table tbody').html(html_content);        
+      }
+    });
+  }
+  $.fn.venues_network_table();
+  
+  $("#wifi_page").on('click', '.btn_wifi', function() {
+    var venue_id = $('#venue_id').val();
+    var ap_name = $('#ap_name').val();
+    var ap_desc = $('#ap_desc').val();
+    var ap_serial = $('#ap_serial').val();
+    var ap_tags = $('#ap_tags').val();
+    //alert(venue_id+"::"+ap_name+"::"+ap_serial);
+    if (venue_id == '' || ap_name == '' || ap_serial == '') {
+      $('#error_msg_crt').show();
+      $('#error_text').html('Fields marked with * are mandatory');
+      $('#success_msg_crt').hide();
+    } else {
+      $.ajax({
+        url: "createAccessPoint",
+        type: "POST",
+        data: {
+          venue_id: venue_id,
+          ap_name: ap_name,
+          ap_desc: ap_desc,
+          ap_serial: ap_serial,
+          ap_tags: ap_tags,
+          '_token': window.Laravel.csrfToken
+        },
+        success: function(result) {
+          //alert(result);
+          //alert(result);
+          if (result == 'success') {
+            $('#error_msg_crt').hide();
+            $('#success_msg_crt').show();
+
+            $.fn.generate_ap_table();
+          } else {
+            $('#error_msg_crt').show();
+            $('#error_text').html('Some unexpected error occured.');
+            $('#success_msg_crt').hide();
+          }
+        }
+      });   
+    }
+  });
+
+
+  $.fn.generate_wifi_table = function() {
+    //alert();
+    $.ajax({
+      url: "getAllAccessPoints",
+      type: "POST",
+      data: {
+        '_token': window.Laravel.csrfToken
+      },
+      success: function(all_aps) {
+        //console.log(all_aps);
+        var html_content = '';
+        for (var ap in all_aps) {
+          var venue_name = all_aps[ap]['venue_name'];
+          var ap_crt_date = all_aps[ap]['created_at'];
+          
+          var ap_name = '';
+          if (all_aps[ap]['ap_name']) {
+            ap_name = all_aps[ap]['ap_name'];
+          }
+
+          var ap_description = '';
+          if (all_aps[ap]['ap_description']) {
+            ap_description = all_aps[ap]['ap_description'];
+          }
+
+          var ap_serial = '';
+          if (all_aps[ap]['ap_serial']) {
+            ap_serial = all_aps[ap]['ap_serial'];
+          }
+
+          var ap_tags = '';
+          if (all_aps[ap]['ap_tags']) {
+            ap_tags = all_aps[ap]['ap_tags'];
+          }
+
+          var ap_status = '';
+          if (all_aps[ap]['ap_status']) {
+            ap_status = all_aps[ap]['ap_status'];
+          }
+
+          var ap_model = '';
+          if (all_aps[ap]['ap_model']) {
+            ap_model = all_aps[ap]['ap_model'];
+          }
+
+          var ap_ip_address = '';
+          if (all_aps[ap]['ap_ip_address']) {
+            ap_ip_address = all_aps[ap]['ap_ip_address'];
+          }
+
+          var ap_mac_address = '';
+          if (all_aps[ap]['ap_mac_address']) {
+            ap_mac_address = all_aps[ap]['ap_mac_address'];
+          }
+
+          var ap_mesh_role = '';
+          if (all_aps[ap]['ap_mesh_role']) {
+            ap_mesh_role = all_aps[ap]['ap_mesh_role'];
+          }
+
+          html_content = html_content+'<tr>';
+          html_content = html_content+'<td>'+ap_name+'<br/>Created On: '+ap_crt_date+'</td>';
+          html_content = html_content+'<td>'+ap_status+'</td>';
+          html_content = html_content+'<td>'+ap_serial+'</td>';
+          html_content = html_content+'<td>'+ap_ip_address+'</td>';
+          html_content = html_content+'<td>'+ap_mac_address+'</td>';
+          html_content = html_content+'<td>'+venue_name+'</td>';
+          html_content = html_content+'<td>'+ap_tags+'</td>';
+          //console.log(all_venues[venue]['venue_id']);
+          html_content = html_content+'</tr>';
+        }
+        $('#ap_table tbody').html(html_content);       
+      }
+    }); 
+  };
+  //$.fn.generate_wifi_table();
+
+  $.fn.get_all_networks = function() {
+    $.ajax({
+      url: "getAllVenues",
+      type: "POST",
+      data: {
+        '_token': window.Laravel.csrfToken
+      },
+      success: function(all_venues) {
+        var html_content = '';
+        //alert(all_venues);
+        for (var venue in all_venues) {
+          var venue_name = all_venues[venue]['venue_name'];
+          var venue_id = all_venues[venue]['venue_id'];
+
+          html_content = html_content+'<a class="dropdown-item" data-value="'+venue_id+'">'+venue_name+'</a>';
+        }
+
+        $("#venue_dropdown_options").html(html_content);
+      }
+    });
+  }
+  //$.fn.get_all_networks();
 }

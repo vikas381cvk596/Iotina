@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\VenueService;
 use App\Services\AccessPointService;
+use App\Services\NetworkService;
 
 class AppController extends Controller
 {
@@ -28,6 +29,13 @@ class AppController extends Controller
         $result = $apService->createAccessPoint($_POST['venue_id'], $_POST['ap_name'], $_POST['ap_desc'], $_POST['ap_serial'], $_POST['ap_tags']);
         return $result;   
     }  
+
+    public function createNetwork()
+    {
+        $networkService = new NetworkService();
+        $result = $networkService->createNetwork($_POST['networkData']);
+        return $result;
+    }
 
     public function getAllAccessPoints()
     {

@@ -35,14 +35,13 @@
                       <input type="hidden" id="venue_id" name="venue_id">
                       <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600;">* Venue</div>
                       <div class="dropdown venue_name" style="">
-                            <button class="btn btn-default dropdown-toggle" type="button" id="venue_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size: 14px; background-color: #fff; border: 1px solid #c3c3c3; width: 10vw; color: #696969; width: 15vw; text-align: left;">
-                                Select Venue
-                            </button>
-                            <div class="dropdown-menu" id="venue_dropdown_options" aria-labelledby="venue_dropdown">
-                                <a class="dropdown-item" style="" data-value="HQ">HQ</a>
-                                <a class="dropdown-item" style="" data-value="Warehouse - Fresno">Warehouse - Fresno</a>
-                            </div>
+                        <button class="btn btn-default dropdown-toggle" type="button"id="venue_dropdown" data-toggle="dropdown" aria-haspopup="   true" aria-expanded="false" style="font-size: 14px; background-color: #fff; border: 1px solid #c3c3c3; width: 10vw; color: #696969; width: 15vw; text-align: left;">
+                          Select Venue
+                        </button>
+                        <div class="dropdown-menu" id="venue_dropdown_options" aria-labelledby="venue_dropdown">
+                          
                         </div>
+                      </div>
                           
                     </div>  
                     <div class="form-group" style="padding-left: 20px;width: 15vw;">

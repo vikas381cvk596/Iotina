@@ -481,8 +481,24 @@ footer.sticky-footer {
   padding-left: 10px;
 }
 
-#create_ap_block .venue_name .dropdown-toggle::after {
+#ap_page .venue_name .dropdown-toggle::after {
   position: absolute;
   right: 10px;
   top: 40%;
+}
+
+#wifi_page .dropdown .dropdown-toggle::after {
+  position: absolute;
+  right: 10px;
+  top: 40%;
+}
+
+#wifi_page .btn-next-class {
+  background-color: #d3d3d3; 
+  border: #f2f2f2;
+}
+
+#wifi_page .btn-next-class.active {
+  background-color: #6c757d; 
+  border: #f2f2f2;
 }

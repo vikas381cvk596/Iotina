@@ -52,14 +52,22 @@ class VenueService
         $organisationService = new OrganisationService();
         $org_id = $organisationService->getOrganisationID();
 
+        //$venue_raw['2'] = 'aaa';
+
         $all_venues = DB::table('venue')->where(['org_id' => $org_id])->get();
         $venue_raw = [];
         foreach ($all_venues as $venue) {
+            $network_raw = DB::table('network_venue_mapping')->where(['venue_id' => $venue->venue_id, 'org_id' => $org_id])->get();
+            $networkCount = $network_raw->count();
+
+            $ap_raw = DB::table('access_point')->where(['venue_id' => $venue->venue_id, 'org_id' => $org_id])->get();
+            $apCount = $ap_raw->count();
+
+
+            $venue->network_count = $networkCount;
+            $venue->ap_count = $apCount;
             $venue_raw[$venue->venue_id] = $venue;
         }
-        //$venue_raw = [];
-        
-        //$venue_raw['2'] = 'aaa';
         return $venue_raw;       
     }
 
