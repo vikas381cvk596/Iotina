@@ -253,12 +253,12 @@
 
             <div id="error_msg_crt" class="row" style="display: none;">
               <div class="col-md-12">
-                <p id="error_text" style="font-size: 14px; color: #840808; padding-left: 30px; padding-top: 0px; text-align: center;font-weight: 600;"></p>
+                <p id="error_text" style="font-size: 14px; color: #840808; padding-left: 80px; padding-top: 0px; text-align: left; font-weight: 600;"></p>
               </div>
             </div>
             <div id="success_msg_crt" class="row" style="display: none;">
               <div class="col-md-12">
-                <p style="font-size: 14px; color: #636363; padding-left: 30px; padding-top: 0px; text-align: center; font-weight: 600;">AP created successfully &#10003;</p>
+                <p style="font-size: 14px; color: #636363; padding-left: 80px; padding-top: 0px; text-align: left; font-weight: 600;">Wifi Network successfully created &#10003;</p>
               </div>
             </div>
             
@@ -271,16 +271,15 @@
           <i class="fa fa-table"></i>&nbsp;&nbsp;Networks</div>
         <div class="card-body">
           <div class="table-responsive">
-            <table id="ap_table" class="table table-bordered" id="dataTable" width="100%" cellspacing="0" style="font-size: 13px;">
+            <table id="wifi_table" class="table table-bordered" id="dataTable" width="100%" cellspacing="0" style="font-size: 13px;">
               <thead>
                 <tr>
-                  <th>AP</th>
-                  <th>Status</th>
-                  <th>Serial</th>
-                  <th>IP Address</th>
-                  <th>MAC Address</th>
-                  <th>Venue</th>
-                  <th>Tags</th>
+                  <th>Network Name</th>
+                  <th>Description</th>
+                  <th>Type</th>
+                  <th>Venues</th>
+                  <th>APs</th>
+                  <th>VLAN</th>
                 </tr>
               </thead>
               <tbody>

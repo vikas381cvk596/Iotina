@@ -12,6 +12,7 @@ class NetworkService
 {
     public function createNetwork ($network_data_list) 
     {
+        $network_data_list = json_decode($network_data_list, true);
         $return_flag = 'success';
         $network_id = 1;
         $network_id_last = DB::table('network')->orderBy('network_id', 'desc')->first();
@@ -34,8 +35,8 @@ class NetworkService
 
         $network_meta_id = 1;
         $network_meta_id_last = DB::table('network_meta')->orderBy('network_meta_id', 'desc')->first();
-        if (!is_null($network_meta_last)) {
-            $network_meta_id_id = $network_meta_id_last->network_meta_id + 1;
+        if (!is_null($network_meta_id_last)) {
+            $network_meta_id = $network_meta_id_last->network_meta_id + 1;
         }
 
         $networkMetaData = [];
@@ -51,7 +52,7 @@ class NetworkService
             $networkMetaData['passphrase_expiry'] = $network_data_list['passphrase_expiry'];
         }
         if ($network_data_list['backup_passphrase']) {
-            $networkMetaData['backup_passphrase'] = $network_data_list['backup_passphrase'];
+            $networkMetaData['backup_phrase'] = $network_data_list['backup_passphrase'];
         }
         if ($network_data_list['passphrase_length']) {
             $networkMetaData['passphrase_length'] = $network_data_list['passphrase_length'];
@@ -62,19 +63,21 @@ class NetworkService
 
         return $return_flag;
     }
-    public function getAllAccessPoints () {
-        /*$organisationService = new OrganisationService();
+
+    public function getAllWifiNetworks () {
+        $organisationService = new OrganisationService();
         $org_id = $organisationService->getOrganisationID();
 
-        $all_aps = DB::table('access_point')->where(['org_id' => $org_id])->get();
-        $ap_raw = [];
-        foreach ($all_aps as $ap) {
-            $venueService = new VenueService();
-            $venue_name = $venueService->getVenueNameByID($ap->venue_id);
-        
-            $ap->venue_name = $venue_name;
-            $ap_raw[$ap->ap_id] = $ap;
+        $all_networks = DB::table('network')->where(['org_id' => $org_id])->get();
+        $network_raw = [];
+        foreach ($all_networks as $network) {
+            $network_meta = DB::table('network_meta')->where(['network_id' => $network->network_id])->first();
+            if (!is_null($network_meta)) {
+                $network->backup_phrase = $network_meta->backup_phrase;     
+            }
+            
+            $network_raw[$network->network_id] = $network;
         }
-        return $ap_raw; */      
+        return $network_raw;       
     }
 }

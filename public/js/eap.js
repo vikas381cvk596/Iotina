@@ -248,42 +248,40 @@ if (document.getElementById('venue_page'))
   }
 
   $.fn.create_network = function() {
-    var networkData = [];
-    
-    networkData['network_name'] = $('#network_name').val();
-    networkData['network_desc'] = $('#network_desc').val(); 
-    networkData['network_type'] = $('#network_type').val(); 
-
-    networkData['security_protocol'] = $('#security_protocol').val(); 
-    networkData['passphrase_format'] = $('#passphrase_format').val();
-    networkData['passphrase_expiry'] = $('#passphrase_expiry').val();
-    networkData['backup_passphrase'] = $('#backup_passphrase').val();
-    networkData['passphrase_length'] = $('#passphrase_length').val();    
-    alert(networkData['passphrase_length']);
+    var networkData = {
+      'network_name': $('#network_name').val(),
+      'network_desc': $('#network_desc').val(),
+      'network_type': $('#network_type').val(),
+      'security_protocol': $('#security_protocol').val(),
+      'passphrase_format': $('#passphrase_format').val(),
+      'passphrase_expiry': $('#passphrase_expiry').val(),
+      'backup_passphrase': $('#backup_passphrase').val(),
+      'passphrase_length': $('#passphrase_length').val(),
+    };
     
     $.ajax({
       url: "createNetwork",
       type: "POST",
       data: {
-        networkData: networkData,
+        networkData: JSON.stringify(networkData),
         '_token': window.Laravel.csrfToken
       },
       success: function(result) {
-        alert(result);
+        //alert(result);
         console.log(result);
-        /*if (result == 'success') {
+        if (result == 'success') {
           $('#error_msg_crt').hide();
           $('#success_msg_crt').show();
-
-          $.fn.generate_ap_table();
+          $.fn.generate_wifi_table();
         } else {
           $('#error_msg_crt').show();
           $('#error_text').html('Some unexpected error occured.');
           $('#success_msg_crt').hide();
-        }*/
+        }
       }
     });
   }
+  //$.fn.create_network();
 
   $.fn.navigate = function(this_object) {
     var navigate_step_form = $(this_object).attr('link');
@@ -518,79 +516,51 @@ if (document.getElementById('venue_page'))
   $.fn.generate_wifi_table = function() {
     //alert();
     $.ajax({
-      url: "getAllAccessPoints",
+      url: "getAllWifiNetworks",
       type: "POST",
       data: {
         '_token': window.Laravel.csrfToken
       },
-      success: function(all_aps) {
-        //console.log(all_aps);
+      success: function(all_networks) {
+        //alert(all_networks);
+        console.log(all_networks);
         var html_content = '';
-        for (var ap in all_aps) {
-          var venue_name = all_aps[ap]['venue_name'];
-          var ap_crt_date = all_aps[ap]['created_at'];
+        for (var network in all_networks) {
+
+          var network_name = '';
+          if (all_networks[network]['network_name']) {
+            network_name = all_networks[network]['network_name'];
+          }
+
+          var network_desc = '';
+          if (all_networks[network]['network_description']) {
+            network_desc = all_networks[network]['network_description'];
+          }
           
-          var ap_name = '';
-          if (all_aps[ap]['ap_name']) {
-            ap_name = all_aps[ap]['ap_name'];
+          var network_type = '';
+          if (all_networks[network]['network_type']) {
+            network_type = all_networks[network]['network_type'];
           }
-
-          var ap_description = '';
-          if (all_aps[ap]['ap_description']) {
-            ap_description = all_aps[ap]['ap_description'];
+          
+          var backup_phrase = '';
+          if (all_networks[network]['backup_phrase']) {
+            backup_phrase = all_networks[network]['backup_phrase'];
           }
-
-          var ap_serial = '';
-          if (all_aps[ap]['ap_serial']) {
-            ap_serial = all_aps[ap]['ap_serial'];
-          }
-
-          var ap_tags = '';
-          if (all_aps[ap]['ap_tags']) {
-            ap_tags = all_aps[ap]['ap_tags'];
-          }
-
-          var ap_status = '';
-          if (all_aps[ap]['ap_status']) {
-            ap_status = all_aps[ap]['ap_status'];
-          }
-
-          var ap_model = '';
-          if (all_aps[ap]['ap_model']) {
-            ap_model = all_aps[ap]['ap_model'];
-          }
-
-          var ap_ip_address = '';
-          if (all_aps[ap]['ap_ip_address']) {
-            ap_ip_address = all_aps[ap]['ap_ip_address'];
-          }
-
-          var ap_mac_address = '';
-          if (all_aps[ap]['ap_mac_address']) {
-            ap_mac_address = all_aps[ap]['ap_mac_address'];
-          }
-
-          var ap_mesh_role = '';
-          if (all_aps[ap]['ap_mesh_role']) {
-            ap_mesh_role = all_aps[ap]['ap_mesh_role'];
-          }
-
+          
           html_content = html_content+'<tr>';
-          html_content = html_content+'<td>'+ap_name+'<br/>Created On: '+ap_crt_date+'</td>';
-          html_content = html_content+'<td>'+ap_status+'</td>';
-          html_content = html_content+'<td>'+ap_serial+'</td>';
-          html_content = html_content+'<td>'+ap_ip_address+'</td>';
-          html_content = html_content+'<td>'+ap_mac_address+'</td>';
-          html_content = html_content+'<td>'+venue_name+'</td>';
-          html_content = html_content+'<td>'+ap_tags+'</td>';
-          //console.log(all_venues[venue]['venue_id']);
+          html_content = html_content+'<td>'+network_name+'</td>';
+          html_content = html_content+'<td>'+network_desc+'</td>';
+          html_content = html_content+'<td>'+network_type+'</td>';
+          html_content = html_content+'<td></td>';
+          html_content = html_content+'<td></td>';
+          html_content = html_content+'<td></td>';
           html_content = html_content+'</tr>';
         }
-        $('#ap_table tbody').html(html_content);       
+        $('#wifi_table tbody').html(html_content);       
       }
     }); 
   };
-  //$.fn.generate_wifi_table();
+  $.fn.generate_wifi_table();
 
   $.fn.get_all_networks = function() {
     $.ajax({

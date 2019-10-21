@@ -22,5 +22,7 @@ Route::post('/admin/getAllVenues', array('as' => 'getAllVenues', 'uses' => 'AppC
 Route::post('/admin/createAccessPoint', array('as' => 'createAccessPoint', 'uses' => 'AppController@createAccessPoint'));
 Route::post('/admin/getAllAccessPoints', array('as' => 'getAllAccessPoints', 'uses' => 'AppController@getAllAccessPoints'));
 Route::post('/admin/createNetwork', array('as' => 'createNetwork', 'uses' => 'AppController@createNetwork'));
+Route::post('/admin/getAllWifiNetworks', array('as' => 'getAllWifiNetworks', 'uses' => 'AppController@getAllWifiNetworks'));
+
 
 

@@ -43,4 +43,10 @@ class AppController extends Controller
         $result = $apService->getAllAccessPoints();
         return $result;
     }      
+
+    public function getAllWifiNetworks() {
+        $networkService = new NetworkService();
+        $result = $networkService->getAllWifiNetworks();
+        return $result;
+    }
 }
