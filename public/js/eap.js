@@ -585,3 +585,30 @@ if (document.getElementById('venue_page'))
   }
   //$.fn.get_all_networks();
 }
+
+if (document.getElementById('users_page'))
+{
+  $.fn.get_collections_data = function() {
+    $.ajax({
+      url: "getCollectionsData",
+      type: "POST",
+      data: {
+        '_token': window.Laravel.csrfToken
+      },
+      success: function(result) {
+        console.log(result);
+        /*var html_content = '';
+        //alert(all_venues);
+        for (var venue in all_venues) {
+          var venue_name = all_venues[venue]['venue_name'];
+          var venue_id = all_venues[venue]['venue_id'];
+
+          html_content = html_content+'<a class="dropdown-item" data-value="'+venue_id+'">'+venue_name+'</a>';
+        }
+
+        $("#venue_dropdown_options").html(html_content);*/
+      }
+    });
+  }
+  $.fn.get_collections_data();
+}

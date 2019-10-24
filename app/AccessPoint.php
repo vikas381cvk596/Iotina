@@ -3,9 +3,11 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+//use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 
-class AccessPoint extends Model
+class AccessPoint extends Eloquent
 {
+	//protected $connection = 'mongodb';
     protected $primaryKey = 'ap_id';
 
     protected $table = 'access_point';

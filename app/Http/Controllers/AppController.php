@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Services\VenueService;
 use App\Services\AccessPointService;
 use App\Services\NetworkService;
+use App\Services\CollectionService;
 
 class AppController extends Controller
 {
@@ -48,5 +49,11 @@ class AppController extends Controller
         $networkService = new NetworkService();
         $result = $networkService->getAllWifiNetworks();
         return $result;
+    }
+
+    public function getCollectionsData() {
+        $collectionService = new CollectionService();
+        $result = $collectionService->getCollectionsData();
+        return $result;    
     }
 }
