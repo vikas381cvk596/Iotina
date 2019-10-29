@@ -11,8 +11,31 @@
         </li>
         <li class="breadcrumb-item active">Users</li>
       </ol>
-      <!-- Area Chart Example-->
-      
+      <div class="card mb-3">
+        <div class="card-header">
+          <i class="fa fa-users"></i>&nbsp;&nbsp;Clients Connected&nbsp;<span class="clients_count"></span></div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table id="users_table" class="table table-bordered" id="dataTable" width="100%" cellspacing="0" style="font-size: 13px;">
+              <thead>
+                <tr>
+                  <th>IP Address</th>
+                  <th>Venue</th>
+                  <th>AP</th>
+                  <th>Radio Frequency</th>
+                  <th>Bytes Sent</th>
+                  <th>Bytes Received</th>
+                  <th>Signal Strength</th>
+                  <th>Last Connected</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!--<div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div> -->
+      </div>
     </div>
     <!-- /.container-fluid-->
     <!-- /.content-wrapper-->

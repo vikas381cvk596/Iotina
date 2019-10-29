@@ -2,7 +2,7 @@
 
 @section('content')
 
-  <div class="content-wrapper">
+  <div id="analytics_page" class="content-wrapper">
     <div class="container-fluid">
       <!-- Breadcrumbs-->
       <ol class="breadcrumb">
@@ -12,7 +12,14 @@
         <li class="breadcrumb-item active">Analytics</li>
       </ol>
       <!-- Area Chart Example-->
-      
+      <div class="card mb-3">
+        <div class="card-header">
+          <i class="fa fa-area-chart"></i> Client Traffic (5 Minute Interval)</div>
+        <div class="card-body">
+          <canvas id="clientTrafficGraph" width="80%" height="20"></canvas>
+        </div>
+        <div class="card-footer small text-muted"></div>
+      </div>
     </div>
     <!-- /.container-fluid-->
     <!-- /.content-wrapper-->

@@ -595,20 +595,131 @@ if (document.getElementById('users_page'))
       data: {
         '_token': window.Laravel.csrfToken
       },
-      success: function(result) {
-        console.log(result);
-        /*var html_content = '';
-        //alert(all_venues);
-        for (var venue in all_venues) {
-          var venue_name = all_venues[venue]['venue_name'];
-          var venue_id = all_venues[venue]['venue_id'];
+      success: function(sta_data) {
+        var sta_data = JSON.parse(sta_data);
+        console.log(sta_data);
+        var html_content = '';
+        $('.clients_count').html('('+sta_data['count']+')');
+        for (var field in sta_data['sta_data']) {
+          var sta_fields = sta_data['sta_data'][field];
+          var timestamp = sta_fields['timestamp']['$numberLong'];
+          var sta_id = sta_fields['sta_id'];
+          var sta_id = sta_fields['sta_id'];
+          var ip_address = sta_fields['IPV4Address'];
+          var venue_id = sta_fields['venue_id'];
+          var ap_id = sta_fields['ap_id'];
+          var radio_frequency = sta_fields['radio_frequency'];
+          var bytes_sent = sta_fields['BytesSent'];
+          var bytes_received = sta_fields['BytesReceived'];
+          var signal_strength = sta_fields['SignalStrength'];
+          var last_connected = sta_fields['LastConnectTime'];
 
-          html_content = html_content+'<a class="dropdown-item" data-value="'+venue_id+'">'+venue_name+'</a>';
+          html_content = html_content+'<tr>';
+          html_content = html_content+'<input type="hidden" class="sta_id" value="'+sta_id+'">';
+          html_content = html_content+'<td>'+ip_address+'</td>';
+          html_content = html_content+'<td>'+venue_id+'</td>';
+          html_content = html_content+'<td>'+ap_id+'</td>';
+          html_content = html_content+'<td>'+radio_frequency+'</td>';
+          html_content = html_content+'<td>'+bytes_sent+'</td>';
+          html_content = html_content+'<td>'+bytes_received+'</td>';
+          html_content = html_content+'<td>'+signal_strength+'</td>';
+          html_content = html_content+'<td>'+last_connected+'</td>';
+          //console.log(all_venues[venue]['venue_id']);
+          html_content = html_content+'</tr>';
+          
         }
-
-        $("#venue_dropdown_options").html(html_content);*/
+        $('#users_table tbody').html(html_content);
       }
     });
   }
   $.fn.get_collections_data();
 }
+
+if (document.getElementById('analytics_page'))
+{
+  $.fn.get_clients_graph_data = function() {
+    $.ajax({
+      url: "getClientsTrafficGraphData",
+      type: "POST",
+      data: {
+        '_token': window.Laravel.csrfToken
+      },
+      success: function(graph_data) {
+        console.log(graph_data);
+        var graph_data = JSON.parse(graph_data);
+        var dataPointsCount = graph_data['dataPointsCount'];
+        console.log(dataPointsCount);
+        var dataPoints = graph_data['dataPoints'];
+        console.log(dataPoints);
+        //console.log(graph_data);
+        
+        var dataPointsTime = [];
+        var today = new Date();
+        var current_time = today.getHours() + ":" + today.getMinutes();
+        var interval = 5;
+        for (i=0; i<dataPointsCount; i++) {
+          dataPointsTime[i] = current_time;
+          today.setMinutes(today.getMinutes() + interval);
+          current_time = today.getHours() + ":" + today.getMinutes();
+        }
+        
+
+        var temp_today = new Date();
+        temp_today.setMinutes(today.getMinutes() - 5);
+        
+
+        var ctx2 = document.getElementById("clientTrafficGraph");
+        var myLineChart = new Chart(ctx2, {
+          type: 'line',
+          data: {
+            labels: dataPointsTime,
+            datasets: [{
+              label: "Sessions",
+              lineTension: 0.3,
+              backgroundColor: "rgba(2,117,216,0.2)",
+              borderColor: "rgba(2,117,216,1)",
+              pointRadius: 5,
+              pointBackgroundColor: "rgba(2,117,216,1)",
+              pointBorderColor: "rgba(255,255,255,0.8)",
+              pointHoverRadius: 5,
+              pointHoverBackgroundColor: "rgba(2,117,216,1)",
+              pointHitRadius: 20,
+              pointBorderWidth: 2,
+              data: dataPoints,
+            }],
+          },
+          options: {
+            scales: {
+              xAxes: [{
+                time: {
+                  unit: 'date'
+                },
+                gridLines: {
+                  display: false
+                },
+                ticks: {
+                  maxTicksLimit: 7
+                }
+              }],
+              yAxes: [{
+                ticks: {
+                  min: 0,
+                  max: 1000,
+                  maxTicksLimit: 5
+                },
+                gridLines: {
+                  color: "rgba(0, 0, 0, .125)",
+                }
+              }],
+            },
+            legend: {
+              display: false
+            }
+          }
+        });
+      }
+    });
+  }
+  $.fn.get_clients_graph_data();
+}
+

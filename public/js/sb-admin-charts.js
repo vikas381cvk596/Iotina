@@ -52,6 +52,10 @@ var myLineChart = new Chart(ctx, {
     }
   }
 });
+
+// -- Clients Traffic Chart
+
+
 // -- Bar Chart Example
 var ctx = document.getElementById("myBarChart");
 var myLineChart = new Chart(ctx, {

@@ -24,6 +24,7 @@ Route::post('/admin/getAllAccessPoints', array('as' => 'getAllAccessPoints', 'us
 Route::post('/admin/createNetwork', array('as' => 'createNetwork', 'uses' => 'AppController@createNetwork'));
 Route::post('/admin/getAllWifiNetworks', array('as' => 'getAllWifiNetworks', 'uses' => 'AppController@getAllWifiNetworks'));
 Route::post('/admin/getCollectionsData', array('as' => 'getCollectionsData', 'uses' => 'AppController@getCollectionsData'));
+Route::post('/admin/getClientsTrafficGraphData', array('as' => 'getClientsTrafficGraphData', 'uses' => 'AppController@getClientsTrafficGraphData'));
 
 
 

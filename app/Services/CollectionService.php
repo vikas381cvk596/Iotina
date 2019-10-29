@@ -2,17 +2,15 @@
 
 namespace App\Services;
 
-use App\Venue;
-use DB;
-use App\Services\OrganisationService;
 use MongoDB\Client;
 //use MongoDB\BSON\ObjectId;
-       
+use DateTime;
+use MongoDB\BSON\UTCDateTime;
 class CollectionService
 {
     public function getCollectionsData() {
         $client = new Client;
-        $collection = $client->eap->apTable;
+        $collection = $client->eap->staTable;
         /*$manager = new MongoDB\Driver\Manager("mongodb://localhost:27017");
         //$connect = connect();
         //$document = $collection->findOne(['_id' => '123']);
@@ -20,79 +18,156 @@ class CollectionService
         //$mongoId = '5dad7d014d17a5393a0991ff';
 
         //$document = $collection->find(['_id'=> ObjectId("$mongoId")]);*/
-        return var_dump($collection);
-    }
+        /*$cursor = $collection->find(['IPV4Add' => '192.168.76.1']);
+        $docs = [];
+        foreach ($cursor as $document) {
+            $docs[] = $document['_id'];
+        }*/
 
-    public function createVenue ($venue_name, $venue_desc, $venue_add, $venue_add_notes) 
-    {
-        $return_flag = 'success';
-        if ($this->venueExists($venue_name)) {
+        /*$cursor = $collection->aggregate([
+            ['$group' => ['_id' => '$state', 'count' => ['$sum' => 1]]],
+            ['$sort' => ['count' => -1]],
+            ['$limit' => 5],
+        ]);*/
 
-            $venue_id = 1;
-            $venue_id_last = DB::table('venue')->orderBy('venue_id', 'desc')->first();
-            if (!is_null($venue_id_last)) {
-                $venue_id = $venue_id_last->venue_id + 1;
-            }
+        $pipeline = [ 
+            [ 
+                '$match' => [ 
+                    'org_id' => 1,
+                    'timestamp' => [ 
+                        '$gt' => 1571650955404
+                    ] 
+ 
+                ] 
+            ], [ 
+                '$sort' => [ 
+                    'sta_id' => -1.0 
+                ] 
+            ], [ 
+                '$group' => [ 
+                    '_id' => '$sta_id', 
+                    'data' => [ 
+                        '$first' => '$$ROOT' 
+                    ] 
+                ] 
+            ] 
+        ]; 
 
-            $organisationService = new OrganisationService();
-            $org_id = $organisationService->getOrganisationID();
-            $venueData['venue_id'] = $venue_id;
-            $venueData['org_id'] = $org_id;
-            $venueData['venue_name'] = $venue_name;
-            $venueData['venue_address'] = $venue_add;
-            if ($venue_desc) {
-                $venueData['venue_description'] = $venue_desc;
-            }
-            if ($venue_add_notes) {
-                $venueData['venue_address_notes'] = $venue_add_notes;
-            }
-            Venue::create($venueData);
-        } else {
-            $return_flag = 'venue_name_error';
+        $options = [];
+        $cursor = $collection->aggregate($pipeline, $options); 
+
+        $data = [];
+        foreach ($cursor as $document) { 
+            $data[$document['_id']] = $document['data']; 
         }
 
-        return $return_flag;
+        $results = new \stdClass();
+        $results->count = sizeof($data);
+        $results->sta_data = $data;
+        $results = json_encode($results);
+        return $results;
     }
 
-    public function venueExists ($venue_name) 
-    {
-        $venue_record = DB::table('venue')->where(['venue_name' => $venue_name])->first();
-        if (!is_null($venue_record)) {
-            return false;
+    public function getClientsTrafficGraphData() {
+        $client = new Client;
+        $collection = $client->eap->apTable;
+        $date = new UTCDateTime(0);
+        $pipeline = [
+            [
+                '$match' => [
+                    '$and' => [
+                        [
+                            'org_id' => 1
+                        ], [
+                            'timestamp' => [
+                                '$gt' => 1571650989999
+                            ]
+                        ], [
+                            'timestamp' => [
+                                '$lt' => 1572003684094
+                            ]
+                        ]
+                    ]
+                ]
+            ], [
+                '$group' => [
+                    '_id' => [
+                        'year' => [
+                            '$year' => [
+                                '$add' => [
+                                    $date, '$timestamp'
+                                ]
+                            ]
+                        ],
+                        'dayOfYear' => [
+                            '$dayOfYear' => [
+                                '$add' => [
+                                    $date, '$timestamp'
+                                ]
+                            ]
+                        ],
+                        'hour' => [
+                            '$hour' => [
+                                '$add' => [
+                                    $date, '$timestamp'
+                                ]
+                            ]
+                        ],
+                        'interval' => [
+                            '$subtract' => [
+                                [
+                                    '$minute' => [
+                                        '$add' => [
+                                            $date, '$timestamp'
+                                        ]
+                                    ]
+                                ], [
+                                    '$mod' => [
+                                        [
+                                            '$minute' => [
+                                                '$add' => [
+                                                    $date, '$timestamp'
+                                                ]
+                                            ]
+                                        ], 1.0
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    'count' => [
+                        '$sum' => '$NumberOfSTA'
+                    ]
+                ]
+            ], [
+                '$project' => [
+                    '_id' => 0.0,
+                    'count' => 1.0
+                ]
+            ]
+        ];
+
+
+
+
+        $options = [];
+        $cursor = $collection->aggregate($pipeline, $options); 
+
+        $data = [];
+        $count = [];
+        $count = 0;
+        foreach ($cursor as $document) { 
+            $data[] = $document['count'];
+            $count = $count + 1; 
+            //$count[] = $document['_count'];
         }
-        return true;
-    }
 
-    public function getAllVenues () {
-        $organisationService = new OrganisationService();
-        $org_id = $organisationService->getOrganisationID();
-
-        //$venue_raw['2'] = 'aaa';
-
-        $all_venues = DB::table('venue')->where(['org_id' => $org_id])->get();
-        $venue_raw = [];
-        foreach ($all_venues as $venue) {
-            $network_raw = DB::table('network_venue_mapping')->where(['venue_id' => $venue->venue_id, 'org_id' => $org_id])->get();
-            $networkCount = $network_raw->count();
-
-            $ap_raw = DB::table('access_point')->where(['venue_id' => $venue->venue_id, 'org_id' => $org_id])->get();
-            $apCount = $ap_raw->count();
-
-
-            $venue->network_count = $networkCount;
-            $venue->ap_count = $apCount;
-            $venue_raw[$venue->venue_id] = $venue;
-        }
-        return $venue_raw;       
-    }
-
-    public function getVenueNameByID ($venue_id) {
-        $venue = DB::table('venue')->where(['venue_id' => $venue_id])->first();
-        $venue_name = '';
-        if (!is_null($venue)) {
-            $venue_name = $venue->venue_name;
-        }
-        
-        return $venue_name;       
+        $results = new \stdClass();
+        $results->dataPointsCount = $count;
+        $results->dataPoints = $data;
+        $results = json_encode($results);
+        return $results;
+        //return var_dump($cursor);
+        //return json_encode($data);   
     }
 }

@@ -56,4 +56,11 @@ class AppController extends Controller
         $result = $collectionService->getCollectionsData();
         return $result;    
     }
+    
+    public function getClientsTrafficGraphData() {
+        $collectionService = new CollectionService();
+        $result = $collectionService->getClientsTrafficGraphData();
+        return $result;    
+    }
+    
 }
