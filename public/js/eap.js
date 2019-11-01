@@ -223,6 +223,8 @@ if (document.getElementById('venue_page'))
           if (all_aps[ap]['ap_status']) {
             if (all_aps[ap]['ap_status'] == "not_yet_connected") {
               ap_status = "Not Yet Connected";
+            } else {
+              ap_status = all_aps[ap]['ap_status'];
             }
           }
 
@@ -741,7 +743,7 @@ if (document.getElementById('analytics_page'))
         console.log(dataPoints);
         //console.log(graph_data);
         var maxDataPoint = Math.max.apply(null, dataPoints);
-        maxDataPoint = maxDataPoint + maxDataPoint/5;
+        maxDataPoint = 2500;
 
         var dataPointsTime = [];
         var today = new Date();
@@ -793,7 +795,7 @@ if (document.getElementById('analytics_page'))
               }],
               yAxes: [{
                 ticks: {
-                  min: 0,
+                  min: 5,
                   max: maxDataPoint,
                   maxTicksLimit: 5
                 },

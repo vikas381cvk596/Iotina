@@ -191,6 +191,37 @@ class CollectionService
 
     public function getAPStatus($org_id, $ap_serial) {
         $status = 'not_yet_connected';
-        return $status;
+        $ip_address = '';
+        
+        $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
+        $collection = $client->eapDb->apTable;
+        /*$cursor = $collection->find(['NumberOfSTA' => '36']);
+
+        foreach ($cursor as $document) {
+            $status = "connected";
+            $ip_address = $document['ip_address'];            
+            break;
+        }*/
+
+        $query = [];
+
+        $options = [];
+
+        //$cursor = $collection->find($query, $options);
+        $cursor = $collection->find(['ap_id' => $ap_serial, 'org_id' => 1]);
+        
+        //$cursor = $collection->find(['_id'=> ObjectId("$mongoId")]); 
+        $data = [];
+        foreach ($cursor as $document) { 
+            $status = "connected";
+            $ip_address = $document['IPV4Add'];            
+            break;
+        }
+
+        $ap = new \stdClass();
+        $ap->status = $status;
+        $ap->ip_address = $ip_address;
+        $ap = json_encode($ap);
+        return $ap;
     }
 }

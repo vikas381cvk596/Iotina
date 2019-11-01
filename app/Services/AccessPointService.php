@@ -53,8 +53,13 @@ class AccessPointService
 
             if ($ap->ap_status == 'not_yet_connected') {
                 $collectionService = new CollectionService();
-                $status = $collectionService->getAPStatus($org_id, $ap->ap_serial);
-                $ap->status = $status;
+                $ap_mongo = $collectionService->getAPStatus($org_id, $ap->ap_serial);
+                $ap_mongo = json_decode($ap_mongo);
+                $ap->ap_status = $ap_mongo->status;
+                if ($ap_mongo->status == "connected") {
+                    $ap->ap_ip_address = $ap_mongo->ip_address;      
+                }
+
             }
             $ap_raw[$ap->ap_id] = $ap;
         }
