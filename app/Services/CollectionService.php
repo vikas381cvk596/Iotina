@@ -9,8 +9,10 @@ use MongoDB\BSON\UTCDateTime;
 class CollectionService
 {
     public function getCollectionsData() {
-        $client = new Client;
+        //$client = new Client;
+        $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
         $collection = $client->eap->staTable;
+
         /*$manager = new MongoDB\Driver\Manager("mongodb://localhost:27017");
         //$connect = connect();
         //$document = $collection->findOne(['_id' => '123']);
@@ -69,7 +71,9 @@ class CollectionService
     }
 
     public function getClientsTrafficGraphData() {
-        $client = new Client;
+        //$client = new Client;
+        $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
+        
         $collection = $client->eap->apTable;
         $date = new UTCDateTime(0);
         $pipeline = [
