@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Network;
 use App\NetworkMeta;
+use App\NetworkVenueMapping;
 use DB;
 use App\Services\OrganisationService;
 use App\Services\VenueService;
@@ -31,6 +32,9 @@ class NetworkService
         }
         if ($network_data_list['network_desc']) {
             $networkData['network_description'] = $network_data_list['network_desc'];
+        }
+        if ($network_data_list['network_vlan']) {
+            $networkData['network_vlan'] = $network_data_list['network_vlan'];
         }
 
         $network_meta_id = 1;
@@ -61,6 +65,25 @@ class NetworkService
         Network::create($networkData);
         NetworkMeta::create($networkMetaData);
 
+        if ($network_data_list['network_venues']) {
+            //getNetworkIDByName()
+            $network_venues = json_decode($network_data_list['network_venues']);
+            foreach ($network_venues as $venue_id) {
+                $networkVenueData = [];
+
+                $network_venue_id_last = DB::table('network_venue_mapping')->orderBy('network_venue_id', 'desc')->first();
+                if (!is_null($network_venue_id_last)) {
+                    $network_venue_id = $network_venue_id_last->network_venue_id + 1;
+                }
+                $network_venue_id = 1;
+                $networkVenueData['network_venue_id'] = $network_venue_id;
+                $networkVenueData['network_id'] = $network_id;
+                $networkVenueData['org_id'] = $org_id;
+                $networkVenueData['venue_id'] = $venue_id;
+                NetworkVenueMapping::create($networkVenueData);
+            }
+        }
+        
         return $return_flag;
     }
 
@@ -75,9 +98,62 @@ class NetworkService
             if (!is_null($network_meta)) {
                 $network->backup_phrase = $network_meta->backup_phrase;     
             }
-            
+
+            $nv_mapping = DB::table('network_venue_mapping')->where(['network_id' => $network->network_id, 'org_id' => $network->org_id])->get();
+            /*if (!$count_venue) {
+                $count_venue = '0';
+            }*/
+            /*$count_venue = DB::table('network_venue_mapping')->where(['network_id' => $network->network_id, 'org_id' => $network->org_id])->count();*/
+            $count_venue = 0;
+            $count_ap = 0;
+            if ($nv_mapping) {
+                $count_venue = count($nv_mapping);
+            }
+
+            foreach ($nv_mapping as $venue) {
+                $access_points = DB::table('access_point')->where(['venue_id' => $venue->venue_id, 'org_id' => $network->org_id])->get();
+
+                if ($access_points) {
+                    $count_ap = $count_ap + count($access_points);
+                }
+            }
+
+            $network->count_venue = strval($count_venue);
+            $network->count_ap = strval($count_ap);
             $network_raw[$network->network_id] = $network;
         }
         return $network_raw;       
+    }
+
+    public function duplicateNetworkName ($network_name) 
+    {
+        $organisationService = new OrganisationService();
+        $org_id = $organisationService->getOrganisationID();
+        $network = DB::table('network')->where(['org_id' => $org_id, 'network_name' => $network_name])->first();
+        if ($network) {
+            return 'duplicate';
+        }
+        return 'not-duplicate';
+    }
+
+    public function getAllNetworkDataByVenueID($org_id, $venue_id) 
+    {
+
+        $query = "select DISTINCT(n.network_name) from network n, network_venue_mapping v where n.network_id = v.network_id and v.venue_id = ".$venue_id." and n.org_id = ".$org_id.";";
+        
+        $results = DB::select($query);
+        $network_names = [];
+        foreach ($results as $row) {
+            $network_names[] = $row->network_name;
+        }
+        return $network_names;
+        /*$network_mapping = DB::table('network_venue_mapping')->where(['org_id' => $org_id, 'venue_id' => $venue_id])->get();
+        $network_raw = [];
+        foreach ($network_mapping as $network_map) {
+            $network_id = $network_map->network_id
+            $network_meta = DB::table('network_meta')->where(['network_id' => $network->network_id])->first();
+            if (!is_null($network_meta)) {
+                $network->backup_phrase = $network_meta->backup_phrase;     
+            }*/
     }
 }

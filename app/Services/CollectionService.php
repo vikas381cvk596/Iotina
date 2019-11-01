@@ -170,4 +170,9 @@ class CollectionService
         //return var_dump($cursor);
         //return json_encode($data);   
     }
+
+    public function getAPStatus($org_id, $ap_serial) {
+        $status = 'not_yet_connected';
+        return $status;
+    }
 }

@@ -16,6 +16,7 @@ Route::get('/admin/register', 'AuthController@showRegisterPage');
 Route::post('/admin/user_login', 'AuthController@loginUser');
 Route::post('/admin/registerUser', 'AuthController@registerUser');
 Route::get('/admin/logout', 'AuthController@logoutUser');
+Route::get('/admin/testGetCollectionsData', 'AppController@testGetCollectionsData');
 Route::get('/admin/{page?}', 'AuthController@anyPage')->name('anyPage');
 Route::post('/admin/createVenue', array('as' => 'createVenue', 'uses' => 'AppController@createVenue'));
 Route::post('/admin/getAllVenues', array('as' => 'getAllVenues', 'uses' => 'AppController@getAllVenues'));
@@ -25,6 +26,11 @@ Route::post('/admin/createNetwork', array('as' => 'createNetwork', 'uses' => 'Ap
 Route::post('/admin/getAllWifiNetworks', array('as' => 'getAllWifiNetworks', 'uses' => 'AppController@getAllWifiNetworks'));
 Route::post('/admin/getCollectionsData', array('as' => 'getCollectionsData', 'uses' => 'AppController@getCollectionsData'));
 Route::post('/admin/getClientsTrafficGraphData', array('as' => 'getClientsTrafficGraphData', 'uses' => 'AppController@getClientsTrafficGraphData'));
+Route::post('/admin/duplicateNetworkName', array('as' => 'duplicateNetworkName', 'uses' => 'AppController@duplicateNetworkName'));
+Route::post('/api/accesspoint', array('as' => 'getAPData', 'uses' => 'AppController@getAPData'));
+
+
+
 
 
 

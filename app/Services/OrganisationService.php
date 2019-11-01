@@ -13,7 +13,7 @@ class OrganisationService
     {
     	$org_id = 0; //Org Already Exists Error
     	$org_record = DB::table('organisation')->where(['org_name' => $org_name])->first();
-    	if (is_null($org_record)) {
+    	if (!$org_record) {
 
     		$org_id = 1;
     		$org_id_last = DB::table('organisation')->orderBy('org_id', 'desc')->first();
@@ -36,5 +36,14 @@ class OrganisationService
             $org_id = $user_record->org_id;
         }
         return $org_id;
+    } 
+
+    public function getOrganisationDetails($org_id) {
+        $org_name = '';
+        $org_record = DB::table('organisation')->where(['org_id' => $org_id])->first();
+        if (!is_null($org_record)) {
+            $org_name = $org_record->org_name;
+        }
+        return $org_name;
     }       
 }

@@ -71,11 +71,23 @@ if (document.getElementById('venue_page'))
             venue_add_notes = all_venues[venue]['venue_address_notes'];
           }
 
+          var network_count = '0';
+          if (all_venues[venue]['network_count']) {
+            network_count = all_venues[venue]['network_count'];
+          }
+
+          var ap_count = '0';
+          if (all_venues[venue]['ap_count']) {
+            ap_count = all_venues[venue]['ap_count'];
+          }
+
           html_content = html_content+'<tr>';
           html_content = html_content+'<td>'+venue_name+'<br/>Created On: '+venue_crt_date+'</td>';
           html_content = html_content+'<td>'+venue_desc+'</td>';
           html_content = html_content+'<td>'+venue_add+'</td>';
           html_content = html_content+'<td>'+venue_add_notes+'</td>';
+          html_content = html_content+'<td>'+network_count+'</td>';
+          html_content = html_content+'<td>'+ap_count+'</td>';
           //console.log(all_venues[venue]['venue_id']);
           html_content = html_content+'</tr>';
         }
@@ -89,10 +101,23 @@ if (document.getElementById('venue_page'))
 
 } else if (document.getElementById('ap_page')) {
 
-  $("#ap_page").on('click', '.dropdown-item', function() {
+  $("#ap_page").on('click', '#venue_dropdown_options .dropdown-item', function() {
     $(this).parents(".dropdown").find('.btn').html($(this).text());
     var venue_name = $(this).attr('data-value');
     $('#venue_id').val(venue_name);
+  });
+
+  $("#ap_page").on('click', '#ap_identifier_options .dropdown-item', function() {
+    $(this).parents(".dropdown").find('.btn').html($(this).text());
+    var ap_identifier = $(this).attr('data-value');
+    $('#ap_identifier').val(ap_identifier);
+
+    $('#ap_serial').fadeIn();  
+    if (ap_identifier == "Serial Number") {
+      $('#ap_serial').attr('placeholder','Serial Number');
+    } else if (ap_identifier == "MAC Address") {
+      $('#ap_serial').attr('placeholder','MAC Address');
+    } 
   });
 
   $("#ap_page").on('click', '#btn_add_ap', function() {
@@ -103,10 +128,11 @@ if (document.getElementById('venue_page'))
     var venue_id = $('#venue_id').val();
     var ap_name = $('#ap_name').val();
     var ap_desc = $('#ap_desc').val();
+    var ap_identifier = $('#ap_identifier').val();
     var ap_serial = $('#ap_serial').val();
     var ap_tags = $('#ap_tags').val();
     //alert(venue_id+"::"+ap_name+"::"+ap_serial);
-    if (venue_id == '' || ap_name == '' || ap_serial == '') {
+    if (venue_id == '' || ap_name == '' || ap_identifier == '' || ap_serial == '') {
       $('#error_msg_crt').show();
       $('#error_text').html('Fields marked with * are mandatory');
       $('#success_msg_crt').hide();
@@ -118,6 +144,7 @@ if (document.getElementById('venue_page'))
           venue_id: venue_id,
           ap_name: ap_name,
           ap_desc: ap_desc,
+          ap_identifier: ap_identifier,
           ap_serial: ap_serial,
           ap_tags: ap_tags,
           '_token': window.Laravel.csrfToken
@@ -166,9 +193,25 @@ if (document.getElementById('venue_page'))
             ap_description = all_aps[ap]['ap_description'];
           }
 
+          var ap_identifier = '';
+          if (all_aps[ap]['ap_identifier']) {
+            ap_identifier = all_aps[ap]['ap_identifier'];
+          }
+
           var ap_serial = '';
           if (all_aps[ap]['ap_serial']) {
             ap_serial = all_aps[ap]['ap_serial'];
+          }
+
+          var ap_mac_address = '';
+          if (all_aps[ap]['ap_mac_address']) {
+            ap_mac_address = all_aps[ap]['ap_mac_address'];
+          }
+
+          if (ap_identifier == "MAC Address") {
+            ap_mac_address = ap_serial;
+            ap_serial = '';
+
           }
 
           var ap_tags = '';
@@ -176,9 +219,11 @@ if (document.getElementById('venue_page'))
             ap_tags = all_aps[ap]['ap_tags'];
           }
 
-          var ap_status = '';
+          var ap_status = 'Not Yet Connected';
           if (all_aps[ap]['ap_status']) {
-            ap_status = all_aps[ap]['ap_status'];
+            if (all_aps[ap]['ap_status'] == "not_yet_connected") {
+              ap_status = "Not Yet Connected";
+            }
           }
 
           var ap_model = '';
@@ -189,11 +234,6 @@ if (document.getElementById('venue_page'))
           var ap_ip_address = '';
           if (all_aps[ap]['ap_ip_address']) {
             ap_ip_address = all_aps[ap]['ap_ip_address'];
-          }
-
-          var ap_mac_address = '';
-          if (all_aps[ap]['ap_mac_address']) {
-            ap_mac_address = all_aps[ap]['ap_mac_address'];
           }
 
           var ap_mesh_role = '';
@@ -248,15 +288,25 @@ if (document.getElementById('venue_page'))
   }
 
   $.fn.create_network = function() {
+    var network_venues = [];
+    $('.venue_checkbox').each(function() {
+      if ($(this).is(':checked')) {
+        console.log('ID::::'+$(this).closest('tr').find('.venue_id').val());
+        network_venues.push($(this).closest('tr').find('.venue_id').val());
+      }       
+    });
+
     var networkData = {
       'network_name': $('#network_name').val(),
       'network_desc': $('#network_desc').val(),
       'network_type': $('#network_type').val(),
+      'network_vlan': $('#network_vlan').val(),
       'security_protocol': $('#security_protocol').val(),
       'passphrase_format': $('#passphrase_format').val(),
       'passphrase_expiry': $('#passphrase_expiry').val(),
       'backup_passphrase': $('#backup_passphrase').val(),
       'passphrase_length': $('#passphrase_length').val(),
+      'network_venues': JSON.stringify(network_venues),
     };
     
     $.ajax({
@@ -512,6 +562,29 @@ if (document.getElementById('venue_page'))
     }
   });
 
+  $("#network_name").on('change', function() {
+    if ($(this).val()) {
+      $('.error-text-network-name').html('');
+      $.ajax({
+        url: "duplicateNetworkName",
+        type: "POST",
+        data: {
+          'network_name': $(this).val(),
+          '_token': window.Laravel.csrfToken
+        },
+        success: function(status) {
+          console.log(status);
+          if (status == 'duplicate') {
+            $('#network_name').val('');
+            $('.error-text-network-name').html('* Network name must be unique');
+          } else {
+              $('.error-text-network-name').html('');
+          }
+          $.fn.reset_btn_states();
+        }
+      });       
+    }
+  });
 
   $.fn.generate_wifi_table = function() {
     //alert();
@@ -541,19 +614,34 @@ if (document.getElementById('venue_page'))
           if (all_networks[network]['network_type']) {
             network_type = all_networks[network]['network_type'];
           }
+
+          var network_vlan = '';
+          if (all_networks[network]['network_vlan']) {
+            network_vlan = all_networks[network]['network_vlan'];
+          }
           
           var backup_phrase = '';
           if (all_networks[network]['backup_phrase']) {
             backup_phrase = all_networks[network]['backup_phrase'];
+          }
+
+          var count_venue = '';
+          if (all_networks[network]['count_venue']) {
+            count_venue = all_networks[network]['count_venue'];
+          }
+
+          var count_ap = '';
+          if (all_networks[network]['count_ap']) {
+            count_ap = all_networks[network]['count_ap'];
           }
           
           html_content = html_content+'<tr>';
           html_content = html_content+'<td>'+network_name+'</td>';
           html_content = html_content+'<td>'+network_desc+'</td>';
           html_content = html_content+'<td>'+network_type+'</td>';
-          html_content = html_content+'<td></td>';
-          html_content = html_content+'<td></td>';
-          html_content = html_content+'<td></td>';
+          html_content = html_content+'<td>'+count_venue+'</td>';
+          html_content = html_content+'<td>'+count_ap+'</td>';
+          html_content = html_content+'<td>'+network_vlan+'</td>';
           html_content = html_content+'</tr>';
         }
         $('#wifi_table tbody').html(html_content);       
@@ -722,4 +810,7 @@ if (document.getElementById('analytics_page'))
   }
   $.fn.get_clients_graph_data();
 }
-
+if (document.getElementById('test_page'))
+{
+  console.log(JSON.parse($('#results_hidden').val()));
+}

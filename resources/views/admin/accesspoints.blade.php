@@ -59,17 +59,37 @@
                       </div>
                     </div>  
                   </div>
-                  <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; width: 30vw;">
-                    <div class="form-group" style="width: 15vw;">
-                      <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600;">* Serial Number</div>
-                      <div class='input-group'>
-                        <input type="text" id="ap_serial" name="ap_serial" class="form-control" class="form-control" placeholder="Serial" style="font-size: 14px;"/>
-                      </div>
-                    </div>  
-                    <div class="form-group" style="padding-left: 20px;width: 15vw;">
+                  <div style="display: flex; flex-direction: row; align-items: center; justify-content: flex-start; width: 30vw;">
+                      
+                    <div class="form-group" style="width: 20vw;">
                       <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600;">Tags</div>
                       <div class='input-group'>
                         <input type="text" id="ap_tags" name="ap_tags" class="form-control" class="form-control" placeholder="Add a tag" style="font-size: 14px;"/>
+                      </div>
+                    </div>
+                  </div>
+                  <div style="display: flex; flex-direction: row; align-items: flex-start; justify-content: flex-start; width: 30vw;">
+                    <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center; width: 16vw;">
+                      <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600;">* Identifier</div>
+                      <div class="dropdown" style="">
+                        <input type="hidden" id="ap_identifier" name="ap_identifier" class="form-control" />
+                        <button class="btn btn-default dropdown-toggle" type="button" id="ap_identifier_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size: 14px; background-color: #fff; border: 1px solid #c3c3c3; width: 10vw; color: #696969; width: 15vw; text-align: left;">
+                            Select
+                        </button>
+                        <div class="dropdown-menu" id="ap_identifier_options" aria-labelledby="ap_identifier_dropdown">
+                            <a class="dropdown-item" style="" data-value="Serial Number">
+                              <span class="title_text_dropdown" style="font-size: 14px; font-weight: 600;">Serial Number</span>
+                            </a>
+                            <a class="dropdown-item" style="" data-value="MAC Address">
+                              <span class="title_text_dropdown" style="font-size: 14px; font-weight: 600;">MAC Address</span>
+                            </a>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group" style="padding-left: 20px;width: 15vw;">
+                      <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600; opacity: 0;">A</div>
+                      <div class='input-group'>
+                        <input type="text" id="ap_serial" name="ap_serial" class="form-control" class="form-control" placeholder="Serial" style="font-size: 14px; display: none;"/>
                       </div>
                     </div>
                   </div>

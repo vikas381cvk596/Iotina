@@ -40,6 +40,7 @@
                           <div class='input-group'>
                             <input type="text" id="network_name" name="network_name" class="form-control form-fields" class="form-control" placeholder="Network Name" style="font-size: 14px;"/>
                           </div>
+                          <div class='error-text-network-name' style="text-align: left; font-size: 14px; color: #840808; font-weight: 600;"></div>
                         </div> 
                       </div>
 
@@ -69,6 +70,15 @@
                                     </a>
                                 </div>
                             </div>        
+                        </div> 
+                      </div>
+
+                      <div style="display: flex; flex-direction: row; align-items: center; justify-content: flex-start; width: 30vw;">
+                        <div class="form-group" style="width: 20vw;">
+                          <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600;">VLAN</div>
+                          <div class='input-group'>
+                            <input type="text" id="network_vlan" name="network_vlan" class="form-control form-fields" class="form-control" placeholder="VLAN" style="font-size: 14px;"/>
+                          </div>
                         </div> 
                       </div>
                     </div>
@@ -145,6 +155,10 @@
                               <a class="dropdown-item" style="" data-value="2-days"><span class="title_text_dropdown" style="font-size: 14px; font-weight: 600;">2 days</span></a>
                               <a class="dropdown-item" style="" data-value="1-week"><span class="title_text_dropdown" style="font-size: 14px; font-weight: 600;">1 week</span></a>
                               <a class="dropdown-item" style="" data-value="2-weeks"><span class="title_text_dropdown" style="font-size: 14px; font-weight: 600;">2 weeks</span></a>
+                              <a class="dropdown-item" style="" data-value="1-month"><span class="title_text_dropdown" style="font-size: 14px; font-weight: 600;">1 month</span></a>
+                              <a class="dropdown-item" style="" data-value="6-months"><span class="title_text_dropdown" style="font-size: 14px; font-weight: 600;">6 months</span></a>
+                              <a class="dropdown-item" style="" data-value="1-year"><span class="title_text_dropdown" style="font-size: 14px; font-weight: 600;">1 year</span></a>
+                              <a class="dropdown-item" style="" data-value="2-years"><span class="title_text_dropdown" style="font-size: 14px; font-weight: 600;">2 years</span></a>
                             </div>
                           </div>
                         </div>

@@ -11,6 +11,6 @@ class Network extends Model
     protected $table = 'network';
 
     protected $fillable = [
-        'org_id', 'network_name', 'network_description', 'network_type', 'network_status'
+        'org_id', 'network_name', 'network_description', 'network_type', 'network_status', 'network_vlan'
     ];
 }

@@ -493,6 +493,12 @@ footer.sticky-footer {
   top: 40%;
 }
 
+#ap_page #ap_identifier_dropdown::after {
+  position: absolute!important;
+  right: 10px!important;
+  top: 40%!important;
+}
+
 #wifi_page .btn-next-class {
   background-color: #d3d3d3; 
   border: #f2f2f2;
