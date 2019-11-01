@@ -11,7 +11,7 @@ class CollectionService
     public function getCollectionsData() {
         //$client = new Client;
         $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
-        $collection = $client->eap->staTable;
+        $collection = $client->eapDb->staTable;
 
         /*$manager = new MongoDB\Driver\Manager("mongodb://localhost:27017");
         //$connect = connect();
@@ -62,7 +62,18 @@ class CollectionService
         foreach ($cursor as $document) { 
             $data[$document['_id']] = $document['data']; 
         }
+        
+        /*$query = [];
 
+        $options = [];
+
+        $cursor = $collection->find($query, $options);
+        //$cursor = $collection->find(['_id'=> ObjectId("$mongoId")]); 
+        $data = [];
+        foreach ($cursor as $document) { 
+            $data[] = $document['_id']; 
+        }*/
+        
         $results = new \stdClass();
         $results->count = sizeof($data);
         $results->sta_data = $data;
@@ -74,8 +85,9 @@ class CollectionService
         //$client = new Client;
         $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
         
-        $collection = $client->eap->apTable;
+        $collection = $client->eapDb->apTable;
         $date = new UTCDateTime(0);
+        $current_time = round(microtime(true) * 1000);
         $pipeline = [
             [
                 '$match' => [
@@ -84,11 +96,11 @@ class CollectionService
                             'org_id' => 1
                         ], [
                             'timestamp' => [
-                                '$gt' => 1571650989999
+                                '$gt' => 1569926376000
                             ]
                         ], [
                             'timestamp' => [
-                                '$lt' => 1572003684094
+                                '$lt' => $current_time
                             ]
                         ]
                     ]
@@ -133,7 +145,7 @@ class CollectionService
                                                     $date, '$timestamp'
                                                 ]
                                             ]
-                                        ], 1.0
+                                        ], 5.0
                                     ]
                                 ]
                             ]
@@ -163,6 +175,8 @@ class CollectionService
         foreach ($cursor as $document) { 
             $data[] = $document['count'];
             $count = $count + 1; 
+            /*if ($count == 10) 
+                break;*/
             //$count[] = $document['_count'];
         }
 

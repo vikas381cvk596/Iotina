@@ -740,7 +740,9 @@ if (document.getElementById('analytics_page'))
         var dataPoints = graph_data['dataPoints'];
         console.log(dataPoints);
         //console.log(graph_data);
-        
+        var maxDataPoint = Math.max.apply(null, dataPoints);
+        maxDataPoint = maxDataPoint + maxDataPoint/5;
+
         var dataPointsTime = [];
         var today = new Date();
         var current_time = today.getHours() + ":" + today.getMinutes();
@@ -751,9 +753,9 @@ if (document.getElementById('analytics_page'))
           current_time = today.getHours() + ":" + today.getMinutes();
         }
         
-
-        var temp_today = new Date();
-        temp_today.setMinutes(today.getMinutes() - 5);
+        console.log(dataPointsTime);
+        /*var temp_today = new Date();
+        temp_today.setMinutes(today.getMinutes() - 5);*/
         
 
         var ctx2 = document.getElementById("clientTrafficGraph");
@@ -786,13 +788,13 @@ if (document.getElementById('analytics_page'))
                   display: false
                 },
                 ticks: {
-                  maxTicksLimit: 7
+                  maxTicksLimit: dataPointsCount
                 }
               }],
               yAxes: [{
                 ticks: {
                   min: 0,
-                  max: 1000,
+                  max: maxDataPoint,
                   maxTicksLimit: 5
                 },
                 gridLines: {
