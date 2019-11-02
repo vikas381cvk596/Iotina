@@ -211,18 +211,18 @@ class CollectionService
 
             //$cursor = $collection->find($query, $options);
             if ($ap_identifier == "MAC Address") {
-                $cursor = $collection->find(['ap_id' => $ap_search, 'org_id' => $org_id]);
+                $cursor = $collection->find(['ap_id' => $ap_search, 'org_id' => $org_id], ['sort' => ['timestamp' => -1]]);
             } else {
-                $cursor = $collection->find(['SerialNo' => $ap_search, 'org_id' => $org_id]);
+                $cursor = $collection->find(['SerialNo' => $ap_search, 'org_id' => $org_id], ['sort' => ['timestamp' => -1]]);
             }
             
             foreach ($cursor as $document) { 
                 $status = "connected";
                 $ip_address = $document['IPV4Add'];
-                if (isset($document['SerialNo'])) {
+                if (array_key_exists('SerialNo', $document)) {
                     $ap->ap_serial = $document['SerialNo'];
                 }
-                if (isset($document['ap_id'])) {
+                if (array_key_exists('ap_id', $document)) {
                     $ap->ap_mac_address = $document['ap_id'];
                 }
                 break;
@@ -240,15 +240,15 @@ class CollectionService
             if ($ap_identifier == "MAC Address") {
                 $cursor = $collection->find(['ap_id' => $ap_search, 'org_id' => $org_id, 'timestamp' => ['$gt' => $time_interval]]);
             } else {
-                $cursor = $collection->find(['SerialNo' => $ap_search, 'org_id' => $org_id, 'timestamp' => ['$gt' => $time_interval]]);
+                $cursor = $collection->find(['SerialNo' => $ap_search, 'org_id' => $org_id, 'timestamp' => ['$gt' => $time_interval]], ['sort' => ['timestamp' => -1]]);
             }
             
             foreach ($cursor as $document) { 
                 $status = "connected";
-                if (isset($document['SerialNo'])) {
+                if (array_key_exists('SerialNo', $document)) {
                     $ap->ap_serial = $document['SerialNo'];
                 }
-                if (isset($document['ap_id'])) {
+                if (array_key_exists('ap_id', $document)) {
                     $ap->ap_mac_address = $document['ap_id'];
                 }
                 break;
@@ -258,5 +258,30 @@ class CollectionService
 
         $ap = json_encode($ap);
         return $ap;
+    }
+
+    public function testAPData() {
+        $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
+        $collection = $client->eapDb->apTable;
+
+        $ap = new \stdClass();
+        $time_interval = round(strtotime('-1 day') * 1000); // Last 24 Hours
+
+        $cursor = $collection->find(['org_id' => 1, 'SerialNo' => 'SN00000000C0', 'timestamp' => ['$gt' => $time_interval]], ['sort' => ['timestamp' => -1]]);
+
+        $data = [];
+        foreach ($cursor as $document) { 
+            $data[] = $document; 
+            if (array_key_exists('SerialNo', $document)) {
+                $data[] = $document['SerialNo'];
+            }
+            break;
+        }
+        
+        $results = new \stdClass();
+        $results->count = sizeof($data);
+        $results->ap_data = $data;
+        $results = json_encode($results);
+        return $results;
     }
 }

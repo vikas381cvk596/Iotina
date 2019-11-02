@@ -60,11 +60,10 @@ class AccessPointService
             } else if ($ap->ap_identifier == "MAC Address") {
                 $ap_search = $ap->ap_mac_address;
             }
-
+            $apDataUpdate = [];
             if ($ap->ap_status == 'not_yet_connected') {
                 $collectionService = new CollectionService();
 
-                if ($ap->ap_identifier)
                 $ap_mongo = $collectionService->getAPStatus($org_id, $ap->ap_identifier, $ap_search, 'all_time');
                 $ap_mongo = json_decode($ap_mongo);
                 $ap->ap_status = $ap_mongo->status;
@@ -73,6 +72,17 @@ class AccessPointService
 
                     $apDataUpdate['ap_ip_address'] = $ap->ap_ip_address;
                     $apDataUpdate['ap_status'] = $ap->ap_status;
+
+                    if (isset($ap_mongo->ap_serial)) {
+                        $ap->ap_serial = $ap_mongo->ap_serial;
+                        $apDataUpdate['ap_serial'] = $ap_mongo->ap_serial;
+                    } 
+
+                    if (isset($ap_mongo->ap_mac_address)) {
+                        $ap->ap_mac_address = $ap_mongo->ap_mac_address;
+                        $apDataUpdate['ap_mac_address'] = $ap_mongo->ap_mac_address;
+                    }
+                    
                     DB::table('access_point')->where(['ap_id' => $ap->ap_id])->update($apDataUpdate);  
                 }
             } else if ($ap->ap_status == 'connected' || $ap->ap_status == 'disconnected') {
@@ -82,10 +92,12 @@ class AccessPointService
                 $ap->ap_status = $ap_mongo->status;
 
                 if (isset($ap_mongo->ap_serial)) {
+                    $ap->ap_serial = $ap_mongo->ap_serial;
                     $apDataUpdate['ap_serial'] = $ap_mongo->ap_serial;
                 } 
 
                 if (isset($ap_mongo->ap_mac_address)) {
+                    $ap->ap_mac_address = $ap_mongo->ap_mac_address;
                     $apDataUpdate['ap_mac_address'] = $ap_mongo->ap_mac_address;
                 } 
 
