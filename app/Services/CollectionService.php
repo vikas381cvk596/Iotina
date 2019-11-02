@@ -13,6 +13,8 @@ class CollectionService
         $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
         $collection = $client->eapDb->staTable;
 
+        $time_interval = round(strtotime('-6 minutes') * 1000); // Last 6 Minutes
+
         /*$manager = new MongoDB\Driver\Manager("mongodb://localhost:27017");
         //$connect = connect();
         //$document = $collection->findOne(['_id' => '123']);
@@ -37,7 +39,7 @@ class CollectionService
                 '$match' => [ 
                     'org_id' => 1,
                     'timestamp' => [ 
-                        '$gt' => 1571650955404
+                        '$gt' => $time_interval
                     ] 
  
                 ] 
