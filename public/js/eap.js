@@ -208,11 +208,11 @@ if (document.getElementById('venue_page'))
             ap_mac_address = all_aps[ap]['ap_mac_address'];
           }
 
-          if (ap_identifier == "MAC Address") {
+          /*if (ap_identifier == "MAC Address") {
             ap_mac_address = ap_serial;
             ap_serial = '';
 
-          }
+          }*/
 
           var ap_tags = '';
           if (all_aps[ap]['ap_tags']) {
@@ -223,6 +223,10 @@ if (document.getElementById('venue_page'))
           if (all_aps[ap]['ap_status']) {
             if (all_aps[ap]['ap_status'] == "not_yet_connected") {
               ap_status = "Not Yet Connected";
+            } else if (all_aps[ap]['ap_status'] == "connected") {
+              ap_status = "Connected";
+            } else if (all_aps[ap]['ap_status'] == "disconnected") {
+              ap_status = "Disconnected";
             } else {
               ap_status = all_aps[ap]['ap_status'];
             }

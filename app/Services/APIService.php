@@ -34,10 +34,10 @@ class APIService
     		$ap_data->organization_name = $org_name;
     		$ap_data->organization_id = $ap_db->org_id;
     		$ap_data->venue_id = $ap_db->venue_id;
-    		$ap_data->group_id = '0';
+    		$ap_data->group_id = 0;
     		$ap_data->network_name = $network_names;
-    		$ap_data->stats_collection_interval = '300';
-    		$ap_data->stats_publish_interval = '300';
+    		$ap_data->stats_collection_interval = 300;
+    		$ap_data->stats_publish_interval = 300;
     		$ap_data->stats_publish_url = 'ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:9092';
     		$ap_data->schema_server_url = 'http://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:8081';
 

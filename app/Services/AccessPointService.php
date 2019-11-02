@@ -26,7 +26,11 @@ class AccessPointService
         $apData['org_id'] = $org_id;
         $apData['ap_name'] = $ap_name;
         $apData['ap_identifier'] = $ap_identifier;
-        $apData['ap_serial'] = $ap_serial;
+        if ($ap_identifier == "Serial Number") {
+            $apData['ap_serial'] = $ap_serial;
+        } else if ($ap_identifier == "MAC Address") {
+            $apData['ap_mac_address'] = $ap_serial;
+        }
         $apData['ap_status'] = 'not_yet_connected';
         if ($ap_desc) {
             $apData['ap_desc'] = $ap_desc;
@@ -50,17 +54,44 @@ class AccessPointService
             $venue_name = $venueService->getVenueNameByID($ap->venue_id);
         
             $ap->venue_name = $venue_name;
+            
+            if ($ap->ap_identifier == "Serial Number") {
+                $ap_search = $ap->ap_serial;
+            } else if ($ap->ap_identifier == "MAC Address") {
+                $ap_search = $ap->ap_mac_address;
+            }
 
             if ($ap->ap_status == 'not_yet_connected') {
                 $collectionService = new CollectionService();
-                $ap_mongo = $collectionService->getAPStatus($org_id, $ap->ap_serial);
+
+                if ($ap->ap_identifier)
+                $ap_mongo = $collectionService->getAPStatus($org_id, $ap->ap_identifier, $ap_search, 'all_time');
                 $ap_mongo = json_decode($ap_mongo);
                 $ap->ap_status = $ap_mongo->status;
                 if ($ap_mongo->status == "connected") {
-                    $ap->ap_ip_address = $ap_mongo->ip_address;      
-                }
+                    $ap->ap_ip_address = $ap_mongo->ip_address;   
 
-            }
+                    $apDataUpdate['ap_ip_address'] = $ap->ap_ip_address;
+                    $apDataUpdate['ap_status'] = $ap->ap_status;
+                    DB::table('access_point')->where(['ap_id' => $ap->ap_id])->update($apDataUpdate);  
+                }
+            } else if ($ap->ap_status == 'connected' || $ap->ap_status == 'disconnected') {
+                $collectionService = new CollectionService();
+                $ap_mongo = $collectionService->getAPStatus($org_id, $ap->ap_identifier, $ap_search, 'last_24_hours');
+                $ap_mongo = json_decode($ap_mongo);
+                $ap->ap_status = $ap_mongo->status;
+
+                if (isset($ap_mongo->ap_serial)) {
+                    $apDataUpdate['ap_serial'] = $ap_mongo->ap_serial;
+                } 
+
+                if (isset($ap_mongo->ap_mac_address)) {
+                    $apDataUpdate['ap_mac_address'] = $ap_mongo->ap_mac_address;
+                } 
+
+                $apDataUpdate['ap_status'] = $ap->ap_status;
+                DB::table('access_point')->where(['ap_id' => $ap->ap_id])->update($apDataUpdate);
+            } 
             $ap_raw[$ap->ap_id] = $ap;
         }
         return $ap_raw;       

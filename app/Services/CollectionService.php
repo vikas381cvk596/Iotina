@@ -189,38 +189,73 @@ class CollectionService
         //return json_encode($data);   
     }
 
-    public function getAPStatus($org_id, $ap_serial) {
-        $status = 'not_yet_connected';
-        $ip_address = '';
-        
+    public function getAPStatus($org_id, $ap_identifier, $ap_search, $time_status) {
+        $status = '';
         $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
         $collection = $client->eapDb->apTable;
-        /*$cursor = $collection->find(['NumberOfSTA' => '36']);
-
-        foreach ($cursor as $document) {
-            $status = "connected";
-            $ip_address = $document['ip_address'];            
-            break;
-        }*/
-
-        $query = [];
-
-        $options = [];
-
-        //$cursor = $collection->find($query, $options);
-        $cursor = $collection->find(['ap_id' => $ap_serial, 'org_id' => 1]);
-        
-        //$cursor = $collection->find(['_id'=> ObjectId("$mongoId")]); 
-        $data = [];
-        foreach ($cursor as $document) { 
-            $status = "connected";
-            $ip_address = $document['IPV4Add'];            
-            break;
-        }
 
         $ap = new \stdClass();
-        $ap->status = $status;
-        $ap->ip_address = $ip_address;
+        $ap->status = '';
+        if ($time_status == 'all_time') {
+
+            $status = 'not_yet_connected';
+            $ip_address = '';
+            
+            /*$cursor = $collection->find(['NumberOfSTA' => '36']);
+
+            foreach ($cursor as $document) {
+                $status = "connected";
+                $ip_address = $document['ip_address'];            
+                break;
+            }*/
+
+            //$cursor = $collection->find($query, $options);
+            if ($ap_identifier == "MAC Address") {
+                $cursor = $collection->find(['ap_id' => $ap_search, 'org_id' => $org_id]);
+            } else {
+                $cursor = $collection->find(['SerialNo' => $ap_search, 'org_id' => $org_id]);
+            }
+            
+            foreach ($cursor as $document) { 
+                $status = "connected";
+                $ip_address = $document['IPV4Add'];
+                if (isset($document['SerialNo'])) {
+                    $ap->ap_serial = $document['SerialNo'];
+                }
+                if (isset($document['ap_id'])) {
+                    $ap->ap_mac_address = $document['ap_id'];
+                }
+                break;
+            }
+
+            $ap->status = $status;
+            $ap->ip_address = $ip_address;
+
+        } else if ($time_status == 'last_24_hours') {
+            $status = 'disconnected';
+            
+            //$time_interval = round(microtime(true) * 1000); //Right Now
+            $time_interval = round(strtotime('-1 day') * 1000); // Last 24 Hours
+
+            if ($ap_identifier == "MAC Address") {
+                $cursor = $collection->find(['ap_id' => $ap_search, 'org_id' => $org_id, 'timestamp' => ['$gt' => $time_interval]]);
+            } else {
+                $cursor = $collection->find(['SerialNo' => $ap_search, 'org_id' => $org_id, 'timestamp' => ['$gt' => $time_interval]]);
+            }
+            
+            foreach ($cursor as $document) { 
+                $status = "connected";
+                if (isset($document['SerialNo'])) {
+                    $ap->ap_serial = $document['SerialNo'];
+                }
+                if (isset($document['ap_id'])) {
+                    $ap->ap_mac_address = $document['ap_id'];
+                }
+                break;
+            }
+            $ap->status = $status;
+        }
+
         $ap = json_encode($ap);
         return $ap;
     }
