@@ -81,6 +81,11 @@ if (document.getElementById('venue_page'))
             ap_count = all_venues[venue]['ap_count'];
           }
 
+          var client_count = '0';
+          if (all_venues[venue]['client_count']) {
+            client_count = all_venues[venue]['client_count'];
+          }
+
           html_content = html_content+'<tr>';
           html_content = html_content+'<td>'+venue_name+'<br/>Created On: '+venue_crt_date+'</td>';
           html_content = html_content+'<td>'+venue_desc+'</td>';
@@ -88,6 +93,7 @@ if (document.getElementById('venue_page'))
           html_content = html_content+'<td>'+venue_add_notes+'</td>';
           html_content = html_content+'<td>'+network_count+'</td>';
           html_content = html_content+'<td>'+ap_count+'</td>';
+          html_content = html_content+'<td>'+client_count+'</td>';
           //console.log(all_venues[venue]['venue_id']);
           html_content = html_content+'</tr>';
         }

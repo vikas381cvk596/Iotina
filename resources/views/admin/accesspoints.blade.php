@@ -132,6 +132,7 @@
                   <th>IP Address</th>
                   <th>MAC Address</th>
                   <th>Venue</th>
+                  <th>No. of Clients</th>
                   <th>Tags</th>
                 </tr>
               </thead>

@@ -94,6 +94,7 @@
                   <th>Address Notes</th>
                   <th>Networks</th>
                   <th>APs</th>
+                  <th>No. of Clients</th>
                 </tr>
               </thead>
               <tbody>
