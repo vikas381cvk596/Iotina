@@ -86,9 +86,9 @@
                     <div style="display: none; flex-direction: column;" class="form_class form_step_2" form-step='form_step_2'>
                       <div style="display: flex; flex-direction: row; align-items: center; justify-content: flex-start; width: 30vw;">
                         <div class="form-group" style="width: 20vw;">
-                          <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600;">* Backup Passphrase</div>
+                          <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600;">* Passphrase</div>
                           <div class='input-group'>
-                            <input type="text" id="backup_passphrase" name="backup_passphrase" class="form-control form-fields" placeholder="Dynamic Pre-Shared Key" style="font-size: 14px;"/>
+                            <input type="text" id="backup_passphrase" name="backup_passphrase" class="form-control form-fields" placeholder="Pre-Shared Key" style="font-size: 14px;"/>
                           </div>
                         </div>  
                       </div>
@@ -112,8 +112,8 @@
                       <hr/>
                       <div style="display: flex; flex-direction: row; align-items: center; justify-content: flex-start; width: 30vw;">
                       
-                        <div class="form-group" style="width: 15vw;">
-                          <input type="hidden" id="passphrase_format" name="passphrase_format">
+                        <div class="form-group" style="width: 15vw; display: none;">
+                          <input type="hidden" id="passphrase_format" name="passphrase_format" value='0'>
                           <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600;">* Passphrase Format</div>
                           <div class="dropdown sp_dropdown" style="">
                             <button class="btn btn-default dropdown-toggle" type="button"id="pf_dropdown" data-toggle="dropdown" aria-haspopup="   true" aria-expanded="false" style="font-size: 14px; background-color: #fff; border: 1px solid #c3c3c3; width: 10vw; color: #696969; width: 15vw; text-align: left;">
@@ -129,12 +129,12 @@
                         
                       </div>
 
-                      <div style="display: flex; flex-direction: row; align-items: center; justify-content: flex-start; width: 30vw;">
+                      <div style="display: none; flex-direction: row; align-items: center; justify-content: flex-start; width: 30vw;">
                       
                         <div class="form-group" style="width: 10vw;">
                           <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600;">* Passphrase Length</div>
                           <div class='input-group'>
-                            <input type="text" id="passphrase_length" name="passphrase_length" class="form-control form-fields" placeholder="Number" style="font-size: 14px;"/>
+                            <input type="text" id="passphrase_length" name="passphrase_length" class="form-control form-fields" placeholder="Number" style="font-size: 14px;" value='0'/>
                           </div>
                         </div> 
                         
