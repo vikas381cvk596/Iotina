@@ -82,7 +82,7 @@ class AccessPointService
                         $ap->ap_mac_address = $ap_mongo->ap_mac_address;
                         $apDataUpdate['ap_mac_address'] = $ap_mongo->ap_mac_address;
                     }
-                    
+
                     DB::table('access_point')->where(['ap_id' => $ap->ap_id])->update($apDataUpdate);  
                 }
             } else if ($ap->ap_status == 'connected' || $ap->ap_status == 'disconnected') {
@@ -104,6 +104,16 @@ class AccessPointService
                 $apDataUpdate['ap_status'] = $ap->ap_status;
                 DB::table('access_point')->where(['ap_id' => $ap->ap_id])->update($apDataUpdate);
             } 
+
+            if ($ap->ap_status != 'not_yet_connected') {
+                $input_filters = new \stdClass();
+                $input_filters->org_id = $org_id;
+                $input_filters->ap_mac_address = $ap->ap_mac_address;
+                
+                $clientCount = $collectionService->getAllClientsConnected(json_encode($input_filters), 'ap_page');
+                $ap->client_count = $clientCount;
+            }
+
             $ap_raw[$ap->ap_id] = $ap;
         }
         return $ap_raw;       

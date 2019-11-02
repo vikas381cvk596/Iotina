@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Venue;
 use DB;
 use App\Services\OrganisationService;
+use App\Services\CollectionService;
 
 class VenueService
 {
@@ -63,9 +64,20 @@ class VenueService
             $ap_raw = DB::table('access_point')->where(['venue_id' => $venue->venue_id, 'org_id' => $org_id])->get();
             $apCount = $ap_raw->count();
 
+            $collectionService = new CollectionService();
+            
+            $input_filters = new \stdClass();
+            $input_filters->org_id = $org_id;
+            $input_filters->venue_id = $venue->venue_id;
+            
+            $clientCount = $collectionService->getAllClientsConnected(json_encode($input_filters), 'venue_page');
+
+
+            
 
             $venue->network_count = $networkCount;
             $venue->ap_count = $apCount;
+            $venue->client_count = $clientCount;
             $venue_raw[$venue->venue_id] = $venue;
         }
         return $venue_raw;       

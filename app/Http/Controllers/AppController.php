@@ -78,6 +78,13 @@ class AppController extends Controller
         //$results = 'abc';
         return view('admin/test')->with(['results' => $result]);;    
     }
+
+    public function testClientCount() {
+        $collectionService = new CollectionService();
+        $result = $collectionService->testClientCount();
+        //$results = 'abc';
+        return view('admin/test')->with(['results' => $result]);;    
+    }
     
     
     public function getClientsTrafficGraphData() {

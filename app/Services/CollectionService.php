@@ -191,6 +191,7 @@ class CollectionService
 
     public function getAPStatus($org_id, $ap_identifier, $ap_search, $time_status) {
         $status = '';
+        $org_id = (int)$org_id;
         $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
         $collection = $client->eapDb->apTable;
 
@@ -260,6 +261,115 @@ class CollectionService
         return $ap;
     }
 
+    public function getAllClientsConnected ($input_filters, $page) {
+        $input_filters = json_decode($input_filters);
+        $clients_count = '0';
+
+        if ($page == 'venue_page') {
+            $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
+            $collection = $client->eapDb->staTable;
+            
+            $org_id = (int)$input_filters->org_id;
+            $venue_id = (int)$input_filters->venue_id; 
+            $time_interval = round(strtotime('-6 minutes') * 1000); // Last 6 Minutes
+            $current_time = round(microtime(true) * 1000);
+
+            $query = [
+                '$and' => [
+                    [
+                        'org_id' => 1
+                    ],[
+                        'venue_id' => 1
+                    ], [
+                        'timestamp' => [
+                            '$gte' => $time_interval
+                        ]
+                    ], [
+                        'timestamp' => [
+                            '$lte' => $current_time
+                        ]
+                    ]
+                ]
+            ];
+
+            $options = [];
+            $clients_count = $collection->count($query, $options);
+        } else if ($page == 'ap_page') {
+            $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
+            $collection = $client->eapDb->apTable;
+            
+            $org_id = (int)$input_filters->org_id;
+            $ap_id = $input_filters->ap_mac_address; 
+            $time_interval = round(strtotime('-6 minutes') * 1000); // Last 6 Minutes
+            $current_time = round(microtime(true) * 1000);
+
+            $query = [
+                '$and' => [
+                    [
+                        'org_id' => $org_id
+                    ], [
+                        'ap_id' => $ap_id
+                    ], [
+                        'timestamp' => [
+                            '$gte' => $time_interval
+                        ]
+                    ], [
+                        'timestamp' => [
+                            '$lte' => $current_time
+                        ]
+                    ]
+                ]
+            ];
+
+            $options = [
+                'projection' => [
+                    'NumberOfSTA' => 1.0,
+                    '_id' => 0.0
+                ],
+                'sort' => [
+                    'timestamp' => -1.0
+                ],
+                'limit' => 1
+            ];
+            
+            $options = [];
+
+            $clients_count = $collection->count($query, $options);
+        } else if ($page == 'network_page') {
+            $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
+            $collection = $client->eapDb->staTable;
+            
+            $org_id = (int)$input_filters->org_id;
+            $network_name = $input_filters->network_name; 
+            $time_interval = round(strtotime('-6 minutes') * 1000); // Last 6 Minutes
+            $current_time = round(microtime(true) * 1000);
+            //$network_name = 'ssid0';
+            $query = [
+                '$and' => [
+                    [
+                        'org_id' => $org_id
+                    ], [
+                        'network_id' => $network_name
+                    ], [
+                        'timestamp' => [
+                            '$gte' => $time_interval
+                        ]
+                    ], [
+                        'timestamp' => [
+                            '$lte' => $current_time
+                        ]
+                    ]
+                ]
+            ];
+
+            $options = [];
+            $clients_count = $collection->count($query, $options);
+        }
+
+
+        return $clients_count;
+    }
+
     public function testAPData() {
         $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
         $collection = $client->eapDb->apTable;
@@ -281,6 +391,42 @@ class CollectionService
         $results = new \stdClass();
         $results->count = sizeof($data);
         $results->ap_data = $data;
+        $results = json_encode($results);
+        return $results;
+    }
+
+    public function testClientCount() {
+        $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
+        $collection = $client->eapDb->staTable;
+        
+        $org_id = 1;
+        $venue_id = 1; 
+        $time_interval = round(strtotime('-600 minutes') * 1000); // Last 6 Minutes
+        $current_time = round(microtime(true) * 1000);
+
+        $query = [
+            '$and' => [
+                [
+                    'org_id' => 1
+                ],[
+                    'venue_id' => 1
+                ], [
+                    'timestamp' => [
+                        '$gte' => $time_interval
+                    ]
+                ], [
+                    'timestamp' => [
+                        '$lte' => $current_time
+                    ]
+                ]
+            ]
+        ];
+
+        $options = [];
+        $cursor = $collection->count($query, $options);
+        
+        $results = new \stdClass();
+        $results->ap_count_data = $cursor;
         $results = json_encode($results);
         return $results;
     }

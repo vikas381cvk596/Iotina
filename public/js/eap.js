@@ -253,6 +253,11 @@ if (document.getElementById('venue_page'))
             ap_mesh_role = all_aps[ap]['ap_mesh_role'];
           }
 
+          var client_count = '0';
+          if (all_aps[ap]['client_count']) {
+            client_count = all_aps[ap]['client_count'];
+          }
+
           html_content = html_content+'<tr>';
           html_content = html_content+'<td>'+ap_name+'<br/>Created On: '+ap_crt_date+'</td>';
           html_content = html_content+'<td>'+ap_status+'</td>';
@@ -260,6 +265,7 @@ if (document.getElementById('venue_page'))
           html_content = html_content+'<td>'+ap_ip_address+'</td>';
           html_content = html_content+'<td>'+ap_mac_address+'</td>';
           html_content = html_content+'<td>'+venue_name+'</td>';
+          html_content = html_content+'<td>'+client_count+'</td>';
           html_content = html_content+'<td>'+ap_tags+'</td>';
           //console.log(all_venues[venue]['venue_id']);
           html_content = html_content+'</tr>';
@@ -646,6 +652,11 @@ if (document.getElementById('venue_page'))
           if (all_networks[network]['count_ap']) {
             count_ap = all_networks[network]['count_ap'];
           }
+
+          var client_count = '0';
+          if (all_networks[network]['client_count']) {
+            client_count = all_networks[network]['client_count'];
+          }
           
           html_content = html_content+'<tr>';
           html_content = html_content+'<td>'+network_name+'</td>';
@@ -654,6 +665,7 @@ if (document.getElementById('venue_page'))
           html_content = html_content+'<td>'+count_venue+'</td>';
           html_content = html_content+'<td>'+count_ap+'</td>';
           html_content = html_content+'<td>'+network_vlan+'</td>';
+          html_content = html_content+'<td>'+client_count+'</td>';
           html_content = html_content+'</tr>';
         }
         $('#wifi_table tbody').html(html_content);       

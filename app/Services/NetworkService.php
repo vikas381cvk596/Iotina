@@ -8,6 +8,7 @@ use App\NetworkVenueMapping;
 use DB;
 use App\Services\OrganisationService;
 use App\Services\VenueService;
+use App\Services\CollectionService;
 
 class NetworkService
 {
@@ -120,6 +121,14 @@ class NetworkService
 
             $network->count_venue = strval($count_venue);
             $network->count_ap = strval($count_ap);
+
+            $collectionService = new CollectionService();
+            $input_filters = new \stdClass();
+            $input_filters->org_id = $network->org_id;
+            $input_filters->network_name = $network->network_name;            
+            $clientCount = $collectionService->getAllClientsConnected(json_encode($input_filters), 'network_page');
+            $network->client_count = $clientCount;
+
             $network_raw[$network->network_id] = $network;
         }
         return $network_raw;       

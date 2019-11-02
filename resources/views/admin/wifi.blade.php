@@ -294,6 +294,7 @@
                   <th>Venues</th>
                   <th>APs</th>
                   <th>VLAN</th>
+                  <th>No. of Clients</th>
                 </tr>
               </thead>
               <tbody>
