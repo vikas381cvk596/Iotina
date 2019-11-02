@@ -235,7 +235,7 @@ class CollectionService
             $status = 'disconnected';
             
             //$time_interval = round(microtime(true) * 1000); //Right Now
-            $time_interval = round(strtotime('-1 day') * 1000); // Last 24 Hours
+            $time_interval = round(strtotime('-6 minutes') * 1000); // Last 6 Minutes
 
             if ($ap_identifier == "MAC Address") {
                 $cursor = $collection->find(['ap_id' => $ap_search, 'org_id' => $org_id, 'timestamp' => ['$gt' => $time_interval]]);
@@ -265,9 +265,9 @@ class CollectionService
         $collection = $client->eapDb->apTable;
 
         $ap = new \stdClass();
-        $time_interval = round(strtotime('-1 day') * 1000); // Last 24 Hours
+        $time_interval = round(strtotime('-6 minutes') * 1000); // Last 24 Hours
 
-        $cursor = $collection->find(['org_id' => 1, 'SerialNo' => 'SN00000000C0', 'timestamp' => ['$gt' => $time_interval]], ['sort' => ['timestamp' => -1]]);
+        $cursor = $collection->find(['org_id' => 1, 'SerialNo' => '123456', 'timestamp' => ['$gt' => $time_interval]], ['sort' => ['timestamp' => -1]]);
 
         $data = [];
         foreach ($cursor as $document) { 
