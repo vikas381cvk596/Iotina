@@ -14,7 +14,7 @@
       <!-- Area Chart Example-->
       <div class="card mb-3">
         <div class="card-header">
-          <i class="fa fa-area-chart"></i> Client Traffic (5 Minute Interval)</div>
+          <i class="fa fa-area-chart"></i> Connected Clients (5 Minute Interval)</div>
         <div class="card-body">
           <canvas id="clientTrafficGraph" width="80%" height="20"></canvas>
         </div>

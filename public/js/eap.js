@@ -780,10 +780,12 @@ if (document.getElementById('users_page'))
         var interval = 5;
         for (i=0; i<dataPointsCount; i++) {
           dataPointsTime[i] = current_time;
-          today.setMinutes(today.getMinutes() + interval);
+          today.setMinutes(today.getMinutes() - interval);
           current_time = today.getHours() + ":" + today.getMinutes();
         }
-        
+
+        dataPoints.reverse();
+        dataPointsTime.reverse();
         console.log(dataPointsTime);
         /*var temp_today = new Date();
         temp_today.setMinutes(today.getMinutes() - 5);*/
@@ -897,9 +899,12 @@ if (document.getElementById('users_page'))
         var interval = 5;
         for (i=0; i<dataPointsCount; i++) {
           dataPointsTime[i] = current_time;
-          today.setMinutes(today.getMinutes() + interval);
+          today.setMinutes(today.getMinutes() - interval);
           current_time = today.getHours() + ":" + today.getMinutes();
         }
+        
+        dataPoints.reverse();
+        dataPointsTime.reverse();
         
         console.log(dataPointsTime);
         /*var temp_today = new Date();
