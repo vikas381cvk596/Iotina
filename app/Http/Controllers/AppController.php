@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\VenueService;
+use App\Services\OrganisationService;
 use App\Services\AccessPointService;
 use App\Services\NetworkService;
 use App\Services\CollectionService;
@@ -101,6 +102,11 @@ class AppController extends Controller
             ->withHeaders([
                 'Content-Type' => 'application/json',
             ]);  
+    }
+    public function getDashboardData() {
+        $organisationService = new OrganisationService();
+        $result = $organisationService->getDashboardData();
+        return $result;    
     }
     
 }

@@ -745,9 +745,7 @@ if (document.getElementById('users_page'))
     });
   }
   $.fn.get_collections_data();
-}
-
-if (document.getElementById('analytics_page'))
+} else if (document.getElementById('analytics_page'))
 {
   $.fn.get_clients_graph_data = function() {
     $.ajax({
@@ -765,7 +763,16 @@ if (document.getElementById('analytics_page'))
         console.log(dataPoints);
         //console.log(graph_data);
         var maxDataPoint = Math.max.apply(null, dataPoints);
-        maxDataPoint = 2500;
+        maxDataPoint = maxDataPoint*(3/2);
+        var digits_cnt = digits_count(maxDataPoint);
+        //maxDataPoint = parseInt(maxDataPoint / 10, 10) + 1 * 10;
+        if (digits_cnt == 2) {
+          maxDataPoint = Math.ceil(maxDataPoint / 10) * 10;
+        } else if (digits_cnt == 3) {
+          maxDataPoint = Math.ceil(maxDataPoint / 100) * 100;
+        } else if (digits_cnt == 4) {
+          maxDataPoint = Math.ceil(maxDataPoint / 1000) * 1000;
+        }
 
         var dataPointsTime = [];
         var today = new Date();
@@ -835,8 +842,139 @@ if (document.getElementById('analytics_page'))
     });
   }
   $.fn.get_clients_graph_data();
+} else if (document.getElementById('dashboard_page'))
+{
+  $.fn.get_live_dashboard_data = function() {
+    $.ajax({
+      url: "getDashboardData",
+      type: "POST",
+      data: {
+        '_token': window.Laravel.csrfToken
+      },
+      success: function(dashboard_data) {
+        console.log(dashboard_data);
+        var dashboard_data_raw = JSON.parse(dashboard_data);
+        //console.log(dashboard_data_raw.org_id);
+        $('.venue_count').html(dashboard_data_raw.venue_count);
+        $('.ap_count').html(dashboard_data_raw.ap_count);
+        $('.network_count').html(dashboard_data_raw.network_count);
+        $('.clients_count').html(dashboard_data_raw.clients_count);
+                
+      }
+    });
+  }
+
+  $.fn.get_clients_graph_data = function() {
+    $.ajax({
+      url: "getClientsTrafficGraphData",
+      type: "POST",
+      data: {
+        '_token': window.Laravel.csrfToken
+      },
+      success: function(graph_data) {
+        console.log(graph_data);
+        var graph_data = JSON.parse(graph_data);
+        var dataPointsCount = graph_data['dataPointsCount'];
+        console.log(dataPointsCount);
+        var dataPoints = graph_data['dataPoints'];
+        console.log(dataPoints);
+        //console.log(graph_data);
+        var maxDataPoint = Math.max.apply(null, dataPoints);
+        maxDataPoint = maxDataPoint*(3/2);
+        var digits_cnt = digits_count(maxDataPoint);
+        //maxDataPoint = parseInt(maxDataPoint / 10, 10) + 1 * 10;
+        if (digits_cnt == 2) {
+          maxDataPoint = Math.ceil(maxDataPoint / 10) * 10;
+        } else if (digits_cnt == 3) {
+          maxDataPoint = Math.ceil(maxDataPoint / 100) * 100;
+        } else if (digits_cnt == 4) {
+          maxDataPoint = Math.ceil(maxDataPoint / 1000) * 1000;
+        }
+
+        var dataPointsTime = [];
+        var today = new Date();
+        var current_time = today.getHours() + ":" + today.getMinutes();
+        var interval = 5;
+        for (i=0; i<dataPointsCount; i++) {
+          dataPointsTime[i] = current_time;
+          today.setMinutes(today.getMinutes() + interval);
+          current_time = today.getHours() + ":" + today.getMinutes();
+        }
+        
+        console.log(dataPointsTime);
+        /*var temp_today = new Date();
+        temp_today.setMinutes(today.getMinutes() - 5);*/
+        
+
+        var ctx2 = document.getElementById("clientTrafficGraph");
+        var myLineChart = new Chart(ctx2, {
+          type: 'line',
+          data: {
+            labels: dataPointsTime,
+            datasets: [{
+              label: "Sessions",
+              lineTension: 0.3,
+              backgroundColor: "rgba(2,117,216,0.2)",
+              borderColor: "rgba(2,117,216,1)",
+              pointRadius: 5,
+              pointBackgroundColor: "rgba(2,117,216,1)",
+              pointBorderColor: "rgba(255,255,255,0.8)",
+              pointHoverRadius: 5,
+              pointHoverBackgroundColor: "rgba(2,117,216,1)",
+              pointHitRadius: 20,
+              pointBorderWidth: 2,
+              data: dataPoints,
+            }],
+          },
+          options: {
+            scales: {
+              xAxes: [{
+                time: {
+                  unit: 'date'
+                },
+                gridLines: {
+                  display: false
+                },
+                ticks: {
+                  maxTicksLimit: dataPointsCount
+                }
+              }],
+              yAxes: [{
+                ticks: {
+                  min: 5,
+                  max: maxDataPoint,
+                  maxTicksLimit: 5
+                },
+                gridLines: {
+                  color: "rgba(0, 0, 0, .125)",
+                }
+              }],
+            },
+            legend: {
+              display: false
+            }
+          }
+        });
+      }
+    });
+  }
+  $.fn.get_clients_graph_data();
+  $.fn.get_live_dashboard_data();
 }
+
 if (document.getElementById('test_page'))
 {
   console.log(JSON.parse($('#results_hidden').val()));
+}
+
+function digits_count(n) {
+  var count = 0;
+  if (n >= 1) ++count;
+
+  while (n / 10 >= 1) {
+    n /= 10;
+    ++count;
+  }
+
+  return count;
 }

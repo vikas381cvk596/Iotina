@@ -6,10 +6,15 @@ use MongoDB\Client;
 //use MongoDB\BSON\ObjectId;
 use DateTime;
 use MongoDB\BSON\UTCDateTime;
+use App\Services\OrganisationService;
+
 class CollectionService
 {
     public function getCollectionsData() {
         //$client = new Client;
+        $organisationService = new OrganisationService();
+        $org_id = $organisationService->getOrganisationID();
+        
         $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
         $collection = $client->eapDb->staTable;
 
@@ -37,7 +42,7 @@ class CollectionService
         $pipeline = [ 
             [ 
                 '$match' => [ 
-                    'org_id' => 1,
+                    'org_id' => $org_id,
                     'timestamp' => [ 
                         '$gt' => $time_interval
                     ] 
@@ -85,20 +90,26 @@ class CollectionService
 
     public function getClientsTrafficGraphData() {
         //$client = new Client;
+        $organisationService = new OrganisationService();
+        $org_id = $organisationService->getOrganisationID();
+            
+
         $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
         
         $collection = $client->eapDb->apTable;
         $date = new UTCDateTime(0);
+
+        $time_interval = round(strtotime('-1 day') * 1000); // Last 6 Minutes
         $current_time = round(microtime(true) * 1000);
         $pipeline = [
             [
                 '$match' => [
                     '$and' => [
                         [
-                            'org_id' => 1
+                            'org_id' => $org_id
                         ], [
                             'timestamp' => [
-                                '$gt' => 1569926376000
+                                '$gt' => $time_interval
                             ]
                         ], [
                             'timestamp' => [
@@ -177,8 +188,8 @@ class CollectionService
         foreach ($cursor as $document) { 
             $data[] = $document['count'];
             $count = $count + 1; 
-            /*if ($count == 10) 
-                break;*/
+            if ($count >= 10) 
+                break;
             //$count[] = $document['_count'];
         }
 
@@ -365,6 +376,44 @@ class CollectionService
             ];
 
             $options = [];
+            $clients_count = $collection->count($query, $options);
+        } else if ($page == 'dashboard_page') {
+            $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
+            $collection = $client->eapDb->apTable;
+            
+            $org_id = (int)$input_filters->org_id;
+            $time_interval = round(strtotime('-6 minutes') * 1000); // Last 6 Minutes
+            $current_time = round(microtime(true) * 1000);
+
+            $query = [
+                '$and' => [
+                    [
+                        'org_id' => $org_id
+                    ], [
+                        'timestamp' => [
+                            '$gte' => $time_interval
+                        ]
+                    ], [
+                        'timestamp' => [
+                            '$lte' => $current_time
+                        ]
+                    ]
+                ]
+            ];
+
+            $options = [
+                'projection' => [
+                    'NumberOfSTA' => 1.0,
+                    '_id' => 0.0
+                ],
+                'sort' => [
+                    'timestamp' => -1.0
+                ],
+                'limit' => 1
+            ];
+            
+            $options = [];
+
             $clients_count = $collection->count($query, $options);
         }
 

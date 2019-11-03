@@ -29,6 +29,10 @@ Route::post('/admin/createNetwork', array('as' => 'createNetwork', 'uses' => 'Ap
 Route::post('/admin/getAllWifiNetworks', array('as' => 'getAllWifiNetworks', 'uses' => 'AppController@getAllWifiNetworks'));
 Route::post('/admin/getCollectionsData', array('as' => 'getCollectionsData', 'uses' => 'AppController@getCollectionsData'));
 Route::post('/admin/getClientsTrafficGraphData', array('as' => 'getClientsTrafficGraphData', 'uses' => 'AppController@getClientsTrafficGraphData'));
+Route::post('/getClientsTrafficGraphData', array('as' => 'getClientsTrafficGraphData', 'uses' => 'AppController@getClientsTrafficGraphData'));
+Route::post('/admin/getDashboardData', array('as' => 'getDashboardData', 'uses' => 'AppController@getDashboardData'));
+Route::post('/getDashboardData', array('as' => 'getDashboardData', 'uses' => 'AppController@getDashboardData'));
+
 Route::post('/admin/duplicateNetworkName', array('as' => 'duplicateNetworkName', 'uses' => 'AppController@duplicateNetworkName'));
 Route::post('/api/accesspoint', array('as' => 'getAPData', 'uses' => 'AppController@getAPData'));
 
