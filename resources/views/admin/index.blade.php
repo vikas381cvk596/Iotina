@@ -67,7 +67,7 @@
               <div class="card-body-icon">
                 <i class="fa fa-fw fa-users"></i>
               </div>
-              <div class="mr-5"><span class="clients_count">0</span> Client(s) Connected!</div>
+              <div class="mr-5"><span class="clients_count">0</span> User(s) Connected!</div>
             </div>
             <a class="card-footer text-white clearfix small z-1" href="{{ url('/admin/users') }}">
               <span class="float-left">View Details</span>
