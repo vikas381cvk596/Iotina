@@ -99,7 +99,7 @@ class CollectionService
         $collection = $client->eapDb->apTable;
         $date = new UTCDateTime(0);
 
-        $time_interval = round(strtotime('-1 day') * 1000); // Last 6 Minutes
+        $time_interval = round(strtotime('-6 minutes') * 1000); // Last 6 Minutes
         $current_time = round(microtime(true) * 1000);
         $pipeline = [
             [
