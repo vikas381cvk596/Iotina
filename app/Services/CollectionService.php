@@ -347,7 +347,16 @@ class CollectionService
             
             $options = [];
 
-            $clients_count = $collection->count($query, $options);
+            //$clients_count = $collection->count($query, $options);
+            $cursor = $collection->find($query, $options);
+            $count = 0;
+            foreach ($cursor as $document) { 
+                $status = "connected";
+                if (array_key_exists('NumberOfSTA', $document)) {
+                    $count = $count + (int)$document['NumberOfSTA'];
+                }
+            }
+            $clients_count = strval($count);
         } else if ($page == 'network_page') {
             $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
             $collection = $client->eapDb->staTable;
