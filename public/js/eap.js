@@ -784,7 +784,7 @@ if (document.getElementById('users_page'))
           current_time = today.getHours() + ":" + today.getMinutes();
         }
 
-        dataPoints.reverse();
+        //dataPoints.reverse();
         dataPointsTime.reverse();
         console.log(dataPointsTime);
         /*var temp_today = new Date();
@@ -826,7 +826,7 @@ if (document.getElementById('users_page'))
               }],
               yAxes: [{
                 ticks: {
-                  min: 5,
+                  min: 0,
                   max: maxDataPoint,
                   maxTicksLimit: 5
                 },
@@ -877,6 +877,7 @@ if (document.getElementById('users_page'))
         console.log(graph_data);
         var graph_data = JSON.parse(graph_data);
         var dataPointsCount = graph_data['dataPointsCount'];
+        console.log(graph_data['all_data']);
         console.log(dataPointsCount);
         var dataPoints = graph_data['dataPoints'];
         console.log(dataPoints);
@@ -903,7 +904,7 @@ if (document.getElementById('users_page'))
           current_time = today.getHours() + ":" + today.getMinutes();
         }
         
-        dataPoints.reverse();
+        //dataPoints.reverse();
         dataPointsTime.reverse();
         
         console.log(dataPointsTime);
@@ -946,7 +947,7 @@ if (document.getElementById('users_page'))
               }],
               yAxes: [{
                 ticks: {
-                  min: 5,
+                  min: 0,
                   max: maxDataPoint,
                   maxTicksLimit: 5
                 },

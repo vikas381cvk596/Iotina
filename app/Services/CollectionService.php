@@ -18,7 +18,7 @@ class CollectionService
         $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
         $collection = $client->eapDb->staTable;
 
-        $time_interval = round(strtotime('-6 minutes') * 1000); // Last 6 Minutes
+        $time_interval = round(strtotime('-5 minutes') * 1000); // Last 6 Minutes
 
         /*$manager = new MongoDB\Driver\Manager("mongodb://localhost:27017");
         //$connect = connect();
@@ -99,9 +99,9 @@ class CollectionService
         $collection = $client->eapDb->apTable;
         $date = new UTCDateTime(0);
 
-        $time_interval = round(strtotime('-6 minutes') * 1000); // Last 6 Minutes
+        $time_interval = round(strtotime('-60 minutes') * 1000); // Last 6 Minutes
         $current_time = round(microtime(true) * 1000);
-        $pipeline = [
+        $pipeline = [   
             [
                 '$match' => [
                     '$and' => [
@@ -166,13 +166,18 @@ class CollectionService
                     ],
                     'count' => [
                         '$sum' => '$NumberOfSTA'
-                    ]
+                    ],
+                    
                 ]
             ], [
+                '$sort' => [
+                    '_id' => 1.0
+                ],
+            ], [
                 '$project' => [
-                    '_id' => 0.0,
+                    '_id' => 1.0,
                     'count' => 1.0
-                ]
+                ],
             ]
         ];
 
@@ -183,12 +188,14 @@ class CollectionService
         $cursor = $collection->aggregate($pipeline, $options); 
 
         $data = [];
+        $all_data = [];
         $count = [];
         $count = 0;
         foreach ($cursor as $document) { 
+            $all_data[] = $document;
             $data[] = $document['count'];
             $count = $count + 1; 
-            if ($count >= 10) 
+            if ($count >= 12) 
                 break;
             //$count[] = $document['_count'];
         }
@@ -196,6 +203,7 @@ class CollectionService
         $results = new \stdClass();
         $results->dataPointsCount = $count;
         $results->dataPoints = $data;
+        $results->all_data = $all_data;
         $results = json_encode($results);
         return $results;
         //return var_dump($cursor);
@@ -249,7 +257,7 @@ class CollectionService
             $status = 'disconnected';
             
             //$time_interval = round(microtime(true) * 1000); //Right Now
-            $time_interval = round(strtotime('-6 minutes') * 1000); // Last 6 Minutes
+            $time_interval = round(strtotime('-10 minutes') * 1000); // Last 10 Minutes, 2 missed msgs 
 
             if ($ap_identifier == "MAC Address") {
                 $cursor = $collection->find(['ap_id' => $ap_search, 'org_id' => $org_id, 'timestamp' => ['$gt' => $time_interval]]);
@@ -284,15 +292,15 @@ class CollectionService
             
             $org_id = (int)$input_filters->org_id;
             $venue_id = (int)$input_filters->venue_id; 
-            $time_interval = round(strtotime('-6 minutes') * 1000); // Last 6 Minutes
+            $time_interval = round(strtotime('-5 minutes') * 1000); // Last 6 Minutes
             $current_time = round(microtime(true) * 1000);
 
             $query = [
                 '$and' => [
                     [
-                        'org_id' => 1
+                        'org_id' => $org_id
                     ],[
-                        'venue_id' => 1
+                        'venue_id' => $venue_id
                     ], [
                         'timestamp' => [
                             '$gte' => $time_interval
@@ -313,7 +321,7 @@ class CollectionService
             
             $org_id = (int)$input_filters->org_id;
             $ap_id = $input_filters->ap_mac_address; 
-            $time_interval = round(strtotime('-6 minutes') * 1000); // Last 6 Minutes
+            $time_interval = round(strtotime('-5 minutes') * 1000); // Last 6 Minutes
             $current_time = round(microtime(true) * 1000);
 
             $query = [
@@ -363,7 +371,7 @@ class CollectionService
             
             $org_id = (int)$input_filters->org_id;
             $network_name = $input_filters->network_name; 
-            $time_interval = round(strtotime('-6 minutes') * 1000); // Last 6 Minutes
+            $time_interval = round(strtotime('-5 minutes') * 1000); // Last 6 Minutes
             $current_time = round(microtime(true) * 1000);
             //$network_name = 'ssid0';
             $query = [
@@ -388,13 +396,32 @@ class CollectionService
             $clients_count = $collection->count($query, $options);
         } else if ($page == 'dashboard_page') {
             $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
-            $collection = $client->eapDb->apTable;
+            $collection = $client->eapDb->staTable;
             
             $org_id = (int)$input_filters->org_id;
-            $time_interval = round(strtotime('-6 minutes') * 1000); // Last 6 Minutes
+            $time_interval = round(strtotime('-5 minutes') * 1000); // Last 6 Minutes
             $current_time = round(microtime(true) * 1000);
 
             $query = [
+                '$and' => [
+                    [
+                        'org_id' => $org_id
+                    ], [
+                        'timestamp' => [
+                            '$gte' => $time_interval
+                        ]
+                    ], [
+                        'timestamp' => [
+                            '$lte' => $current_time
+                        ]
+                    ]
+                ]
+            ];
+
+            $options = [];
+            $clients_count = $collection->count($query, $options);
+            
+            /*$query = [
                 '$and' => [
                     [
                         'org_id' => $org_id
@@ -423,7 +450,17 @@ class CollectionService
             
             $options = [];
 
-            $clients_count = $collection->count($query, $options);
+            //$clients_count = $collection->count($query, $options);
+            $cursor = $collection->find($query, $options);
+            $count = 0;
+            foreach ($cursor as $document) { 
+                //$status = "connected";
+                if (array_key_exists('NumberOfSTA', $document)) {
+                    //$count = 10;
+                    $count = $count + (int)$document['NumberOfSTA'];
+                }
+            }
+            $clients_count = strval($count);*/
         }
 
 
@@ -435,7 +472,7 @@ class CollectionService
         $collection = $client->eapDb->apTable;
 
         $ap = new \stdClass();
-        $time_interval = round(strtotime('-6 minutes') * 1000); // Last 24 Hours
+        $time_interval = round(strtotime('-5 minutes') * 1000); // Last 24 Hours
 
         $cursor = $collection->find(['org_id' => 1, 'SerialNo' => '123456', 'timestamp' => ['$gt' => $time_interval]], ['sort' => ['timestamp' => -1]]);
 
