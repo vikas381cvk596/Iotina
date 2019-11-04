@@ -214,7 +214,7 @@ class CollectionService
             $all_data[] = $document;
             $data[] = $document['count'];
             $count = $count + 1; 
-            if ($count >= 12) 
+            if ($count >= 13) 
                 break;
             //$count[] = $document['_count'];
         }
