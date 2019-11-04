@@ -767,7 +767,6 @@ if (document.getElementById('users_page'))
   
   $.fn.get_time_interval_setting = function() {
     //var setting_time_interval = $("#setting_time_interval").val();
-    //alert(setting_time_interval);
 
     $.ajax({
       url: "getTimeInterval",
@@ -777,6 +776,11 @@ if (document.getElementById('users_page'))
       },
       success: function(data) {
         $("#setting_time_interval").val(data);
+        if (data != '') {
+          $(".interval_time_heading").html(data);
+        } else {
+          $(".interval_time_heading").html('300');
+        }
       }
     });
   }
@@ -1009,6 +1013,27 @@ if (document.getElementById('users_page'))
   }
   $.fn.get_clients_graph_data();
   $.fn.get_live_dashboard_data();
+
+  $.fn.get_time_interval_setting = function() {
+    //var setting_time_interval = $("#setting_time_interval").val();
+
+    $.ajax({
+      url: "getTimeInterval",
+      type: "POST",
+      data: {
+        '_token': window.Laravel.csrfToken
+      },
+      success: function(data) {
+        if (data != '') {
+          $(".interval_time_heading").html(data);
+        } else {
+          $(".interval_time_heading").html('300');
+        }
+      }
+    });
+  }
+  $.fn.get_time_interval_setting();
+
 }
 
 if (document.getElementById('test_page'))
