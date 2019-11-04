@@ -35,6 +35,10 @@ Route::post('/getDashboardData', array('as' => 'getDashboardData', 'uses' => 'Ap
 
 Route::post('/admin/duplicateNetworkName', array('as' => 'duplicateNetworkName', 'uses' => 'AppController@duplicateNetworkName'));
 Route::post('/api/accesspoint', array('as' => 'getAPData', 'uses' => 'AppController@getAPData'));
+Route::post('/admin/setTimeInterval', array('as' => 'setTimeInterval', 'uses' => 'AppController@setTimeInterval'));
+Route::post('/admin/getTimeInterval', array('as' => 'getTimeInterval', 'uses' => 'AppController@getTimeInterval'));
+
+
 
 
 

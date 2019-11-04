@@ -103,10 +103,24 @@ class AppController extends Controller
                 'Content-Type' => 'application/json',
             ]);  
     }
+
     public function getDashboardData() {
         $organisationService = new OrganisationService();
         $result = $organisationService->getDashboardData();
         return $result;    
     }
+
+    public function setTimeInterval(Request $request) {
+        $organisationService = new OrganisationService();
+        $result = $organisationService->setTimeInterval($request->input('setting_time_interval'));
+        return $result;    
+    }
+
+    public function getTimeInterval() {
+        $organisationService = new OrganisationService();
+        $result = $organisationService->getTimeInterval();
+        return $result;    
+    }
+    
     
 }

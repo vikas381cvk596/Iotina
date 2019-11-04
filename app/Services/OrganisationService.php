@@ -80,4 +80,25 @@ class OrganisationService
         $dashboard_data = json_encode($dashboard_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
         return $dashboard_data;
     }
+
+    public function setTimeInterval ($setting_time_interval) {
+        $org_id = $this->getOrganisationID();
+
+        $orgUpdate['setting_time_interval'] = $setting_time_interval;
+        DB::table('organisation')->where(['org_id' => $org_id])->update($orgUpdate); 
+
+        return $setting_time_interval;
+    }
+
+    public function getTimeInterval() {
+        $org_id = $this->getOrganisationID();
+        $org_record = DB::table('organisation')->where(['org_id' => $org_id])->first();
+        $setting_time_interval = '300';
+
+        if ($org_record) {
+            $setting_time_interval = $org_record->setting_time_interval;
+        } 
+
+        return $setting_time_interval;
+    }
 }

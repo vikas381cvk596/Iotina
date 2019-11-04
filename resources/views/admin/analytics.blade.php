@@ -7,11 +7,17 @@
       <!-- Breadcrumbs-->
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
-          <a href="#">Dashboard</a>
+          <a href="{{ url('/admin') }}">Dashboard</a>
         </li>
         <li class="breadcrumb-item active">Analytics</li>
       </ol>
       <!-- Area Chart Example-->
+          <div class="form-group" style="display: flex; flex-direction: row; align-items: center; justify-content: flex-end;">
+            <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600;">Time Interval (seconds)&nbsp; &nbsp;&nbsp;</div>
+            <input type="text" id="setting_time_interval" name="setting_time_interval" class="form-control" class="form-control" placeholder="300" style="font-size: 14px; max-width: 6vw;"/>
+            &nbsp;&nbsp;<button type="submit" name="btn_save_setting" id="btn_save_setting" class="btn btn_save_setting_class" style="font-size: 15px;">Save</button>
+        </div>
+
       <div class="card mb-3">
         <div class="card-header">
           <i class="fa fa-area-chart"></i> Connected Clients (5 Minute Interval)</div>

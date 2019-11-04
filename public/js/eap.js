@@ -747,6 +747,41 @@ if (document.getElementById('users_page'))
   $.fn.get_collections_data();
 } else if (document.getElementById('analytics_page'))
 {
+  $("#analytics_page").on('click', '.btn_save_setting_class', function() {
+    var setting_time_interval = $("#setting_time_interval").val();
+    //alert(setting_time_interval);
+
+    $.ajax({
+      url: "setTimeInterval",
+      type: "POST",
+      data: {
+        'setting_time_interval': setting_time_interval,
+        '_token': window.Laravel.csrfToken
+      },
+      success: function(data) {
+        $("#setting_time_interval").val(data);
+      }
+    });
+    
+  });
+  
+  $.fn.get_time_interval_setting = function() {
+    //var setting_time_interval = $("#setting_time_interval").val();
+    //alert(setting_time_interval);
+
+    $.ajax({
+      url: "getTimeInterval",
+      type: "POST",
+      data: {
+        '_token': window.Laravel.csrfToken
+      },
+      success: function(data) {
+        $("#setting_time_interval").val(data);
+      }
+    });
+  }
+  $.fn.get_time_interval_setting();
+
   $.fn.get_clients_graph_data = function() {
     $.ajax({
       url: "getClientsTrafficGraphData",
@@ -761,6 +796,8 @@ if (document.getElementById('users_page'))
         console.log(dataPointsCount);
         var dataPoints = graph_data['dataPoints'];
         console.log(dataPoints);
+
+        var setting_time_interval = graph_data['setting_time_interval'];
         //console.log(graph_data);
         var maxDataPoint = Math.max.apply(null, dataPoints);
         maxDataPoint = maxDataPoint*(3/2);
@@ -777,7 +814,8 @@ if (document.getElementById('users_page'))
         var dataPointsTime = [];
         var today = new Date();
         var current_time = today.getHours() + ":" + today.getMinutes();
-        var interval = 5;
+        var interval = parseInt(setting_time_interval);
+        
         for (i=0; i<dataPointsCount; i++) {
           dataPointsTime[i] = current_time;
           today.setMinutes(today.getMinutes() - interval);
@@ -874,14 +912,18 @@ if (document.getElementById('users_page'))
         '_token': window.Laravel.csrfToken
       },
       success: function(graph_data) {
-        console.log(graph_data);
+        console.log("original_data_mongo"+graph_data);
         var graph_data = JSON.parse(graph_data);
+        //var finalArray = graph_data['finalArray'];
+        //console.log("data_final_array::"+finalArray);
         var dataPointsCount = graph_data['dataPointsCount'];
         console.log(graph_data['all_data']);
         console.log(dataPointsCount);
         var dataPoints = graph_data['dataPoints'];
         console.log(dataPoints);
         //console.log(graph_data);
+        var setting_time_interval = graph_data['setting_time_interval'];
+        
         var maxDataPoint = Math.max.apply(null, dataPoints);
         maxDataPoint = maxDataPoint*(3/2);
         var digits_cnt = digits_count(maxDataPoint);
@@ -897,7 +939,8 @@ if (document.getElementById('users_page'))
         var dataPointsTime = [];
         var today = new Date();
         var current_time = today.getHours() + ":" + today.getMinutes();
-        var interval = 5;
+        var interval = parseInt(setting_time_interval);
+
         for (i=0; i<dataPointsCount; i++) {
           dataPointsTime[i] = current_time;
           today.setMinutes(today.getMinutes() - interval);

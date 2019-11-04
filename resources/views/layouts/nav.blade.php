@@ -44,6 +44,12 @@
                     <span class="nav-link-text">Analytics</span>
                 </a>
             </li>
+            <!--<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Inventory">
+                <a class="nav-link" href="{{ url('/admin/settings') }}">
+                    <i class="fa fa-fw fa-chart-bar"></i>
+                    <span class="nav-link-text">Settings</span>
+                </a>
+            </li>-->
             <!--
             <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
                 <a class="nav-link" href="{{ url('/admin/charts') }}">

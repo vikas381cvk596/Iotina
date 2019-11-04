@@ -27,6 +27,12 @@ class APIService
 
     		$organisationService = new OrganisationService();
         	$org_name = $organisationService->getOrganisationDetails($ap_db->org_id);
+            $setting_time_interval = 300;
+            $org_interval = $organisationService->getTimeInterval();
+
+            if ($org_interval != '') {
+                $setting_time_interval = (int)$org_interval;
+            }  
 
         	$networkService = new NetworkService();
         	$network_names = $networkService->getAllNetworkDataByVenueID($ap_db->org_id, $ap_db->venue_id);
@@ -36,8 +42,8 @@ class APIService
     		$ap_data->venue_id = $ap_db->venue_id;
     		$ap_data->group_id = 0;
     		$ap_data->network_name = $network_names;
-    		$ap_data->stats_collection_interval = 300;
-    		$ap_data->stats_publish_interval = 300;
+    		$ap_data->stats_collection_interval = $setting_time_interval;
+    		$ap_data->stats_publish_interval = $setting_time_interval;
     		$ap_data->stats_publish_url = 'ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:9092';
     		$ap_data->schema_server_url = 'http://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:8081';
 

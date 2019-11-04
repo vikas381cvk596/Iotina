@@ -11,6 +11,6 @@ class Organisation extends Model
     protected $table = 'organisation';
 
     protected $fillable = [
-        'org_id', 'org_name', 'org_address', 'org_city', 'org_state', 'org_country', 'org_status'
+        'org_id', 'org_name', 'org_address', 'org_city', 'org_state', 'org_country', 'org_status', 'setting_time_interval'
     ];
 }
