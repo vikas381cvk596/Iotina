@@ -95,7 +95,8 @@ class OrganisationService
         $org_record = DB::table('organisation')->where(['org_id' => $org_id])->first();
         $setting_time_interval = '300';
 
-        if ($org_record) {
+        if (!is_null($org_record)) {
+        
             $setting_time_interval = $org_record->setting_time_interval;
         } 
 
