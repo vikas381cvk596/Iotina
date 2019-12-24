@@ -45,6 +45,16 @@ class OrganisationService
             $org_name = $org_record->org_name;
         }
         return $org_name;
+    } 
+
+    public function getAllOrganisationDetails() {
+        $org_data = '';
+        $org_id = $this->getOrganisationID();
+        $org_record = DB::table('organisation')->where(['org_id' => $org_id])->first();
+        if (!is_null($org_record)) {
+            $org_data = $org_record;
+        }
+        return $org_data;
     }       
 
     public function getDashboardData() {

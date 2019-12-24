@@ -11,6 +11,7 @@ use Validator;
 use Illuminate\Support\Facades\Input;
 use App\User;
 use App\Services\OrganisationService;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -38,6 +39,7 @@ class AuthController extends Controller
         $user->name = $request->get ( 'user_name' );
         $user->email = $request->get ( 'user_email' );
         $user->password = Hash::make ( $request->get ( 'password' ) );
+        $user->api_token = Str::random(60);
         $user->role = "super_admin";
         $org_name = $request->get ( 'user_organisation' );
         //$user->is_active = 'Yes';

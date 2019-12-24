@@ -40,9 +40,53 @@ class VenueService
         return $return_flag;
     }
 
+    public function updateVenue ($venue_id, $venue_name, $venue_desc) 
+    {
+        $return_flag = 'success';
+        if ($venue_name == '') {
+            $return_flag = 'venue_name_missing';
+        } else {
+            $organisationService = new OrganisationService();
+            $org_id = $organisationService->getOrganisationID();
+
+            $organisationService = new OrganisationService();
+            $org_id = $organisationService->getOrganisationID();
+            $venue_records = DB::table('venue')
+                ->where("org_id", "=", $org_id)
+                ->where("venue_name", "=", $venue_name)
+                ->where("venue_id", "!=", $venue_id)
+                ->get();
+            $venue_records_count = count($venue_records);
+
+            if ($venue_records_count > 0) {
+                $return_flag = 'venue_name_duplicate';
+            } else {
+                $venueData['venue_name'] = $venue_name;
+                $venueData['venue_description'] = $venue_desc;
+
+                $current_date = new \DateTime();
+                $current_date = $current_date->format('Y-m-d h:i:s'); 
+                $venueData['updated_at'] = $current_date;
+
+
+                $result = DB::table('venue')->where(['venue_id' => $venue_id, 'org_id' => $org_id, ])->update($venueData);
+                if (!$result) {
+                    $return_flag = 'venue_not_found';
+                } else {
+                    $return_flag = 'success';
+                }
+            }
+        } 
+
+        return $return_flag;
+    }
+    
+
     public function venueExists ($venue_name) 
     {
-        $venue_record = DB::table('venue')->where(['venue_name' => $venue_name])->first();
+        $organisationService = new OrganisationService();
+        $org_id = $organisationService->getOrganisationID();
+        $venue_record = DB::table('venue')->where(['venue_name' => $venue_name, 'org_id' => $org_id])->first();
         if (!is_null($venue_record)) {
             return false;
         }
@@ -91,5 +135,21 @@ class VenueService
         }
         
         return $venue_name;       
+    }
+
+    public function getVenueDetailsByName ($venue_name) 
+    {
+        $organisationService = new OrganisationService();
+        $org_id = $organisationService->getOrganisationID();
+        $venue_record = DB::table('venue')->where(['venue_name' => $venue_name, 'org_id' => $org_id])->first();
+
+        return $venue_record;
+    }
+
+    public function getVenueDetailsByID ($venue_id) 
+    {
+        $venue_record = DB::table('venue')->where(['venue_id' => $venue_id])->first();
+        
+        return $venue_record;
     }
 }

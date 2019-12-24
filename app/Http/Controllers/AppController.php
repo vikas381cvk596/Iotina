@@ -104,6 +104,51 @@ class AppController extends Controller
             ]);  
     }
 
+    public function getOrganisationDetails() {
+        $apiService = new APIService();
+        $result = $apiService->getOrganisationDetails();
+        return response($result)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+            ]);  
+    }
+
+    public function getClusterDetails($cluster_id) {
+        $apiService = new APIService();
+        $result = $apiService->getClusterDetails($cluster_id);
+        return response($result)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+            ]);  
+    }
+
+    public function getAllClusters(Request $request) {
+        $apiService = new APIService();
+        $result = $apiService->getAllClusters($request);
+        return response($result)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+            ]);  
+    }
+
+    public function createCluster(Request $request) {
+        $apiService = new APIService();
+        $result = $apiService->createCluster($request);
+        return response($result)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+            ]);  
+    }
+
+    public function updateCluster($cluster_id, Request $request) {
+        $apiService = new APIService();
+        $result = $apiService->updateCluster($cluster_id, $request);
+        return response($result)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+            ]);  
+    }
+
     public function getDashboardData() {
         $organisationService = new OrganisationService();
         $result = $organisationService->getDashboardData();

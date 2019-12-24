@@ -10,7 +10,11 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::get('/', 'AuthController@showHomePage');
+//Route::get('/', 'AuthController@showHomePage');
+Route::get('/', [
+        'as' => 'login2',
+        'uses' => 'AuthController@showHomePage'
+    ]);
 Route::get('/admin/login', 'AuthController@showHomePage');
 Route::get('/admin/register', 'AuthController@showRegisterPage');
 Route::post('/admin/user_login', 'AuthController@loginUser');
@@ -38,6 +42,20 @@ Route::post('/api/accesspoint', array('as' => 'getAPData', 'uses' => 'AppControl
 Route::post('/admin/setTimeInterval', array('as' => 'setTimeInterval', 'uses' => 'AppController@setTimeInterval'));
 Route::post('/admin/getTimeInterval', array('as' => 'getTimeInterval', 'uses' => 'AppController@getTimeInterval'));
 Route::post('/getTimeInterval', array('as' => 'getTimeInterval', 'uses' => 'AppController@getTimeInterval'));
+
+
+//Route::get('/api/organisation/{token?}', array('as' => 'getOrganisationDetails', 'uses' => 'AppController@getOrganisationDetails'));
+
+Route::middleware('auth:api')->get('api/organisation', array('as' => 'getOrganisationDetails', 'uses' => 'AppController@getOrganisationDetails'));
+
+Route::middleware('auth:api')->get('api/clusters/{cluster_id}', array('as' => 'getClusterDetails', 'uses' => 'AppController@getClusterDetails'));
+
+Route::middleware('auth:api')->get('api/clusters', array('as' => 'getAllClusters', 'uses' => 'AppController@getAllClusters'));
+
+Route::middleware('auth:api')->post('api/clusters', array('as' => 'createCluster', 'uses' => 'AppController@createCluster'));
+
+Route::middleware('auth:api')->put('api/clusters/{cluster_id}', array('as' => 'updateCluster', 'uses' => 'AppController@updateCluster'));
+
 
 
 
