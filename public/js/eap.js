@@ -158,7 +158,8 @@ if (document.getElementById('venue_page'))
         success: function(result) {
           //alert(result);
           //alert(result);
-          if (result == 'success') {
+          var ap_output = JSON.parse(result);
+          if (ap_output.status == 'success') {
             $('#error_msg_crt').hide();
             $('#success_msg_crt').show();
 
@@ -336,8 +337,8 @@ if (document.getElementById('venue_page'))
       },
       success: function(result) {
         //alert(result);
-        console.log(result);
-        if (result == 'success') {
+        var wifi_output = JSON.parse(result);
+        if (wifi_output.status == 'success') {
           $('#error_msg_crt').hide();
           $('#success_msg_crt').show();
           $.fn.generate_wifi_table();

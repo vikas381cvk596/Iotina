@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use MongoDB\Client;
+use MongoDB\Driver\Exception\ConnectionException;
+use MongoDB\Driver\Exception\ConnectionTimeoutException;
 //use MongoDB\BSON\ObjectId;
 use DateTime;
 use MongoDB\BSON\UTCDateTime;
@@ -303,10 +305,21 @@ class CollectionService
             }*/
 
             //$cursor = $collection->find($query, $options);
+            $cursor = [];
             if ($ap_identifier == "MAC Address") {
-                $cursor = $collection->find(['ap_id' => $ap_search, 'org_id' => $org_id], ['sort' => ['timestamp' => -1]]);
+                try {
+                    $cursor = $collection->find(['ap_id' => $ap_search, 'org_id' => $org_id], ['sort' => ['timestamp' => -1]]);
+                } catch (ConnectionException $e) {
+                    return $clients_count;
+                } catch (ConnectionTimeoutException $e) {
+                    return $clients_count;
+                }
             } else {
-                $cursor = $collection->find(['SerialNo' => $ap_search, 'org_id' => $org_id], ['sort' => ['timestamp' => -1]]);
+                try {
+                    $cursor = $collection->find(['SerialNo' => $ap_search, 'org_id' => $org_id], ['sort' => ['timestamp' => -1]]);
+                } catch (ConnectionException $e) {
+                } catch (ConnectionTimeoutException $e) {
+                }
             }
             
             foreach ($cursor as $document) { 
@@ -385,7 +398,13 @@ class CollectionService
             ];
 
             $options = [];
-            $clients_count = $collection->count($query, $options);
+            try {
+                $clients_count = $collection->count($query, $options);
+            } catch (ConnectionException $e) {
+                return $clients_count;
+            } catch (ConnectionTimeoutException $e) {
+                return $clients_count;
+            }
         } else if ($page == 'ap_page') {
             $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
             $collection = $client->eapDb->apTable;
@@ -464,7 +483,13 @@ class CollectionService
             ];
 
             $options = [];
-            $clients_count = $collection->count($query, $options);
+            try {
+                $clients_count = $collection->count($query, $options);
+            } catch (ConnectionException $e) {
+                return $clients_count;
+            } catch (ConnectionTimeoutException $e) {
+                return $clients_count;
+            }
         } else if ($page == 'dashboard_page') {
             $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
             $collection = $client->eapDb->staTable;
@@ -490,7 +515,13 @@ class CollectionService
             ];
 
             $options = [];
-            $clients_count = $collection->count($query, $options);
+            try {
+                $clients_count = $collection->count($query, $options);
+            } catch (ConnectionException $e) {
+                return $clients_count;
+            } catch (ConnectionTimeoutException $e) {
+                return $clients_count;
+            }
             
             /*$query = [
                 '$and' => [

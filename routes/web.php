@@ -56,6 +56,21 @@ Route::middleware('auth:api')->post('api/clusters', array('as' => 'createCluster
 
 Route::middleware('auth:api')->put('api/clusters/{cluster_id}', array('as' => 'updateCluster', 'uses' => 'AppController@updateCluster'));
 
+Route::middleware('auth:api')->get('api/accesspoints/{ap_id}', array('as' => 'getAPDetails', 'uses' => 'AppController@getAPDetails'));
+
+Route::middleware('auth:api')->get('api/accesspoints', array('as' => 'getAllAPs', 'uses' => 'AppController@getAllAPs'));
+
+Route::middleware('auth:api')->post('api/accesspoints', array('as' => 'createAP', 'uses' => 'AppController@createAP'));
+
+Route::middleware('auth:api')->put('api/accesspoints/{ap_id}', array('as' => 'updateAP', 'uses' => 'AppController@updateAP'));
+
+Route::middleware('auth:api')->get('api/wifi_network/{ap_id}', array('as' => 'getWifiNetworkDetails', 'uses' => 'AppController@getWifiNetworkDetails'));
+
+Route::middleware('auth:api')->get('api/wifi_network', array('as' => 'getAllWifiNetworksAPI', 'uses' => 'AppController@getAllWifiNetworksAPI'));
+
+Route::middleware('auth:api')->post('api/wifi_network', array('as' => 'createWifiNetwork', 'uses' => 'AppController@createWifiNetwork'));
+
+Route::middleware('auth:api')->put('api/wifi_network/{ap_id}', array('as' => 'updateWifiNetwork', 'uses' => 'AppController@updateWifiNetwork'));
 
 
 

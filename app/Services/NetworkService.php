@@ -50,42 +50,53 @@ class NetworkService
         if ($network_data_list['security_protocol']) {
             $networkMetaData['security_protocol'] = $network_data_list['security_protocol'];
         }
-        if ($network_data_list['passphrase_format']) {
+        if (isset($network_data_list['passphrase_format'])) {
             $networkMetaData['passphrase_format'] = $network_data_list['passphrase_format'];
         }
-        if ($network_data_list['passphrase_expiry']) {
+        if (isset($network_data_list['passphrase_expiry'])) {
             $networkMetaData['passphrase_expiry'] = $network_data_list['passphrase_expiry'];
         }
-        if ($network_data_list['backup_passphrase']) {
+        if (isset($network_data_list['backup_passphrase'])) {
             $networkMetaData['backup_phrase'] = $network_data_list['backup_passphrase'];
         }
-        if ($network_data_list['passphrase_length']) {
+        if (isset($network_data_list['passphrase_length'])) {
             $networkMetaData['passphrase_length'] = $network_data_list['passphrase_length'];
         }
         
         Network::create($networkData);
         NetworkMeta::create($networkMetaData);
-
-        if ($network_data_list['network_venues']) {
+        if (isset($network_data_list['network_venues'])) {
             //getNetworkIDByName()
             $network_venues = json_decode($network_data_list['network_venues']);
-            foreach ($network_venues as $venue_id) {
-                $networkVenueData = [];
+            if (is_array($network_venues)) {
+                foreach ($network_venues as $venue_id) {
+                    $networkVenueData = [];
 
-                $network_venue_id_last = DB::table('network_venue_mapping')->orderBy('network_venue_id', 'desc')->first();
-                if (!is_null($network_venue_id_last)) {
-                    $network_venue_id = $network_venue_id_last->network_venue_id + 1;
+                    $network_venue_id_last = DB::table('network_venue_mapping')->orderBy('network_venue_id', 'desc')->first();
+                    $network_venue_id = 1;
+                    if (!is_null($network_venue_id_last)) {
+                        $network_venue_id = $network_venue_id_last->network_venue_id + 1;
+                    }
+                    $networkVenueData['network_venue_id'] = $network_venue_id;
+                    $networkVenueData['network_id'] = $network_id;
+                    $networkVenueData['org_id'] = $org_id;
+                    $networkVenueData['venue_id'] = $venue_id;
+
+                    $venueService = new VenueService();
+                    $venue_exists = $venueService->getVenueDetailsByID($venue_id);
+                    if ($venue_exists) {
+                        NetworkVenueMapping::create($networkVenueData);
+                    }
                 }
-                $network_venue_id = 1;
-                $networkVenueData['network_venue_id'] = $network_venue_id;
-                $networkVenueData['network_id'] = $network_id;
-                $networkVenueData['org_id'] = $org_id;
-                $networkVenueData['venue_id'] = $venue_id;
-                NetworkVenueMapping::create($networkVenueData);
             }
         }
+        $network_info = $this->getNetworkDetails($network_id);
         
-        return $return_flag;
+        $network_data = new \stdClass();
+        $network_data->network_info = $network_info;
+        $network_data->status = $return_flag;
+        $network_data = json_encode($network_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+        return $network_data;
     }
 
     public function getAllWifiNetworks () {
@@ -164,5 +175,150 @@ class NetworkService
             if (!is_null($network_meta)) {
                 $network->backup_phrase = $network_meta->backup_phrase;     
             }*/
+    }
+
+    public function getNetworkDetails($network_id) 
+    {
+        $organisationService = new OrganisationService();
+        $org_id = $organisationService->getOrganisationID();
+
+        $network_info = [];
+        if ($network_id != "") {
+            $network = DB::table('network')->where(['org_id' => $org_id, 'network_id' => $network_id])->first();
+            $network_info['network'] = $network;
+            
+            if ($network) {                
+                $network_meta = DB::table('network_meta')->where(['network_id' => $network_id])->first();
+                $network_info['network_meta'] = $network_meta;
+
+                $nv_mapping = DB::table('network_venue_mapping')->where(['network_id' => $network->network_id, 'org_id' => $network->org_id])->get();
+                
+                $count_venue = 0;
+                $count_ap = 0;
+
+                if ($nv_mapping) {
+                    $count_venue = count($nv_mapping);
+                }
+                $cluster_list = [];
+                foreach ($nv_mapping as $venue) {
+                    $cluster_list[] = $venue->venue_id;
+
+                    $access_points = DB::table('access_point')->where(['venue_id' => $venue->venue_id, 'org_id' => $network->org_id])->get();
+
+                    if ($access_points) {
+                        $count_ap = $count_ap + count($access_points);
+                    }
+                }
+                $network_info['cluster_list'] = $cluster_list;
+                $network_info['count_venue'] = strval($count_venue);
+                $network_info['count_ap'] = strval($count_ap);
+            }
+        }
+        return $network_info;
+    }
+
+    public function updateNetwork ($network_id, $network_data_list) 
+    {
+        $return_flag = 'success';
+        $network_data_list = json_decode($network_data_list, true);
+
+        $organisationService = new OrganisationService();
+        $org_id = $organisationService->getOrganisationID();
+        $networkData['network_id'] = $network_id;
+        $networkData['org_id'] = $org_id;
+        $networkData['network_type'] = $network_data_list['network_type'];
+        $network_name = '';
+
+        if ($network_data_list['network_name']) {
+            $network_name = $network_data_list['network_name'];
+            $networkData['network_name'] = $network_data_list['network_name'];
+        }
+        if ($network_data_list['network_desc']) {
+            $networkData['network_description'] = $network_data_list['network_desc'];
+        }
+        if ($network_data_list['network_vlan']) {
+            $networkData['network_vlan'] = $network_data_list['network_vlan'];
+        }
+
+        $network_meta_id = 1;
+        $network_meta_id_last = DB::table('network_meta')->orderBy('network_meta_id', 'desc')->first();
+        if (!is_null($network_meta_id_last)) {
+            $network_meta_id = $network_meta_id_last->network_meta_id + 1;
+        }
+
+        $networkMetaData = [];
+        $networkMetaData['network_meta_id'] = $network_meta_id;
+        $networkMetaData['network_id'] = $network_id;
+        if ($network_data_list['security_protocol']) {
+            $networkMetaData['security_protocol'] = $network_data_list['security_protocol'];
+        }
+        if (isset($network_data_list['passphrase_format'])) {
+            $networkMetaData['passphrase_format'] = $network_data_list['passphrase_format'];
+        }
+        if (isset($network_data_list['passphrase_expiry'])) {
+            $networkMetaData['passphrase_expiry'] = $network_data_list['passphrase_expiry'];
+        }
+        if (isset($network_data_list['backup_passphrase'])) {
+            $networkMetaData['backup_phrase'] = $network_data_list['backup_passphrase'];
+        }
+        if (isset($network_data_list['passphrase_length'])) {
+            $networkMetaData['passphrase_length'] = $network_data_list['passphrase_length'];
+        }
+        
+        $organisationService = new OrganisationService();
+        $org_id = $organisationService->getOrganisationID();
+
+        $network_records = DB::table('network')
+                ->where("org_id", "=", $org_id)
+                ->where("network_name", "=", $network_name)
+                ->where("network_id", "!=", $network_id)
+                ->get();
+        $network_records_count = count($network_records);
+
+        if ($network_records_count > 0) {
+            $return_flag = 'network_name_duplicate';
+        } else {
+            $current_date = new \DateTime();
+            $current_date = $current_date->format('Y-m-d h:i:s'); 
+            $networkData['updated_at'] = $current_date;
+            $networkMetaData['updated_at'] = $current_date;
+
+            $result1 = DB::table('network')->where(['network_id' => $network_id, 'org_id' => $org_id])->update($networkData);
+            $result2 = DB::table('network_meta')->where(['network_id' => $network_id])->update($networkMetaData);
+        }
+ 
+        $deletedRows = NetworkVenueMapping::where('network_id', $network_id)->delete();
+        if (isset($network_data_list['network_venues'])) {
+            //getNetworkIDByName()
+            $network_venues = json_decode($network_data_list['network_venues']);
+            if (is_array($network_venues)) {
+                foreach ($network_venues as $venue_id) {
+                    $networkVenueData = [];
+
+                    $network_venue_id_last = DB::table('network_venue_mapping')->orderBy('network_venue_id', 'desc')->first();
+                    $network_venue_id = 1;
+                    if (!is_null($network_venue_id_last)) {
+                        $network_venue_id = $network_venue_id_last->network_venue_id + 1;
+                    }
+                    $networkVenueData['network_venue_id'] = $network_venue_id;
+                    $networkVenueData['network_id'] = $network_id;
+                    $networkVenueData['org_id'] = $org_id;
+                    $networkVenueData['venue_id'] = $venue_id;
+
+                    $venueService = new VenueService();
+                    $venue_exists = $venueService->getVenueDetailsByID($venue_id);
+                    if ($venue_exists) {
+                        NetworkVenueMapping::create($networkVenueData);
+                    }
+                }
+            }
+        }
+        $network_info = $this->getNetworkDetails($network_id);
+        
+        $network_data = new \stdClass();
+        $network_data->network_info = $network_info;
+        $network_data->status = $return_flag;
+        $network_data = json_encode($network_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+        return $network_data;
     }
 }

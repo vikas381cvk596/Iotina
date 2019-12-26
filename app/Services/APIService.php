@@ -4,7 +4,10 @@ namespace App\Services;
 use App\Services\OrganisationService;
 use App\Services\NetworkService;
 use App\Services\VenueService;
+use App\Services\AccessPointService;
 use App\Venue;
+use App\AccessPoint;
+use App\Network;
 use DB;
 
 class APIService
@@ -183,8 +186,8 @@ class APIService
 
     public function createCluster($input_fields)
     {
-        $venue_name = $input_fields->input('cluster_name');;
-        $venue_desc = $input_fields->input('cluster_description');;
+        $venue_name = $input_fields->input('cluster_name');
+        $venue_desc = $input_fields->input('cluster_description');
         $venue_add = '';
         $venue_add_notes = '';
 
@@ -252,4 +255,626 @@ class APIService
         $cluster_data = json_encode($cluster_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
         return $cluster_data;
     }
+
+    public function getAPDetails($ap_id)
+    {
+        $ap_data = new \stdClass();
+        if ($ap_id != '') {
+            $apService = new AccessPointService();
+            $ap_info = new \stdClass();
+
+            $ap_info = $apService->getAccessPointDetails($ap_id);
+            if ($ap_info != '') {
+                $ap_info->return_msg = "success";
+                $ap_data = $ap_info;
+            } else {
+                $ap_data->return_msg = "Access Point not found";
+            }
+
+        } else {
+            $ap_data->return_msg = "Access Point ID not provided";
+        }
+
+        $ap_data = json_encode($ap_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+        return $ap_data;
+    }
+
+    public function createAP($input_fields)
+    {
+        $ap_name = $input_fields->input('ap_name');
+        $ap_description = $input_fields->input('ap_description');
+        $ap_serial = $input_fields->input('ap_serial');
+        $ap_ip_address = $input_fields->input('ap_ip_address');
+        $ap_tags = $input_fields->input('ap_tags');
+        $ap_mac_address = $input_fields->input('ap_mac_address');
+        $ap_cluster_id = $input_fields->input('cluster_id');
+        $ap_identifier = $input_fields->input('ap_identifier');
+
+        if ($ap_identifier == '') {
+            if ($ap_serial != '') {
+                $ap_identifier = "Serial Number";
+            } else if ($ap_mac_address != '') {
+                $ap_identifier = "MAC Address";
+            } 
+        }
+
+        $ap_data = new \stdClass();
+
+        if ($ap_name == '') {
+            $ap_data->return_msg = "Access Point name not provided";
+            $ap_data = json_encode($ap_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $ap_data;
+        } else if ($ap_cluster_id == '') {
+            $ap_data->return_msg = "Cluster ID not provided";
+            $ap_data = json_encode($ap_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $ap_data;
+        } else if (!is_numeric($ap_cluster_id)) {
+            $ap_data->return_msg = "Cluster ID must be numeric";
+            $ap_data = json_encode($ap_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $ap_data;
+        } else if ($ap_serial == '' && $ap_mac_address == '') {
+            $ap_data->return_msg = "Access Point Serial ID or MAC Address is required";
+            $ap_data = json_encode($ap_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $ap_data;
+        }
+
+        $venueService = new VenueService();
+        $venue_exists = $venueService->getVenueDetailsByID($ap_cluster_id);
+        if (!$venue_exists) {
+            $ap_data->return_msg = "Cluster not found";
+            $ap_data = json_encode($ap_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $ap_data;
+        }
+
+        $apService = new AccessPointService();
+        $output = $apService->createAccessPoint($ap_cluster_id, $ap_name, $ap_description, $ap_identifier, $ap_serial, $ap_tags);
+        $ap_data = json_decode($output)->ap_info;
+        $ap_data->return_msg = "success";
+
+        $ap_data = json_encode($ap_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+        return $ap_data;
+    }
+
+    public function updateAP($ap_id, $input_fields)
+    {
+        $ap_name = $input_fields->input('ap_name');
+        $ap_description = $input_fields->input('ap_description');
+        $ap_serial = $input_fields->input('ap_serial');
+        $ap_ip_address = $input_fields->input('ap_ip_address');
+        $ap_tags = $input_fields->input('ap_tags');
+        $ap_mac_address = $input_fields->input('ap_mac_address');
+        $ap_cluster_id = $input_fields->input('cluster_id');
+        $ap_identifier = $input_fields->input('ap_identifier');
+
+        if ($ap_identifier == '') {
+            if ($ap_serial != '') {
+                $ap_identifier = "Serial Number";
+            } else if ($ap_mac_address != '') {
+                $ap_identifier = "MAC Address";
+            } 
+        }
+
+        $ap_data = new \stdClass();
+
+        if ($ap_name == '') {
+            $ap_data->return_msg = "Access Point name not provided";
+            $ap_data = json_encode($ap_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $ap_data;
+        } else if ($ap_cluster_id == '') {
+            $ap_data->return_msg = "Cluster ID not provided";
+            $ap_data = json_encode($ap_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $ap_data;
+        } else if (!is_numeric($ap_cluster_id)) {
+            $ap_data->return_msg = "Cluster ID must be numeric";
+            $ap_data = json_encode($ap_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $ap_data;
+        } else if ($ap_serial == '' && $ap_mac_address == '') {
+            $ap_data->return_msg = "Access Point Serial ID or MAC Address is required";
+            $ap_data = json_encode($ap_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $ap_data;
+        }
+
+        $venueService = new VenueService();
+        $venue_exists = $venueService->getVenueDetailsByID($ap_cluster_id);
+        if (!$venue_exists) {
+            $ap_data->return_msg = "Cluster not found";
+            $ap_data = json_encode($ap_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $ap_data;
+        }
+
+        $apService = new AccessPointService();
+        $output = $apService->updateAccessPoint($ap_id, $ap_cluster_id, $ap_name, $ap_description, $ap_identifier, $ap_serial, $ap_tags);
+
+        if (json_decode($output)->ap_info) {
+            $ap_data = json_decode($output)->ap_info;
+            $ap_data->return_msg = json_decode($output)->status;
+        } else {
+            $ap_data->return_msg = json_decode($output)->status;
+        }
+
+        if (json_decode($output)->status == "ap_not_found") {
+            $ap_data->return_msg = "Access point not found";
+        } else {
+            $ap_data = json_decode($output)->ap_info;
+            $ap_data->return_msg = "success";
+        }
+
+        $ap_data = json_encode($ap_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+        return $ap_data;
+    }
+
+    public function getAllAPs($input_filters)
+    {
+        $page_num = $input_filters->input('page_num');
+
+        $build_query = AccessPoint::query();
+        $organisationService = new OrganisationService();
+        $org_id = $organisationService->getOrganisationID();
+        
+        $build_query = $build_query->where("org_id", "=", $org_id);
+        $build_query->orderBy('created_at','asc');
+        if (is_numeric($page_num)) {
+            $ap_records = $build_query->paginate(5,['*'],'page',$page_num);
+        } else {
+            $ap_records = $build_query->paginate(5);
+        }
+
+        $ap_raw = [];
+        foreach ($ap_records as $row){
+            $row = json_decode($row);
+            $ap_record = new \stdClass();
+            
+            $ap_record->ap_id = $row->ap_id;
+            $ap_record->cluster_id = $row->venue_id;
+            $ap_record->ap_name = $row->ap_name;
+            $ap_record->ap_description = $row->ap_description;
+            $ap_record->ap_status = $row->ap_status;
+            $ap_record->ap_serial = $row->ap_serial;
+            $ap_record->ap_mac_address = $row->ap_mac_address;
+            $ap_record->ap_identifier = $row->ap_identifier;
+            $ap_record->ap_tags = $row->ap_tags;
+            $ap_record->ap_ip_address = $row->ap_ip_address;
+            $ap_record->ap_mesh_role = $row->ap_mesh_role;
+            
+            $ap_record->created_at = $row->created_at;
+            $ap_record->updated_at = $row->updated_at;
+
+            $ap_raw[] = $ap_record;
+        }
+        
+        $ap_data = new \stdClass();
+        $ap_data->return_msg = "success";
+        $ap_data->current_page = $ap_records->currentPage();
+        $ap_data->total_records = $ap_records->total();
+        $ap_data->page_size = $ap_records->perPage();
+        $ap_data->all_data = $ap_raw;
+
+        $ap_data = json_encode($ap_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+        return $ap_data;
+    }
+
+    public function createWifiNetwork($input_fields)
+    {
+        $network_info = new \stdClass();
+        $network_info->network_name = $input_fields->input('network_name');
+        $network_info->network_desc = $input_fields->input('network_description');
+        $network_info->network_type = strtoupper($input_fields->input('network_type'));
+        $network_info->network_status = $input_fields->input('network_status');
+        $network_info->network_vlan = $input_fields->input('network_vlan');
+        $network_info->backup_passphrase = $input_fields->input('backup_phrase');
+        $network_info->security_protocol = strtoupper($input_fields->input('security_protocol'));
+        $network_info->passphrase_expiry = $input_fields->input('passphrase_expiry');
+        $network_info->network_venues = $input_fields->input('cluster_list');
+
+        $wifi_data = new \stdClass();
+
+        if ($network_info->network_name == '') {
+            $wifi_data->return_msg = "Error: Network name not provided";
+            $wifi_data = json_encode($wifi_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $wifi_data;
+        } else if ($network_info->network_type == '') {
+            $wifi_data->return_msg = "Error: Network type not provided";
+            $wifi_data = json_encode($wifi_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $wifi_data;
+        } else if ($network_info->backup_passphrase == '') {
+            $wifi_data->return_msg = "Error: Network passphrase not provided";
+            $wifi_data = json_encode($wifi_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $wifi_data;
+        } else if ($network_info->security_protocol == '') {
+            $wifi_data->return_msg = "Error: Network Security Protocol not provided";
+            $wifi_data = json_encode($wifi_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $wifi_data;
+        } else if ($network_info->passphrase_expiry == '') {
+            $wifi_data->return_msg = "Error: Network Password Expiry not provided";
+            $wifi_data = json_encode($wifi_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $wifi_data;
+        } 
+        
+        $networkService = new NetworkService();
+        $duplicate_name_check = $networkService->duplicateNetworkName($network_info->network_name);
+
+        if ($duplicate_name_check == "duplicate") {
+            $wifi_data->return_msg = "Error: Network name already exists";
+            $wifi_data = json_encode($wifi_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $wifi_data;
+        }
+        
+        $network_info->network_venues = json_encode($network_info->network_venues);
+        $output = $networkService->createNetwork(json_encode($network_info));
+
+        if ($output) {
+            if (isset(json_decode($output)->network_info)) {
+                if (isset(json_decode($output)->network_info->network)) {
+                    $network_record = json_decode($output)->network_info->network;
+                    if (isset($network_record->network_id)) {
+                        $wifi_data->network_id = $network_record->network_id;
+                    }
+                    if (isset($network_record->network_name)) {
+                        $wifi_data->network_name = $network_record->network_name;
+                    } else {
+                        $wifi_data->network_name = '';
+                    }
+                    if (isset($network_record->network_description)) {
+                        $wifi_data->network_description = $network_record->network_description;
+                    } else {
+                        $wifi_data->network_description = '';
+                    }
+                    if (isset($network_record->network_type)) {
+                        $wifi_data->network_type = $network_record->network_type;
+                    } else {
+                        $wifi_data->network_type = '';
+                    }
+                    if (isset($network_record->network_status)) {
+                        $wifi_data->network_status = $network_record->network_status;
+                    } else {
+                        $wifi_data->network_status = '';
+                    }
+                    if (isset($network_record->network_vlan)) {
+                        $wifi_data->network_vlan = $network_record->network_vlan;
+                    } else {
+                        $wifi_data->network_vlan = '';
+                    }
+                    if (isset($network_record->created_at)) {
+                        $wifi_data->created_at = $network_record->created_at;
+                    } else {
+                        $wifi_data->created_at = '';
+                    }
+                }  
+                if (isset(json_decode($output)->network_info->network_meta)) {
+                    $network_meta_record = json_decode($output)->network_info->network_meta;
+                    if (isset($network_meta_record->backup_phrase)) {
+                        $wifi_data->backup_phrase = $network_meta_record->backup_phrase;
+                    } else {
+                        $wifi_data->backup_phrase = '';
+                    }
+                    if (isset($network_meta_record->security_protocol)) {
+                        $wifi_data->security_protocol = $network_meta_record->security_protocol;
+                    } else {
+                        $wifi_data->security_protocol = '';
+                    }
+                    if (isset($network_meta_record->passphrase_expiry)) {
+                        $wifi_data->passphrase_expiry = $network_meta_record->passphrase_expiry;
+                    } else {
+                        $wifi_data->passphrase_expiry = '';
+                    }
+                }  
+                if (isset(json_decode($output)->network_info->cluster_list)) {
+                    $wifi_data->cluster_list = json_decode($output)->network_info->cluster_list;
+                } 
+                if (isset(json_decode($output)->network_info->count_venue)) {
+                    $wifi_data->count_venue = json_decode($output)->network_info->count_venue;
+                } 
+                if (isset(json_decode($output)->network_info->count_ap)) {
+                    $wifi_data->count_ap = json_decode($output)->network_info->count_ap;
+                }  
+            }
+        }
+        $network_data = json_decode($output)->network_info->network;
+        $wifi_data->return_msg = "success";
+
+        $wifi_data = json_encode($wifi_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+        return $wifi_data;
+    }
+
+    public function getAllWifiNetworksAPI($input_filters)
+    {
+        $page_num = $input_filters->input('page_num');
+
+        $build_query = Network::query();
+        $organisationService = new OrganisationService();
+        $org_id = $organisationService->getOrganisationID();
+        
+        $build_query = $build_query->where("org_id", "=", $org_id);
+        $build_query->orderBy('created_at','asc');
+        if (is_numeric($page_num)) {
+            $network_records = $build_query->paginate(5,['*'],'page',$page_num);
+        } else {
+            $network_records = $build_query->paginate(5);
+        }
+
+        $network_raw = [];
+        foreach ($network_records as $row){
+            $row = json_decode($row);
+            $network_record = new \stdClass();
+            
+            $network_record->network_id = $row->network_id;
+            $network_record->network_name = $row->network_name;
+            $network_record->network_description = $row->network_description;
+            $network_record->network_type = $row->network_type;
+            $network_record->network_vlan = $row->network_vlan;
+            
+            $network_meta_record = DB::table('network_meta')->where(['network_id' => $row->network_id])->first();
+            if ($network_meta_record) {
+                $network_record->backup_phrase = $network_meta_record->backup_phrase;
+                $network_record->security_protocol = $network_meta_record->security_protocol;
+                $network_record->passphrase_expiry = $network_meta_record->passphrase_expiry;
+            }
+
+            $nv_mapping = DB::table('network_venue_mapping')->where(['network_id' => $row->network_id, 'org_id' => $org_id])->get();
+                
+            $count_venue = 0;
+            $count_ap = 0;
+
+            if ($nv_mapping) {
+                $count_venue = count($nv_mapping);
+            }
+            $cluster_list = [];
+            foreach ($nv_mapping as $venue) {
+                $cluster_list[] = $venue->venue_id;
+
+                $access_points = DB::table('access_point')->where(['venue_id' => $venue->venue_id, 'org_id' => $org_id])->get();
+
+                if ($access_points) {
+                    $count_ap = $count_ap + count($access_points);
+                }
+            }
+            $network_record->cluster_list = $cluster_list;
+            $network_record->count_venue = strval($count_venue);
+            $network_record->count_ap = strval($count_ap);
+
+            $network_record->created_at = $row->created_at;
+            $network_record->updated_at = $row->updated_at;
+            $network_raw[] = $network_record;
+        }
+        
+        $wifi_data = new \stdClass();
+        $wifi_data->return_msg = "success";
+        $wifi_data->current_page = $network_records->currentPage();
+        $wifi_data->total_records = $network_records->total();
+        $wifi_data->page_size = $network_records->perPage();
+        $wifi_data->all_data = $network_raw;
+
+        $wifi_data = json_encode($wifi_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+        return $wifi_data;
+    }
+
+    public function getWifiNetworkDetails($network_id)
+    {
+        $wifi_data = new \stdClass();
+        if ($network_id != '') {
+            $networkService = new NetworkService();
+            $network_info = new \stdClass();
+            $network_info = $networkService->getNetworkDetails($network_id);
+            if ($network_info) {
+                if (isset($network_info['network'])) {
+                    $network_record = $network_info['network'];
+                    if (isset($network_record->network_id)) {
+                        $wifi_data->network_id = $network_record->network_id;
+                    }
+                    if (isset($network_record->network_name)) {
+                        $wifi_data->network_name = $network_record->network_name;
+                    } else {
+                        $wifi_data->network_name = '';
+                    }
+                    if (isset($network_record->network_description)) {
+                        $wifi_data->network_description = $network_record->network_description;
+                    } else {
+                        $wifi_data->network_description = '';
+                    }
+                    if (isset($network_record->network_type)) {
+                        $wifi_data->network_type = $network_record->network_type;
+                    } else {
+                        $wifi_data->network_type = '';
+                    }
+                    if (isset($network_record->network_status)) {
+                        $wifi_data->network_status = $network_record->network_status;
+                    } else {
+                        $wifi_data->network_status = '';
+                    }
+                    if (isset($network_record->network_vlan)) {
+                        $wifi_data->network_vlan = $network_record->network_vlan;
+                    } else {
+                        $wifi_data->network_vlan = '';
+                    }
+                    if (isset($network_record->created_at)) {
+                        $wifi_data->created_at = $network_record->created_at;
+                    } else {
+                        $wifi_data->created_at = '';
+                    }
+                    $wifi_data->return_msg = "success";
+                }  else {
+                    $wifi_data->return_msg = "Network not found";
+                }
+                if (isset($network_info['network_meta'])) {
+                    $network_meta_record = $network_info['network_meta'];
+                    if (isset($network_meta_record->backup_phrase)) {
+                        $wifi_data->backup_phrase = $network_meta_record->backup_phrase;
+                    } else {
+                        $wifi_data->backup_phrase = '';
+                    }
+                    if (isset($network_meta_record->security_protocol)) {
+                        $wifi_data->security_protocol = $network_meta_record->security_protocol;
+                    } else {
+                        $wifi_data->security_protocol = '';
+                    }
+                    if (isset($network_meta_record->passphrase_expiry)) {
+                        $wifi_data->passphrase_expiry = $network_meta_record->passphrase_expiry;
+                    } else {
+                        $wifi_data->passphrase_expiry = '';
+                    }
+                }  
+                if (isset($network_info['cluster_list'])) {
+                    $wifi_data->cluster_list = $network_info['cluster_list'];
+                } 
+                if (isset($network_info['count_venue'])) {
+                    $wifi_data->count_venue = $network_info['count_venue'];
+                } 
+                if (isset($network_info['count_ap'])) {
+                    $wifi_data->count_ap = $network_info['count_ap'];
+                } 
+            }
+            //$wifi_data = $network_info;
+            /*if ($network_info != '') {
+                $wifi_data = $network_info;
+                $wifi_data->return_msg = "success";
+            } else {
+                $wifi_data->return_msg = "Network not found";
+            }*/
+
+        } else {
+            $wifi_data->return_msg = "Network ID not provided";
+        }
+
+        $wifi_data = json_encode($wifi_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+        return $wifi_data;
+    }
+
+    public function updateWifiNetwork($network_id, $input_fields)
+    {
+        $network_info = new \stdClass();
+        $network_info->network_name = $input_fields->input('network_name');
+        $network_info->network_desc = $input_fields->input('network_description');
+        $network_info->network_type = strtoupper($input_fields->input('network_type'));
+        $network_info->network_status = $input_fields->input('network_status');
+        $network_info->network_vlan = $input_fields->input('network_vlan');
+        $network_info->backup_passphrase = $input_fields->input('backup_phrase');
+        $network_info->security_protocol = strtoupper($input_fields->input('security_protocol'));
+        $network_info->passphrase_expiry = $input_fields->input('passphrase_expiry');
+        $network_info->network_venues = $input_fields->input('cluster_list');
+
+        $wifi_data = new \stdClass();
+        $networkService = new NetworkService();
+        
+        $network_record_exists = $networkService->getNetworkDetails($network_id);
+
+        if (empty($network_record_exists)) {
+            $wifi_data->return_msg = "Error: Network not found";
+            $wifi_data = json_encode($wifi_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $wifi_data;
+        }
+        if ($network_info->network_name == '') {
+            $wifi_data->return_msg = "Error: Network name not provided";
+            $wifi_data = json_encode($wifi_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $wifi_data;
+        } else if ($network_info->network_type == '') {
+            $wifi_data->return_msg = "Error: Network type not provided";
+            $wifi_data = json_encode($wifi_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $wifi_data;
+        } else if ($network_info->backup_passphrase == '') {
+            $wifi_data->return_msg = "Error: Network passphrase not provided";
+            $wifi_data = json_encode($wifi_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $wifi_data;
+        } else if ($network_info->security_protocol == '') {
+            $wifi_data->return_msg = "Error: Network Security Protocol not provided";
+            $wifi_data = json_encode($wifi_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $wifi_data;
+        } else if ($network_info->passphrase_expiry == '') {
+            $wifi_data->return_msg = "Error: Network Password Expiry not provided";
+            $wifi_data = json_encode($wifi_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $wifi_data;
+        } 
+        
+        //$duplicate_name_check = $networkService->duplicateNetworkName($network_info->network_name);
+
+       /* if ($duplicate_name_check == "duplicate") {
+            $wifi_data->return_msg = "Error: Network name already exists";
+            $wifi_data = json_encode($wifi_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $wifi_data;
+        }*/
+        
+        $network_info->network_venues = json_encode($network_info->network_venues);
+        $output = $networkService->updateNetwork($network_id, json_encode($network_info));
+
+        if ($output) {
+            if (isset(json_decode($output)->status)) {
+                if (json_decode($output)->status == 'network_name_duplicate') {
+                    $wifi_data->return_msg = "Error: Network name already exists";
+                    $wifi_data = json_encode($wifi_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+                    return $wifi_data;
+                } 
+            }
+            if (isset(json_decode($output)->network_info)) {
+                if (isset(json_decode($output)->network_info->network)) {
+                    $network_record = json_decode($output)->network_info->network;
+                    if (isset($network_record->network_id)) {
+                        $wifi_data->network_id = $network_record->network_id;
+                    }
+                    if (isset($network_record->network_name)) {
+                        $wifi_data->network_name = $network_record->network_name;
+                    } else {
+                        $wifi_data->network_name = '';
+                    }
+                    if (isset($network_record->network_description)) {
+                        $wifi_data->network_description = $network_record->network_description;
+                    } else {
+                        $wifi_data->network_description = '';
+                    }
+                    if (isset($network_record->network_type)) {
+                        $wifi_data->network_type = $network_record->network_type;
+                    } else {
+                        $wifi_data->network_type = '';
+                    }
+                    if (isset($network_record->network_status)) {
+                        $wifi_data->network_status = $network_record->network_status;
+                    } else {
+                        $wifi_data->network_status = '';
+                    }
+                    if (isset($network_record->network_vlan)) {
+                        $wifi_data->network_vlan = $network_record->network_vlan;
+                    } else {
+                        $wifi_data->network_vlan = '';
+                    }
+                    if (isset($network_record->created_at)) {
+                        $wifi_data->created_at = $network_record->created_at;
+                    } else {
+                        $wifi_data->created_at = '';
+                    }
+                }  
+                if (isset(json_decode($output)->network_info->network_meta)) {
+                    $network_meta_record = json_decode($output)->network_info->network_meta;
+                    if (isset($network_meta_record->backup_phrase)) {
+                        $wifi_data->backup_phrase = $network_meta_record->backup_phrase;
+                    } else {
+                        $wifi_data->backup_phrase = '';
+                    }
+                    if (isset($network_meta_record->security_protocol)) {
+                        $wifi_data->security_protocol = $network_meta_record->security_protocol;
+                    } else {
+                        $wifi_data->security_protocol = '';
+                    }
+                    if (isset($network_meta_record->passphrase_expiry)) {
+                        $wifi_data->passphrase_expiry = $network_meta_record->passphrase_expiry;
+                    } else {
+                        $wifi_data->passphrase_expiry = '';
+                    }
+                }  
+                if (isset(json_decode($output)->network_info->cluster_list)) {
+                    $wifi_data->cluster_list = json_decode($output)->network_info->cluster_list;
+                } 
+                if (isset(json_decode($output)->network_info->count_venue)) {
+                    $wifi_data->count_venue = json_decode($output)->network_info->count_venue;
+                } 
+                if (isset(json_decode($output)->network_info->count_ap)) {
+                    $wifi_data->count_ap = json_decode($output)->network_info->count_ap;
+                }  
+            }
+        }
+        //$wifi_data = json_decode($output)->network_info;
+        $wifi_data->return_msg = "success";
+
+        $wifi_data = json_encode($wifi_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+        return $wifi_data;
+
+    }
+    
 }

@@ -48,9 +48,6 @@ class VenueService
         } else {
             $organisationService = new OrganisationService();
             $org_id = $organisationService->getOrganisationID();
-
-            $organisationService = new OrganisationService();
-            $org_id = $organisationService->getOrganisationID();
             $venue_records = DB::table('venue')
                 ->where("org_id", "=", $org_id)
                 ->where("venue_name", "=", $venue_name)
@@ -69,7 +66,7 @@ class VenueService
                 $venueData['updated_at'] = $current_date;
 
 
-                $result = DB::table('venue')->where(['venue_id' => $venue_id, 'org_id' => $org_id, ])->update($venueData);
+                $result = DB::table('venue')->where(['venue_id' => $venue_id, 'org_id' => $org_id])->update($venueData);
                 if (!$result) {
                     $return_flag = 'venue_not_found';
                 } else {
@@ -113,11 +110,8 @@ class VenueService
             $input_filters = new \stdClass();
             $input_filters->org_id = $org_id;
             $input_filters->venue_id = $venue->venue_id;
-            
+            $clientCount = 0;
             $clientCount = $collectionService->getAllClientsConnected(json_encode($input_filters), 'venue_page');
-
-
-            
 
             $venue->network_count = $networkCount;
             $venue->ap_count = $apCount;
@@ -148,7 +142,10 @@ class VenueService
 
     public function getVenueDetailsByID ($venue_id) 
     {
-        $venue_record = DB::table('venue')->where(['venue_id' => $venue_id])->first();
+        $organisationService = new OrganisationService();
+        $org_id = $organisationService->getOrganisationID();
+
+        $venue_record = DB::table('venue')->where(['venue_id' => $venue_id, 'org_id' => $org_id])->first();
         
         return $venue_record;
     }

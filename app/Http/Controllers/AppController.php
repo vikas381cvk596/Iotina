@@ -149,6 +149,78 @@ class AppController extends Controller
             ]);  
     }
 
+    public function getAPDetails($ap_id) {
+        $apiService = new APIService();
+        $result = $apiService->getAPDetails($ap_id);
+        return response($result)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+            ]);  
+    }
+
+    public function getAllAPs(Request $request) {
+        $apiService = new APIService();
+        $result = $apiService->getAllAPs($request);
+        return response($result)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+            ]);  
+    }
+
+    public function createAP(Request $request) {
+        $apiService = new APIService();
+        $result = $apiService->createAP($request);
+        return response($result)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+            ]);  
+    }
+
+    public function updateAP($ap_id, Request $request) {
+        $apiService = new APIService();
+        $result = $apiService->updateAP($ap_id, $request);
+        return response($result)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+            ]);  
+    }
+
+    public function getWifiNetworkDetails($network_id) {
+        $apiService = new APIService();
+        $result = $apiService->getWifiNetworkDetails($network_id);
+        return response($result)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+            ]);  
+    }
+
+    public function getAllWifiNetworksAPI(Request $request) {
+        $apiService = new APIService();
+        $result = $apiService->getAllWifiNetworksAPI($request);
+        return response($result)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+            ]);  
+    }
+
+    public function createWifiNetwork(Request $request) {
+        $apiService = new APIService();
+        $result = $apiService->createWifiNetwork($request);
+        return response($result)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+            ]);  
+    }
+
+    public function updateWifiNetwork($network_id, Request $request) {
+        $apiService = new APIService();
+        $result = $apiService->updateWifiNetwork($network_id, $request);
+        return response($result)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+            ]);  
+    }
+
     public function getDashboardData() {
         $organisationService = new OrganisationService();
         $result = $organisationService->getDashboardData();
