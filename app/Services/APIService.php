@@ -942,10 +942,13 @@ class APIService
     {
         $collectionService = new CollectionService();
         $clients = $collectionService->getCollectionsData();
-            
+        $clients = json_decode($clients);
+
         $clients_data = new \stdClass();
         $clients_data->return_msg = "success";
-        $clients_data->all_data = json_decode($clients);
+        $clients_data->count = $clients->count;
+        $clients_data->all_data = $clients->sta_data;
+
 
         $clients_data = json_encode($clients_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
         return $clients_data;
