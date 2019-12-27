@@ -65,9 +65,22 @@ class CollectionService
         ]; 
 
         $options = [];
-        $cursor = $collection->aggregate($pipeline, $options); 
-
+        $results = new \stdClass();
         $data = [];
+        
+        try {
+            $cursor = $collection->aggregate($pipeline, $options); 
+        } catch (ConnectionException $e) {
+            $results->count = sizeof($data);
+            $results->sta_data = $data;
+            $results = json_encode($results);
+            return $results;
+        } catch (ConnectionTimeoutException $e) {
+            $results->count = sizeof($data);
+            $results->sta_data = $data;
+            $results = json_encode($results);
+            return $results;
+        }
         foreach ($cursor as $document) { 
             $data[$document['_id']] = $document['data']; 
         }
@@ -83,7 +96,6 @@ class CollectionService
             $data[] = $document['_id']; 
         }*/
         
-        $results = new \stdClass();
         $results->count = sizeof($data);
         $results->sta_data = $data;
         $results = json_encode($results);
@@ -200,17 +212,36 @@ class CollectionService
             ]
         ];
 
-
-
-
         $options = [];
-        $cursor = $collection->aggregate($pipeline, $options); 
 
         //$dataInterval = [];
         $data = [];
         $all_data = [];
         $count = [];
         $count = 0;
+
+        try {
+            $cursor = $collection->aggregate($pipeline, $options); 
+        } catch (ConnectionException $e) {
+            $results = new \stdClass();
+            $results->dataPointsCount = $count;
+            $results->dataPoints = $data;
+            $results->all_data = $all_data;
+            $results->setting_time_interval = $setting_time_interval;
+            //$results->finalArray = json_encode($finalArray);
+            $results = json_encode($results);
+            return $results;
+        } catch (ConnectionTimeoutException $e) {
+            $results = new \stdClass();
+            $results->dataPointsCount = $count;
+            $results->dataPoints = $data;
+            $results->all_data = $all_data;
+            $results->setting_time_interval = $setting_time_interval;
+            //$results->finalArray = json_encode($finalArray);
+            $results = json_encode($results);
+            return $results;
+        }
+
         foreach ($cursor as $document) { 
             //$dataInterval[] = $document['_id'];
             $all_data[] = $document;

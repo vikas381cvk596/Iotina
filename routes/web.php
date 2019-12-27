@@ -72,7 +72,9 @@ Route::middleware('auth:api')->post('api/wifi_network', array('as' => 'createWif
 
 Route::middleware('auth:api')->put('api/wifi_network/{ap_id}', array('as' => 'updateWifiNetwork', 'uses' => 'AppController@updateWifiNetwork'));
 
+Route::middleware('auth:api')->get('api/connected_clients', array('as' => 'getAllConnectedClients', 'uses' => 'AppController@getAllConnectedClients'));
 
+Route::middleware('auth:api')->get('api/graph/connected_clients', array('as' => 'getAllConnectedClientsGraph', 'uses' => 'AppController@getAllConnectedClientsGraph'));
 
 
 

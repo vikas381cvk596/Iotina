@@ -221,6 +221,24 @@ class AppController extends Controller
             ]);  
     }
 
+    public function getAllConnectedClients(Request $request) {
+        $apiService = new APIService();
+        $result = $apiService->getAllConnectedClients($request);
+        return response($result)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+            ]);  
+    }
+
+    public function getAllConnectedClientsGraph(Request $request) {
+        $apiService = new APIService();
+        $result = $apiService->getAllConnectedClientsGraph($request);
+        return response($result)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+            ]);  
+    }
+    
     public function getDashboardData() {
         $organisationService = new OrganisationService();
         $result = $organisationService->getDashboardData();

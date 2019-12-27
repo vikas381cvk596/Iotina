@@ -5,6 +5,7 @@ use App\Services\OrganisationService;
 use App\Services\NetworkService;
 use App\Services\VenueService;
 use App\Services\AccessPointService;
+use App\Services\CollectionService;
 use App\Venue;
 use App\AccessPoint;
 use App\Network;
@@ -876,5 +877,33 @@ class APIService
         return $wifi_data;
 
     }
+    
+    public function getAllConnectedClients($input_filters)
+    {
+        $collectionService = new CollectionService();
+        $clients = $collectionService->getCollectionsData();
+            
+        $clients_data = new \stdClass();
+        $clients_data->return_msg = "success";
+        $clients_data->all_data = json_decode($clients);
+
+        $clients_data = json_encode($clients_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+        return $clients_data;
+    }
+
+    public function getAllConnectedClientsGraph($input_filters)
+    {
+        $collectionService = new CollectionService();
+        $clients = $collectionService->getClientsTrafficGraphData();
+            
+        $clients_data = new \stdClass();
+        $clients_data->return_msg = "success";
+        $clients_data->all_data = json_decode($clients);
+
+        $clients_data = json_encode($clients_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+        return $clients_data;
+    }
+
+    
     
 }
