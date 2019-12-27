@@ -131,6 +131,17 @@ class APIService
                 $venue_data->cluster_name = $cluster_info->venue_name;
                 $venue_data->cluster_description = $cluster_info->venue_description;
                 $venue_data->cluster_status = $cluster_info->venue_status;
+
+                $organisationService = new OrganisationService();
+                $org_id = $organisationService->getOrganisationID();
+                
+                $input_filters = new \stdClass();
+                $input_filters->org_id = $org_id;
+                $input_filters->venue_id = $cluster_id;
+                $collectionService = new CollectionService();
+                $clients_connected = $collectionService->getAllClientsConnected(json_encode($input_filters),'venue_page');
+
+                $venue_data->clients_connected = $clients_connected;
                 $venue_data->created_at = $cluster_info->created_at;
                 $venue_data->return_msg = "success";
             } else {
@@ -169,6 +180,14 @@ class APIService
             $cluster_record->cluster_name = $row->venue_name;
             $cluster_record->cluster_description = $row->venue_description;
             $cluster_record->cluster_status = $row->venue_status;
+
+            $input_filters = new \stdClass();
+            $input_filters->org_id = $org_id;
+            $input_filters->venue_id = $row->venue_id;
+            $collectionService = new CollectionService();
+            $clients_connected = $collectionService->getAllClientsConnected(json_encode($input_filters),'venue_page');
+            $cluster_record->clients_connected = $clients_connected;
+
             $cluster_record->created_at = $row->created_at;
 
             $cluster_raw[] = $cluster_record;
@@ -267,7 +286,21 @@ class APIService
             $ap_info = $apService->getAccessPointDetails($ap_id);
             if ($ap_info != '') {
                 $ap_info->return_msg = "success";
+                
+
+                $organisationService = new OrganisationService();
+                $org_id = $organisationService->getOrganisationID();
+                
+                $input_filters = new \stdClass();
+                $input_filters->org_id = $org_id;
+                $input_filters->ap_mac_address = $ap_info->ap_mac_address;
+                $collectionService = new CollectionService();
+                $clients_connected = $collectionService->getAllClientsConnected(json_encode($input_filters),'ap_page');
+
+                $ap_info->clients_connected = $clients_connected;
+
                 $ap_data = $ap_info;
+
             } else {
                 $ap_data->return_msg = "Access Point not found";
             }
@@ -437,6 +470,14 @@ class APIService
             $ap_record->ap_ip_address = $row->ap_ip_address;
             $ap_record->ap_mesh_role = $row->ap_mesh_role;
             
+            $input_filters = new \stdClass();
+            $input_filters->org_id = $org_id;
+            $input_filters->ap_mac_address = $row->ap_mac_address;
+            $collectionService = new CollectionService();
+            $clients_connected = $collectionService->getAllClientsConnected(json_encode($input_filters),'ap_page');
+
+            $ap_record->clients_connected = $clients_connected;
+
             $ap_record->created_at = $row->created_at;
             $ap_record->updated_at = $row->updated_at;
 
@@ -633,6 +674,14 @@ class APIService
             $network_record->count_venue = strval($count_venue);
             $network_record->count_ap = strval($count_ap);
 
+            $input_filters = new \stdClass();
+            $input_filters->org_id = $org_id;
+            $input_filters->network_name = $row->network_name;
+            $collectionService = new CollectionService();
+            $clients_connected = $collectionService->getAllClientsConnected(json_encode($input_filters),'network_page');
+
+            $network_record->clients_connected = $clients_connected;
+
             $network_record->created_at = $row->created_at;
             $network_record->updated_at = $row->updated_at;
             $network_raw[] = $network_record;
@@ -723,6 +772,17 @@ class APIService
                 if (isset($network_info['count_ap'])) {
                     $wifi_data->count_ap = $network_info['count_ap'];
                 } 
+
+                $organisationService = new OrganisationService();
+                $org_id = $organisationService->getOrganisationID();
+
+                $input_filters = new \stdClass();
+                $input_filters->org_id = $org_id;
+                $input_filters->network_name = $wifi_data->network_name;
+                $collectionService = new CollectionService();
+                $clients_connected = $collectionService->getAllClientsConnected(json_encode($input_filters),'network_page');
+
+                $wifi_data->clients_connected = $clients_connected;
             }
             //$wifi_data = $network_info;
             /*if ($network_info != '') {

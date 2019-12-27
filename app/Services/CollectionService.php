@@ -475,9 +475,15 @@ class CollectionService
             ];
             
             $options = [];
-
+            $cursor = [];
             //$clients_count = $collection->count($query, $options);
-            $cursor = $collection->find($query, $options);
+            try {
+                $cursor = $collection->find($query, $options);
+            } catch (ConnectionException $e) {
+                return "0";
+            } catch (ConnectionTimeoutException $e) {
+                return "0";
+            }
             $count = 0;
             foreach ($cursor as $document) { 
                 $status = "connected";
