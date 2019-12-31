@@ -10,6 +10,7 @@ use App\Services\NetworkService;
 use App\Services\CollectionService;
 use App\Services\APIService;
 
+
 class AppController extends Controller
 {
     public function createVenue()
@@ -90,7 +91,10 @@ class AppController extends Controller
     
     public function getClientsTrafficGraphData() {
         $collectionService = new CollectionService();
-        $result = $collectionService->getClientsTrafficGraphData();
+        $duration = '';
+        $time_interval = '';
+        $page = 'web';
+        $result = $collectionService->getClientsTrafficGraphData($duration, $time_interval, $page);
         return $result;    
     }
 
@@ -233,6 +237,24 @@ class AppController extends Controller
     public function getAllConnectedClientsGraph(Request $request) {
         $apiService = new APIService();
         $result = $apiService->getAllConnectedClientsGraph($request);
+        return response($result)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+            ]);  
+    }
+
+    public function loginUser(Request $request) {
+        $apiService = new APIService();
+        $result = $apiService->loginUser($request);
+        return response($result)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+            ]);  
+    }
+
+    public function createUser(Request $request) {
+        $apiService = new APIService();
+        $result = $apiService->createUser($request);
         return response($result)
             ->withHeaders([
                 'Content-Type' => 'application/json',

@@ -9,7 +9,11 @@ use App\Services\CollectionService;
 use App\Venue;
 use App\AccessPoint;
 use App\Network;
+use App\User;
 use DB;
+use Auth;
+use Hash;
+use Illuminate\Support\Str;
 
 class APIService
 {
@@ -954,10 +958,14 @@ class APIService
         return $clients_data;
     }
 
-    public function getAllConnectedClientsGraph($input_filters)
+    public function getAllConnectedClientsGraph($input_fields)
     {
+        $duration = $input_fields->input('duration');
+        $time_interval = $input_fields->input('time_interval');
+        $access_page = 'api';
+
         $collectionService = new CollectionService();
-        $clients = $collectionService->getClientsTrafficGraphData();
+        $clients = $collectionService->getClientsTrafficGraphData($duration, $time_interval, $access_page);
             
         $clients_data = new \stdClass();
         $clients_data->return_msg = "success";
@@ -967,6 +975,71 @@ class APIService
         return $clients_data;
     }
 
+    public function loginUser($input_fields)
+    {
+        $user_data = new \stdClass();
+        $email = $input_fields->input('email');
+        $password = $input_fields->input('password');
+
+        if ($email == '' || $password == '') {
+            $user_data->return_msg = 'Email ID or passowrd is not provided';
+            $user_data = json_encode($user_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $user_data;
+        } 
+
+
+        if (Auth::attempt(['email' => $email, 'password' => $password])) {
+            $user_data = Auth::user();
+            $user_data->return_msg = 'success';
+            
+        } else {
+            $user_data->return_msg = 'Invalid Email or Passowrd Combination';
+        }
+        $user_data = json_encode($user_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+        return $user_data;
+    }
+
+    public function createUser($input_fields)
+    {
+        $user = new User ();
+        $user_data = new \stdClass();
+        $user->name = $input_fields->input('name');
+        $user->email = $input_fields->input('email');
+        $user->password = Hash::make ( $input_fields->get ( 'password' ) );
+        $user->api_token = Str::random(60);
+        $user->role = "super_admin";
+        $org_name = $input_fields->get('org_name');
+
+        if ($user->email == '' || $user->password == '' || $org_name == '') {
+            $user_data->return_msg = 'Error: email, passowrd, organisation fields are mandatory';
+            $user_data = json_encode($user_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $user_data;
+        } 
+
+        $check_user_exists = DB::table('users')->where(['email' => $user->email])->first();
+        if ($check_user_exists) { 
+            $user_data->return_msg = 'Error: This email is already registered with us';
+            $user_data = json_encode($user_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $user_data;
+        } 
+
+        $OrganisationService = new OrganisationService();
+        $org_id = $OrganisationService->createOrganisation($org_name);
+
+        if ($org_id == 0) { // Error: Organisation Already Exists
+            $user_data->return_msg = 'Error: Organisation by this name already exists';
+            $user_data = json_encode($user_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+            return $user_data;
+        } else {
+            $user->org_id = $org_id;
+            $user->save();
+            $user_data->return_msg = 'success';
+        }
+
+        $user_data = json_encode($user_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+        return $user_data;
+    }
+    
     
     
 }

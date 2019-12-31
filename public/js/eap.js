@@ -797,9 +797,9 @@ if (document.getElementById('users_page'))
       success: function(graph_data) {
         console.log(graph_data);
         var graph_data = JSON.parse(graph_data);
-        var dataPointsCount = graph_data['dataPointsCount'];
+        var dataPointsCount = graph_data['count_datapoints'];
         console.log(dataPointsCount);
-        var dataPoints = graph_data['dataPoints'];
+        var dataPoints = graph_data['clients_count'];
         console.log(dataPoints);
 
         var setting_time_interval = graph_data['setting_time_interval'];
@@ -921,10 +921,9 @@ if (document.getElementById('users_page'))
         var graph_data = JSON.parse(graph_data);
         //var finalArray = graph_data['finalArray'];
         //console.log("data_final_array::"+finalArray);
-        var dataPointsCount = graph_data['dataPointsCount'];
-        console.log(graph_data['all_data']);
-        console.log(dataPointsCount);
-        var dataPoints = graph_data['dataPoints'];
+        var dataPointsCount = graph_data['count_datapoints'];
+        //console.log(dataPointsCount);
+        var dataPoints = graph_data['clients_count'];
         console.log(dataPoints);
         //console.log(graph_data);
         var setting_time_interval = graph_data['setting_time_interval'];
@@ -941,7 +940,7 @@ if (document.getElementById('users_page'))
           maxDataPoint = Math.ceil(maxDataPoint / 1000) * 1000;
         }
 
-        var dataPointsTime = [];
+        /*var dataPointsTime = [];
         var today = new Date();
         var current_time = today.getHours() + ":" + today.getMinutes();
         var interval = parseInt(setting_time_interval);
@@ -952,14 +951,24 @@ if (document.getElementById('users_page'))
           current_time = today.getHours() + ":" + today.getMinutes();
         }
         
-        //dataPoints.reverse();
-        dataPointsTime.reverse();
+        dataPointsTime.reverse();*/
         
-        console.log(dataPointsTime);
         /*var temp_today = new Date();
         temp_today.setMinutes(today.getMinutes() - 5);*/
+        /*var dataPointsTime = [];
+        var dataPointsTimeArray = JSON.parse(graph_data['time_intervals']);
+        console.log(dataPointsTimeArray);
+        dataPointsTimeArray.forEach(function (item, index) {
+          console.log(item, index);
+        });*/
+        var dataPointsTime = graph_data['time_intervals'];
+        console.log(dataPointsTime);
         
-
+        /*dataPointsTimeArray.forEach(function(value, index) {
+            dataPointsTime[0] = value;
+        });
+        console.log(dataPointsTime);*/
+        
         var ctx2 = document.getElementById("clientTrafficGraph");
         var myLineChart = new Chart(ctx2, {
           type: 'line',

@@ -85,7 +85,7 @@ class CollectionService
             $data[$document['_id']] = $document['data']; 
         }
         
-        /*$query = [];
+        $query = [];
 
         $options = [];
 
@@ -94,19 +94,22 @@ class CollectionService
         $data = [];
         foreach ($cursor as $document) { 
             $data[] = $document['_id']; 
-        }*/
+        }
+
+        //Hard code for testing purposes
         
         $results->count = sizeof($data);
         $results->sta_data = $data;
-        $results = json_encode($results);
+        $results = json_encode($results, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
         return $results;
     }
 
-    public function getClientsTrafficGraphData() {
+    public function getClientsTrafficGraphData($duration_api, $time_interval_api, $page) {
         //$client = new Client;
+        $setting_time_interval = 5; // default
+        $duration = '-60 minutes'; // default
         $organisationService = new OrganisationService();
         $org_id = $organisationService->getOrganisationID();
-        $setting_time_interval = 5;
         
         $org_interval = $organisationService->getTimeInterval();
 
@@ -119,12 +122,21 @@ class CollectionService
             }
         }                    
 
+        if ($page == 'api') {
+            if ($time_interval_api != '') {
+                $setting_time_interval = (float)$time_interval_api;    
+            }
+            if ($duration != '') {
+                $duration = '-'.$duration_api.' minutes';    
+            }
+        }
+
         $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
         
         $collection = $client->eapDb->apTable;
         $date = new UTCDateTime(0);
 
-        $time_interval = round(strtotime('-60 minutes') * 1000); // Last 6 Minutes
+        $time_interval = round(strtotime($duration) * 1000); // Last 6 Minutes
         $current_time = round(microtime(true) * 1000);
 
         $graph_interval = 
@@ -251,67 +263,29 @@ class CollectionService
                 break;
             //$count[] = $document['_count'];
         }
-
-        /*$data[0] = 10;
-        $data[1] = 20;
-        $data[2] = 30;
-        $data[3] = 40;
-        $data[4] = 50;
-        $data[5] = 60;
-        $data[6] = 70;
-        $data[7] = 80;
-        $data[8] = 90;
-        $data[9] = 100;
-        $data[10] = 110;
-        $data[11] = 120;
-        
-        $dataInterval[0]['interval'] = 0;   // 2 Clients Connected
-        $dataInterval[1]['interval'] = 5;   // 4 Clients Connected
-        $dataInterval[2]['interval'] = 10;  // 1 Clients Connected
-        $dataInterval[3]['interval'] = 15;  // 2 Clients Connected
-        $dataInterval[4]['interval'] = 20;  // 1 Clients Connected
-        $dataInterval[5]['interval'] = 25;  // 1 Clients Connected 
-        $dataInterval[6]['interval'] = 30;  // 9 Clients Connected 0 0
-        $dataInterval[7]['interval'] = 45;  // 8 Clients Connected
-        $dataInterval[8]['interval'] = 50;  // 5 Clients Connected
-        $dataInterval[9]['interval'] = 55;  // 8 Clients Connected
-        $dataInterval[10]['interval'] = 60; // 7 Clients Connected
-        $dataInterval[11]['interval'] = 65; // 6 Clients Connected
-
-        $interval_time = 5;
-        $final[] = array();
-        foreach ($dataInterval as $key => $data_record) {
-            if (isset($dataInterval[$key+1])) {
-                $interval_value_current = $dataInterval[$key]['interval'];
-                $interval_value_next = $dataInterval[$key+1]['interval'];
-
-                $finalArray[$key]['interval'] = $interval_value_current;
-                $finalArray[$key]['count'] = $data[$key];
-
-                if ((($interval_value_next - $interval_value_current) > $interval_time)) {
-                    //$data[$key] = 0;
-                    //$arr = array('A','B','C');
-                    array_splice($data, $key+1, 0, array(0));
-                    array_shift($data);
-                    //array_pop($data);
-                }
-            }
-
-            //$interval_value = 10;
-
-            //$dataInterval[$key]['interval'] = $interval_value;
-        }*/
-
         $results = new \stdClass();
-        $results->dataPointsCount = $count;
-        $results->dataPoints = $data;
-        $results->all_data = $all_data;
+        
+
+        $data_raw = [];
+        date_default_timezone_set('Asia/Calcutta');
+
+        $current_date = new \DateTime();
+        $current_date = $current_date->format('Y-m-d H:i');                    
+        
+        for ($i=1; $i<=$count; $i++) {
+            $interval_cycle = '-'.($i*$setting_time_interval).' minutes';
+            
+            $current_date_time = strtotime('+5 minute',strtotime($current_date));
+            $display_format = date('H:i', strtotime($interval_cycle, $current_date_time));
+            $data_raw[] = $display_format;
+        }
+
+        $results->count_datapoints = $count;
+        $results->clients_count = $data;
+        $results->time_intervals = array_reverse($data_raw);
         $results->setting_time_interval = $setting_time_interval;
-        //$results->finalArray = json_encode($finalArray);
         $results = json_encode($results);
         return $results;
-        //return var_dump($cursor);
-        //return json_encode($data);   
     }
 
     public function getAPStatus($org_id, $ap_identifier, $ap_search, $time_status) {

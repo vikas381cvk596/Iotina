@@ -76,8 +76,9 @@ Route::middleware('auth:api')->get('api/connected_clients', array('as' => 'getAl
 
 Route::middleware('auth:api')->get('api/graph/connected_clients', array('as' => 'getAllConnectedClientsGraph', 'uses' => 'AppController@getAllConnectedClientsGraph'));
 
+Route::post('api/login_user', array('as' => 'loginUser', 'uses' => 'AppController@loginUser'));
 
-
+Route::post('api/create_user', array('as' => 'createUser', 'uses' => 'AppController@createUser'));
 
 
 
