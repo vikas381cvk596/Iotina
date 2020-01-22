@@ -321,4 +321,37 @@ class NetworkService
         $network_data = json_encode($network_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
         return $network_data;
     }
+
+    public function deleteNetwork ($network_id) 
+    {
+        $return_flag = 'success';
+        
+        $organisationService = new OrganisationService();
+        $org_id = $organisationService->getOrganisationID();
+
+        $network_record = DB::table('network')
+                ->where("org_id", "=", $org_id)
+                ->where("network_id", "=", $network_id)
+                ->first();
+
+        if ($network_record) {
+            $deleteNetwork = DB::table('network')
+                ->where("org_id", "=", $org_id)
+                ->where("network_id", "=", $network_id)
+                ->delete();
+
+            $deleteNetworkMeta = DB::table('network_meta')
+                ->where("network_id", "=", $network_id)
+                ->delete();
+            
+            $deleteNetworkMapping = NetworkVenueMapping::where('network_id', $network_id)->delete();
+        } else {
+            $return_flag = 'Network not found'; 
+        }
+        
+        $network_data = new \stdClass();
+        $network_data->status = $return_flag;
+        $network_data = json_encode($network_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+        return $network_data;
+    }
 }

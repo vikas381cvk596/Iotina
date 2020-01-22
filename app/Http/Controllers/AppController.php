@@ -278,6 +278,33 @@ class AppController extends Controller
         $result = $organisationService->getTimeInterval();
         return $result;    
     }
+
+    public function deleteWifiNetwork($network_id) {
+        $apiService = new APIService();
+        $result = $apiService->deleteWifiNetwork($network_id);
+        return response($result)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+            ]);  
+    }
+
+    public function deleteAccessPoint($ap_id) {
+        $apiService = new APIService();
+        $result = $apiService->deleteAccessPoint($ap_id);
+        return response($result)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+            ]);  
+    }
+
+    public function deleteCluster($cluster_id) {
+        $apiService = new APIService();
+        $result = $apiService->deleteCluster($cluster_id);
+        return response($result)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+            ]);  
+    }
     
     
 }

@@ -64,13 +64,13 @@ Route::middleware('auth:api')->post('api/accesspoints', array('as' => 'createAP'
 
 Route::middleware('auth:api')->put('api/accesspoints/{ap_id}', array('as' => 'updateAP', 'uses' => 'AppController@updateAP'));
 
-Route::middleware('auth:api')->get('api/wifi_network/{ap_id}', array('as' => 'getWifiNetworkDetails', 'uses' => 'AppController@getWifiNetworkDetails'));
+Route::middleware('auth:api')->get('api/wifi_network/{network_id}', array('as' => 'getWifiNetworkDetails', 'uses' => 'AppController@getWifiNetworkDetails'));
 
 Route::middleware('auth:api')->get('api/wifi_network', array('as' => 'getAllWifiNetworksAPI', 'uses' => 'AppController@getAllWifiNetworksAPI'));
 
 Route::middleware('auth:api')->post('api/wifi_network', array('as' => 'createWifiNetwork', 'uses' => 'AppController@createWifiNetwork'));
 
-Route::middleware('auth:api')->put('api/wifi_network/{ap_id}', array('as' => 'updateWifiNetwork', 'uses' => 'AppController@updateWifiNetwork'));
+Route::middleware('auth:api')->put('api/wifi_network/{network_id}', array('as' => 'updateWifiNetwork', 'uses' => 'AppController@updateWifiNetwork'));
 
 Route::middleware('auth:api')->get('api/connected_clients', array('as' => 'getAllConnectedClients', 'uses' => 'AppController@getAllConnectedClients'));
 
@@ -79,6 +79,12 @@ Route::middleware('auth:api')->get('api/graph/connected_clients', array('as' => 
 Route::post('api/login_user', array('as' => 'loginUser', 'uses' => 'AppController@loginUser'));
 
 Route::post('api/create_user', array('as' => 'createUser', 'uses' => 'AppController@createUser'));
+
+Route::middleware('auth:api')->delete('api/wifi_network/delete/{network_id}', array('as' => 'deleteWifiNetwork', 'uses' => 'AppController@deleteWifiNetwork'));
+
+Route::middleware('auth:api')->delete('api/accesspoints/delete/{ap_id}', array('as' => 'deleteAccessPoint', 'uses' => 'AppController@deleteAccessPoint'));
+
+Route::middleware('auth:api')->delete('api/clusters/delete/{cluster_id}', array('as' => 'deleteCluster', 'uses' => 'AppController@deleteCluster'));
 
 
 

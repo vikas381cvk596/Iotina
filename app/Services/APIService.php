@@ -1040,6 +1040,25 @@ class APIService
         return $user_data;
     }
     
-    
+    public function deleteWifiNetwork($network_id)
+    {
+        $networkService = new NetworkService();
+        $network_data = $networkService->deleteNetwork($network_id);
+        return $network_data;
+    }
+
+    public function deleteAccessPoint($ap_id)
+    {
+        $apService = new AccessPointService();
+        $ap_data = $apService->deleteAccessPoint($ap_id);
+        return $ap_data;
+    }
+
+    public function deleteCluster($cluster_id)
+    {
+        $venueService = new VenueService();
+        $cluster_data = $venueService->deleteCluster($cluster_id);
+        return $cluster_data;
+    }
     
 }

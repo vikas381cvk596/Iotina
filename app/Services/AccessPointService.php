@@ -185,4 +185,31 @@ class AccessPointService
 
         return $ap_record;
     }
+
+    public function deleteAccessPoint ($ap_id) 
+    {
+        $return_flag = 'success';
+        
+        $organisationService = new OrganisationService();
+        $org_id = $organisationService->getOrganisationID();
+
+        $ap_record = DB::table('access_point')
+                ->where("org_id", "=", $org_id)
+                ->where("ap_id", "=", $ap_id)
+                ->first();
+
+        if ($ap_record) {
+            $deleteAP = DB::table('access_point')
+                ->where("org_id", "=", $org_id)
+                ->where("ap_id", "=", $ap_id)
+                ->delete();
+        } else {
+            $return_flag = 'Access Point not found'; 
+        }
+        
+        $ap_data = new \stdClass();
+        $ap_data->status = $return_flag;
+        $ap_data = json_encode($ap_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+        return $ap_data;
+    }
 }

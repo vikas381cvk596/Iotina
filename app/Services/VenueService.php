@@ -149,4 +149,36 @@ class VenueService
         
         return $venue_record;
     }
+
+    public function deleteCluster ($venue_id) 
+    {
+        $return_flag = 'success';
+        
+        $organisationService = new OrganisationService();
+        $org_id = $organisationService->getOrganisationID();
+
+        $venue_record = DB::table('venue')
+                ->where("org_id", "=", $org_id)
+                ->where("venue_id", "=", $venue_id)
+                ->first();
+
+        if ($venue_record) {
+            $deleteVenue = DB::table('venue')
+                ->where("org_id", "=", $org_id)
+                ->where("venue_id", "=", $venue_id)
+                ->delete();
+
+            $deleteAccessPoint = DB::table('access_point')
+                ->where("org_id", "=", $org_id)
+                ->where("venue_id", "=", $venue_id)
+                ->delete();
+        } else {
+            $return_flag = 'Venue not found'; 
+        }
+        
+        $venue_data = new \stdClass();
+        $venue_data->status = $return_flag;
+        $venue_data = json_encode($venue_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+        return $venue_data;
+    }
 }
