@@ -17,10 +17,10 @@ class CollectionService
         $organisationService = new OrganisationService();
         $org_id = $organisationService->getOrganisationID();
         
-        $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
+        $client = new Client("mongodb://192.168.86.23:27017");
         $collection = $client->eapDb->staTable;
 
-        $time_interval = round(strtotime('-5 minutes') * 1000); // Last 6 Minutes
+        $time_interval = round(strtotime('-5 minutes') * 1000); // Last 5 Minutes
 
         /*$manager = new MongoDB\Driver\Manager("mongodb://localhost:27017");
         //$connect = connect();
@@ -85,21 +85,22 @@ class CollectionService
             $data[$document['_id']] = $document['data']; 
         }
         
-        $query = [];
+        //$query = [];
 
-        $options = [];
+        //$options = [];
 
-        $cursor = $collection->find($query, $options);
+        /*$cursor = $collection->find($query, $options);
         //$cursor = $collection->find(['_id'=> ObjectId("$mongoId")]); 
         $data = [];
         foreach ($cursor as $document) { 
             $data[] = $document['_id']; 
-        }
+        }*/
 
         //Hard code for testing purposes
         
         $results->count = sizeof($data);
         $results->sta_data = $data;
+        $results->dhfdf = $time_interval;
         $results = json_encode($results, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
         return $results;
     }
@@ -131,7 +132,7 @@ class CollectionService
             }
         }
 
-        $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
+        $client = new Client("mongodb://192.168.86.23:27017");
         
         $collection = $client->eapDb->apTable;
         $date = new UTCDateTime(0);
@@ -291,7 +292,7 @@ class CollectionService
     public function getAPStatus($org_id, $ap_identifier, $ap_search, $time_status) {
         $status = '';
         $org_id = (int)$org_id;
-        $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
+        $client = new Client("mongodb://192.168.86.23:27017");
         $collection = $client->eapDb->apTable;
 
         $ap = new \stdClass();
@@ -376,7 +377,7 @@ class CollectionService
         $clients_count = '0';
 
         if ($page == 'venue_page') {
-            $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
+            $client = new Client("mongodb://192.168.86.23:27017");
             $collection = $client->eapDb->staTable;
             
             $org_id = (int)$input_filters->org_id;
@@ -411,7 +412,7 @@ class CollectionService
                 return $clients_count;
             }
         } else if ($page == 'ap_page') {
-            $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
+            $client = new Client("mongodb://192.168.86.23:27017");
             $collection = $client->eapDb->apTable;
             
             $org_id = (int)$input_filters->org_id;
@@ -467,7 +468,7 @@ class CollectionService
             }
             $clients_count = strval($count);
         } else if ($page == 'network_page') {
-            $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
+            $client = new Client("mongodb://192.168.86.23:27017");
             $collection = $client->eapDb->staTable;
             
             $org_id = (int)$input_filters->org_id;
@@ -502,7 +503,7 @@ class CollectionService
                 return $clients_count;
             }
         } else if ($page == 'dashboard_page') {
-            $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
+            $client = new Client("mongodb://192.168.86.23:27017");
             $collection = $client->eapDb->staTable;
             
             $org_id = (int)$input_filters->org_id;
@@ -581,7 +582,7 @@ class CollectionService
     }
 
     public function testAPData() {
-        $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
+        $client = new Client("mongodb://192.168.86.23:27017");
         $collection = $client->eapDb->apTable;
 
         $ap = new \stdClass();
@@ -606,7 +607,7 @@ class CollectionService
     }
 
     public function testClientCount() {
-        $client = new Client("mongodb://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:27017");
+        $client = new Client("mongodb://192.168.86.23:27017");
         $collection = $client->eapDb->staTable;
         
         $org_id = 1;

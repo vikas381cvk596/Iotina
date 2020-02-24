@@ -158,6 +158,8 @@ class AccessPointService
             } 
 
             if ($ap->ap_status != 'not_yet_connected') {
+                $collectionService = new CollectionService();
+                
                 $input_filters = new \stdClass();
                 $input_filters->org_id = $org_id;
                 $input_filters->ap_mac_address = $ap->ap_mac_address;

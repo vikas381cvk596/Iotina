@@ -715,7 +715,8 @@ if (document.getElementById('users_page'))
         $('.clients_count').html('('+sta_data['count']+')');
         for (var field in sta_data['sta_data']) {
           var sta_fields = sta_data['sta_data'][field];
-          var timestamp = sta_fields['timestamp']['$numberLong'];
+          var timestamp = '';
+          //var timestamp = sta_fields['timestamp']['$numberLong'];
           var sta_id = sta_fields['sta_id'];
           var sta_id = sta_fields['sta_id'];
           var ip_address = sta_fields['IPV4Address'];
