@@ -52,7 +52,7 @@ class CollectionService
                 ] 
             ], [ 
                 '$sort' => [ 
-                    'sta_id' => -1.0 
+                    'timestamp' => -1.0 
                 ] 
             ], [ 
                 '$group' => [ 
