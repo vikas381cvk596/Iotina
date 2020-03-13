@@ -44,6 +44,10 @@ Route::post('/admin/getTimeInterval', array('as' => 'getTimeInterval', 'uses' =>
 Route::post('/getTimeInterval', array('as' => 'getTimeInterval', 'uses' => 'AppController@getTimeInterval'));
 
 
+Route::post('/admin/deleteVenue', array('as' => 'createVenue', 'uses' => 'AppController@deleteVenue'));
+Route::post('/admin/updateVenue', array('as' => 'updateVenue', 'uses' => 'AppController@updateVenue'));
+
+
 //Route::get('/api/organisation/{token?}', array('as' => 'getOrganisationDetails', 'uses' => 'AppController@getOrganisationDetails'));
 
 Route::middleware('auth:api')->get('api/organisation', array('as' => 'getOrganisationDetails', 'uses' => 'AppController@getOrganisationDetails'));

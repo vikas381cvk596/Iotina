@@ -305,6 +305,18 @@ class AppController extends Controller
                 'Content-Type' => 'application/json',
             ]);  
     }
-    
-    
+
+    public function deleteVenue()
+    {
+        $venueService = new VenueService();
+        $result = $venueService->deleteCluster($_POST['venue_id']);
+        return $result;   
+    }
+
+    public function updateVenue()
+    {
+        $venueService = new VenueService();
+        $result = $venueService->updateVenue($_POST['venue_id'], $_POST['venue_name'], $_POST['venue_desc']);
+        return $result;   
+    }  
 }

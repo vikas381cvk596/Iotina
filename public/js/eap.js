@@ -1,5 +1,47 @@
+
+var spinner = false;
+
+$.fn.spin_on = function(element_id) {
+    var opts = {
+      lines: 8, // The number of lines to draw
+      length: 3, // The length of each line
+      width: 3, // The line thickness
+      radius: 4, // The radius of the inner circle
+      scale: 1 // Scales overall size of the spinner
+      // corners: 1, // Corner roundness (0..1)
+      // color: '#ffffff', // CSS color or array of colors
+      // fadeColor: 'transparent', // CSS color or array of colors
+      // speed: 1, // Rounds per second
+      // rotate: 0, // The rotation offset
+      // animation: 'spinner-line-fade-quick', // The CSS animation name for the lines
+      // direction: 1, // 1: clockwise, -1: counterclockwise
+      // zIndex: 2e9, // The z-index (defaults to 2000000000)
+      // className: 'spinner', // The CSS class to assign to the spinner
+      // top: '50%', // Top position relative to parent
+      // left: '50%', // Left position relative to parent
+      // shadow: '0 0 1px transparent', // Box-shadow for the lines
+      // position: 'absolute' // Element positioning
+    };
+    console.log('spin called');
+    if (!spinner) {
+        spinner = new Spinner(opts).spin(document.getElementById(element_id));
+    }
+
+    spinner.spin(document.getElementById(element_id));
+    // $(".page-content > div").css('opacity', '0.75');
+};
+
+$.fn.spin_off = function() {
+    if (spinner) {
+        spinner.stop();
+    }
+
+    // $(".page-content > div").css('opacity', '1.0');
+}
+
 if (document.getElementById('venue_page'))
 {
+  
   $("#venue_page").on('click', '#btn_add_venue', function() {
     $('#create_venue_block').fadeIn();
   });
@@ -44,6 +86,8 @@ if (document.getElementById('venue_page'))
 
 
   $.fn.generate_venue_table = function() {
+    $.fn.spin_on('spin-area');
+    $('#venues_table tbody').html(''); 
     $.ajax({
       url: "getAllVenues",
       type: "POST",
@@ -87,6 +131,11 @@ if (document.getElementById('venue_page'))
           }
 
           html_content = html_content+'<tr>';
+          html_content = html_content+'<input type="hidden" class="row_venue_id" value='+venue+'>';
+          html_content = html_content+'<input type="hidden" class="row_venue_name" value='+venue_name+'>';
+          html_content = html_content+'<input type="hidden" class="row_venue_desc" value='+venue_desc+'>';
+          html_content = html_content+'<input type="hidden" class="row_venue_add" value='+venue_add+'>';
+          html_content = html_content+'<input type="hidden" class="row_venue_add_notes" value='+venue_add_notes+'>';
           html_content = html_content+'<td>'+venue_name+'<br/>Created On: '+venue_crt_date+'</td>';
           html_content = html_content+'<td>'+venue_desc+'</td>';
           html_content = html_content+'<td>'+venue_add+'</td>';
@@ -94,16 +143,127 @@ if (document.getElementById('venue_page'))
           html_content = html_content+'<td>'+network_count+'</td>';
           html_content = html_content+'<td>'+ap_count+'</td>';
           html_content = html_content+'<td>'+client_count+'</td>';
+
+          var icons_html = '<span class="edit_venue_record"><i class="far fa-edit" style="font-size:13px; color: #696969;"></i></span><span class="del_venue_record" style="padding-left: 10px;"><i class="far fa-trash-alt" style="font-size:13px; color: #696969;"></i></span>';
+          html_content = html_content+'<td>'+icons_html+'</td>';
+
           //console.log(all_venues[venue]['venue_id']);
           html_content = html_content+'</tr>';
         }
-
+        $.fn.spin_off('spin-area');
         $('#venues_table tbody').html(html_content);        
       }
     }); 
   };
 
   $.fn.generate_venue_table();
+
+  $("#venue_page").on('click', '.del_venue_record', function() {
+    var confirm_check = confirm("Do you want to delete this venue ?");
+
+    if (!confirm_check) {
+      return false;
+    }
+
+    var venue_id = $(this).closest('tr').find('.row_venue_id').val();
+    // console.log(venue_id);
+    $.ajax({
+      url: "deleteVenue",
+      type: "POST",
+      data: {
+        '_token': window.Laravel.csrfToken,
+        venue_id: venue_id
+      },
+      success: function(response) {
+        console.log(response);
+        $.fn.generate_venue_table();
+      }
+    });
+  });
+
+  $("#venue_page").on('click', '.edit_venue_record', function() {
+    $('#error_msg_edit_save').hide();
+    $('#success_msg_edit_save').hide();
+    $('#venue_page .edit_venue_block').fadeIn();
+    var venue_id = $(this).closest('tr').find('.row_venue_id').val();
+    var venue_name = $(this).closest('tr').find('.row_venue_name').val();
+    var venue_desc = $(this).closest('tr').find('.row_venue_desc').val();
+    var venue_add = $(this).closest('tr').find('.row_venue_add').val();
+    var venue_add_notes = $(this).closest('tr').find('.row_venue_add_notes').val();
+
+    $('html, body').animate({
+      scrollTop: $("#venue_page .edit_venue_block").offset().top-60
+    }, 300);
+
+    $('#venue_page .venue_id_edit_block').val(venue_id);
+    $('#venue_name_edit').val(venue_name);
+    $('#venue_desc_edit').val(venue_desc);
+    $('#venue_add_edit').val(venue_add);
+    $('#venue_add_notes_edit').val(venue_add_notes);
+  });
+
+  $("#venue_page").on('click', '.btn_venue_cancel', function() {
+    $('#venue_page .edit_venue_block').fadeOut();
+    $.fn.reset_venue_edit_block();
+  });
+
+  $.fn.reset_venue_edit_block = function() {
+    $('#venue_name_edit').val('');
+    $('#venue_desc_edit').val('');
+    $('#venue_add_edit').val('');
+    $('#venue_add_notes_edit').val('');
+    $('#error_msg_edit_save').hide();
+    $('#success_msg_edit_save').hide();
+  }
+
+  $("#venue_page").on('click', '.btn_venue_edit', function() {
+    var venue_id = $('#venue_page .venue_id_edit_block').val();
+    var venue_name = $('#venue_name_edit').val();
+    var venue_desc = $('#venue_desc_edit').val();
+    var venue_add = $('#venue_add_edit').val();
+    var venue_add_notes = $('#venue_add_notes_edit').val();
+
+    console.log(venue_id+"::"+venue_name+"::"+venue_desc+"::"+venue_add+"::"+venue_add_notes);
+
+    if (venue_id == '' || venue_name == '' || venue_add == '') {
+      console.log('error');
+      $('#error_msg_edit_save').show();
+      $('#error_text_edit_save').html('Fields marked with * are mandatory');
+      $('#success_msg_edit_save').hide();
+    } else {
+      console.log('calling ajax');
+      $.ajax({
+        url: "updateVenue",
+        type: "POST",
+        data: {
+          venue_id: venue_id,
+          venue_name: venue_name,
+          venue_desc: venue_desc,
+          venue_add: venue_add,
+          venue_add_notes: venue_add_notes,
+          '_token': window.Laravel.csrfToken
+        },
+        success: function(result) {
+          console.log(result);
+          console.log('testing');
+          if (result == 'venue_name_duplicate') {
+            $('#error_msg_edit_save').show();
+            $('#error_text_edit_save').html('Error: Venue name '+venue_name+' already exists');
+            $('#success_msg_edit_save').hide();
+          } else {
+            console.log('error occ');
+            $('#error_msg_edit_save').hide();
+            $('#success_msg_edit_save').show();
+
+            $.fn.generate_venue_table();
+          }
+        },
+        error: function(err) {
+          console.log(err);
+        }
+      });   
+    }
+  });
 
 } else if (document.getElementById('ap_page')) {
 
@@ -176,6 +336,8 @@ if (document.getElementById('venue_page'))
 
 
   $.fn.generate_ap_table = function() {
+    $('#ap_table tbody').html('');
+    $.fn.spin_on('spin-area');
     //alert();
     $.ajax({
       url: "getAllAccessPoints",
@@ -271,7 +433,8 @@ if (document.getElementById('venue_page'))
           //console.log(all_venues[venue]['venue_id']);
           html_content = html_content+'</tr>';
         }
-        $('#ap_table tbody').html(html_content);       
+        $('#ap_table tbody').html(html_content);   
+        $.fn.spin_off('spin-area');    
       }
     }); 
   };

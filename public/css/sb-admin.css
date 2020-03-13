@@ -508,3 +508,19 @@ footer.sticky-footer {
   background-color: #6c757d; 
   border: #f2f2f2;
 }
+
+#venue_page .del_venue_record {
+  cursor: pointer;
+}
+
+#venue_page .del_venue_record: hover {
+  cursor: pointer;
+}
+
+#venue_page .edit_venue_record {
+  cursor: pointer;
+}
+
+#venue_page .edit_venue_record: hover {
+  cursor: pointer;
+}

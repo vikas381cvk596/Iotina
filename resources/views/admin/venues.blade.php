@@ -80,6 +80,68 @@
         </div>
       </div>
 
+      <div class="edit_venue_block" class="row" style="display: none;">
+        <input type="hidden" class="venue_id_edit_block">
+        <div class="col-lg-12">
+          <div class="card mb-3">
+            <div class="card-header">
+              <i class="far fa-edit"></i>&nbsp;&nbsp;Edit Venue
+            </div>
+            <div id="error_msg_edit_save" class="row" style="display: none;">
+              <div class="col-md-12">
+                <p id="error_text_edit_save" style="font-size: 14px; color: #840808; padding-left: 30px; padding-top: 20px; font-weight: 600;"></p>
+              </div>
+            </div>
+            <div id="success_msg_edit_save" class="row" style="display: none;">
+              <div class="col-md-12">
+                <p style="font-size: 14px; color: #636363; padding-left: 30px; padding-top: 20px; font-weight: 600;">Venue Updated &#10003;</p>
+              </div>
+            </div>
+            <div id="create-venue-row" class="row" style="padding: 20px;">
+              <div class="col-md-2 text-center">
+                <div class="form-group">
+                  <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600;">* Venue Name</div>
+                  <div class='input-group'>
+                    <input type="text" id="venue_name_edit" name="venue_name" class="form-control" class="form-control" placeholder="Name" style="font-size: 14px;"/>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-2 text-center">
+                <div class="form-group">
+                  <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600;">Description</div>
+                  <div class='input-group'>
+                    <textarea id="venue_desc_edit" name="venue_desc" class="form-control" class="form-control" placeholder="Description" style="font-size: 14px;"> </textarea>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 text-center">
+                <div class="form-group">
+                  <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600;">* Address</div>
+                  <div class='input-group'>
+                    <input disabled type="text" id="venue_add_edit" name="venue_add" class="form-control" class="form-control" placeholder="Complete Address" style="font-size: 14px;"/>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 text-center">
+                <div class="form-group">
+                  <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600;">* Address Notes</div>
+                  <div class='input-group'>
+                    <input disabled type="text" id="venue_add_notes_edit" name="venue_add_notes" class="form-control" class="form-control" placeholder="Eg. Building, Floor No." style="font-size: 14px;"/>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-2 text-center">
+                <div class="form-group">
+                    <button type="submit" name="btn_edit_venue" value="create" id="btn_edit_venue" class="btn btn-secondary btn_venue_edit" style="margin-top:15px">Save</button>
+                    <button type="submit" name="btn_create_venue" value="create" id="btn_create_venue" class="btn btn_venue_cancel" style="margin-top:15px">Cancel</button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="card mb-3">
         <div class="card-header">
           <i class="fa fa-table"></i>&nbsp;&nbsp;Venues</div>
@@ -95,12 +157,16 @@
                   <th>Networks</th>
                   <th>APs</th>
                   <th>No. of Clients</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
+
               </tbody>
             </table>
+
           </div>
+          <div id="spin-area" style="margin-top: 10px; margin-bottom: 10px;"></div>
         </div>
         <!--<div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div> -->
       </div>
