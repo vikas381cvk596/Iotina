@@ -319,4 +319,30 @@ class AppController extends Controller
         $result = $venueService->updateVenue($_POST['venue_id'], $_POST['venue_name'], $_POST['venue_desc']);
         return $result;   
     }  
+
+    public function delAccessPoint()
+    {
+        $apService = new AccessPointService();
+        $result = $apService->deleteAccessPoint($_POST['ap_id']);
+        return $result;   
+    }  
+
+    public function updateAccessPoint()
+    {
+        $apService = new AccessPointService();
+        $result = $apService->updateAccessPoint($_POST['ap_id'], $_POST['venue_id'], $_POST['ap_name'], $_POST['ap_desc'], $_POST['ap_identifier'], $_POST['ap_serial'], $_POST['ap_tags']);
+        return $result;   
+    }  
+
+    public function delWifiNetwork() {
+        $networkService = new NetworkService();
+        $result = $networkService->deleteNetwork($_POST['network_id']);
+        return $result; 
+    }
+
+    public function editWifiNetwork() {
+        $networkService = new NetworkService();
+        $result = $networkService->updateNetwork($_POST['network_id'], $_POST['network_id']);
+        return $result; 
+    }
 }

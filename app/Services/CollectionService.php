@@ -316,9 +316,9 @@ class CollectionService
                 try {
                     $cursor = $collection->find(['ap_id' => $ap_search, 'org_id' => $org_id], ['sort' => ['timestamp' => -1]]);
                 } catch (ConnectionException $e) {
-                    return $clients_count;
+                    // return $clients_count;
                 } catch (ConnectionTimeoutException $e) {
-                    return $clients_count;
+                    // return $clients_count;
                 }
             } else {
                 try {

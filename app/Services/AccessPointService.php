@@ -33,7 +33,7 @@ class AccessPointService
         }
         $apData['ap_status'] = 'not_yet_connected';
         if ($ap_desc) {
-            $apData['ap_desc'] = $ap_desc;
+            $apData['ap_description'] = $ap_desc;
         }
         if ($ap_tags) {
             $apData['ap_tags'] = $ap_tags;
@@ -67,7 +67,7 @@ class AccessPointService
         }
         $apData['ap_status'] = 'not_yet_connected';
         if ($ap_desc) {
-            $apData['ap_desc'] = $ap_desc;
+            $apData['ap_description'] = $ap_desc;
         }
         if ($ap_tags) {
             $apData['ap_tags'] = $ap_tags;

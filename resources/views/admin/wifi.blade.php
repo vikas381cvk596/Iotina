@@ -295,12 +295,14 @@
                   <th>APs</th>
                   <th>VLAN</th>
                   <th>No. of Clients</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
               </tbody>
             </table>
           </div>
+          <div id="spin-area" style="margin-top: 10px; margin-bottom: 10px;"></div>
         </div>
         <!--<div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div> -->
       </div>

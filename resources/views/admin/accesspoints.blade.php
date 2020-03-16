@@ -97,7 +97,7 @@
 
                   <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;">
                     <div class="form-group" style="text-align: center;">
-                      <button type="submit" name="btn_create_ap" value="create" id="btn_create_ap" class="btn btn-secondary btn_ap" style="margin-top:15px; width: 13vw;">Create Access Point</button>
+                      <button type="submit" name="btn_create_ap" value="create" id="btn_create_ap" class="btn btn-secondary btn_ap" style="margin-top:15px;">Create Access Point</button>
                       <div id="error_msg_crt" style="display: none; text-align: center;">
                           <p id="error_text" style="font-size: 14px; color: #840808; padding-left: 0px; margin-top: 10px; text-align: center;font-weight: 600; text-align: center;"></p>
                       </div>
@@ -105,7 +105,109 @@
                     
                     <div id="success_msg_crt" class="row" style="display: none;">
                       <div class="col-md-12">
-                        <p style="font-size: 14px; color: #636363; padding-left: 30px; padding-top: 0px; text-align: center; font-weight: 600;">AP created successfully &#10003;</p>
+                        <p style="font-size: 14px; color: #636363; padding-top: 0px; text-align: center; font-weight: 600; text-align: center;">AP created successfully &#10003;</p>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            
+            
+          </div>
+        </div>
+      </div>
+
+      <div class="edit_ap_block" class="row" style="display: none;">
+        <input type="hidden" class="ap_id_edit_block">
+        <div class="col-lg-12" style="padding: 0px;">
+          <div class="card mb-3">
+            <div class="card-header">
+              <i class="fa fa-network-wired"></i>&nbsp;&nbsp;Edit Access Point
+            </div>
+            
+            <div class="row" style="margin-top: 20px;">
+              <div class="col-md-12">
+                <div style="display: flex; flex-direction: row; align-items: center; padding-left: 30px;">
+                  <div style="flex: 4; display: flex; flex-direction: column; justify-content: flex-start;">
+                    <div style="display: flex; flex-direction: row; align-items: flex-start; justify-content: flex-start;">
+                      <div class="form-group" style="">
+                        <input type="hidden" id="venue_id_edit" name="venue_id_edit">
+                        <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600;">* Venue</div>
+                        <div class="dropdown venue_name" style="">
+                          <button class="btn btn-default dropdown-toggle" type="button" id="venue_dropdown_edit" data-toggle="dropdown" aria-haspopup="   true" aria-expanded="false" style="font-size: 14px; background-color: #fff; border: 1px solid #c3c3c3; width: 10vw; color: #696969; width: 15vw; text-align: left;">
+                            Select Venue
+                          </button>
+                          <div class="dropdown-menu" id="venue_dropdown_options_edit" aria-labelledby="venue_dropdown">
+                            
+                          </div>
+                        </div>
+                            
+                      </div>  
+                      <div class="form-group" style="padding-left: 20px;">
+                        <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600;">* AP Name</div>
+                        <div class='input-group'>
+                          <input type="text" id="ap_name_edit" name="ap_name_edit" class="form-control" class="form-control" placeholder="Name" style="font-size: 14px; width: 15vw;"/>
+                        </div>
+                      </div>
+                      <div class="form-group" style="padding-left: 20px;">
+                        <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600;">Description</div>
+                        <div class='input-group'>
+                          <textarea id="ap_desc_edit" name="ap_desc_edit" class="form-control" class="form-control" placeholder="Description" style="font-size: 14px; width: 20vw;"> </textarea>
+                        </div>
+                      </div>
+                    </div>                      
+                    <div style="display: flex; flex-direction: row; align-items: flex-start; justify-content: flex-start;">
+                        
+                      <div class="form-group" style="">
+                        <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600;">Tags</div>
+                        <div class='input-group'>
+                          <input type="text" id="ap_tags_edit" name="ap_tags_edit" class="form-control" class="form-control" placeholder="Add a tag" style="font-size: 14px; width: 15vw;"/>
+                        </div>
+                      </div>
+
+                       <div style="display: flex; flex-direction: row; align-items: flex-start; justify-content: flex-start;">
+                        <div style="display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding-left: 20px;">
+                          <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600;">* Identifier</div>
+                          <div class="dropdown" style="">
+                            <input type="hidden" id="ap_identifier_edit" name="ap_identifier_edit" class="form-control" />
+                            <button class="btn btn-default dropdown-toggle" type="button" id="ap_identifier_dropdown_edit" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size: 14px; background-color: #fff; border: 1px solid #c3c3c3; width: 10vw; color: #696969; width: 15vw; text-align: left;">
+                                Select
+                            </button>
+                            <div class="dropdown-menu" id="ap_identifier_options_edit" aria-labelledby="ap_identifier_dropdown">
+                                <a class="dropdown-item" style="" data-value="Serial Number">
+                                  <span class="title_text_dropdown" style="font-size: 14px; font-weight: 600;">Serial Number</span>
+                                </a>
+                                <a class="dropdown-item" style="" data-value="MAC Address">
+                                  <span class="title_text_dropdown" style="font-size: 14px; font-weight: 600;">MAC Address</span>
+                                </a>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="form-group" style="padding-left: 20px;">
+                          <div style="text-align: left; font-size: 14px; color: #696969; font-weight: 600; opacity: 0;">A</div>
+                          <div class='input-group'>
+                            <input type="text" id="ap_serial_edit" name="ap_serial_edit" class="form-control" class="form-control" placeholder="Serial" style="font-size: 14px;"/>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <div class="form-group" style="text-align: center;">
+                      <button type="submit" name="btn_edit_ap" id="btn_edit_ap" class="btn btn-secondary btn_ap_edit" style="margin-top:15px;">Save</button>
+                      <button type="submit" name="btn_edit_ap_cancel" id="btn_edit_ap_cancel" class="btn btn_ap_cancel" style="margin-top:15px">Cancel</button>
+                      <div id="error_msg_edit_ap" style="display: none; text-align: center;">
+                          <p id="error_text_ap" style="font-size: 14px; color: #840808; padding-left: 0px; margin-top: 10px; text-align: center;font-weight: 600; text-align: center;"></p>
+                      </div>
+                    </div>  
+                    
+                    <div id="success_msg_edit_ap" class="row" style="display: none;">
+                      <div class="col-md-12">
+                        <p style="font-size: 14px; color: #636363; padding-top: 0px; text-align: center; font-weight: 600; text-align: center;">Access Point Updated &#10003;</p>
                       </div>
                     </div>
                   </div>
@@ -136,6 +238,7 @@
                   <th>Venue</th>
                   <th>No. of Clients</th>
                   <th>Tags</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>

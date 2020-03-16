@@ -46,6 +46,11 @@ Route::post('/getTimeInterval', array('as' => 'getTimeInterval', 'uses' => 'AppC
 
 Route::post('/admin/deleteVenue', array('as' => 'createVenue', 'uses' => 'AppController@deleteVenue'));
 Route::post('/admin/updateVenue', array('as' => 'updateVenue', 'uses' => 'AppController@updateVenue'));
+Route::post('/admin/delAccessPoint', array('as' => 'delAccessPoint', 'uses' => 'AppController@delAccessPoint'));
+Route::post('/admin/updateAccessPoint', array('as' => 'updateAccessPoint', 'uses' => 'AppController@updateAccessPoint'));
+Route::post('/admin/delWifiNetwork', array('as' => 'delWifiNetwork', 'uses' => 'AppController@delWifiNetwork'));
+Route::post('/admin/editWifiNetwork', array('as' => 'editWifiNetwork', 'uses' => 'AppController@editWifiNetwork'));
+
 
 
 //Route::get('/api/organisation/{token?}', array('as' => 'getOrganisationDetails', 'uses' => 'AppController@getOrganisationDetails'));
