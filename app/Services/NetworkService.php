@@ -108,7 +108,10 @@ class NetworkService
         foreach ($all_networks as $network) {
             $network_meta = DB::table('network_meta')->where(['network_id' => $network->network_id])->first();
             if (!is_null($network_meta)) {
-                $network->backup_phrase = $network_meta->backup_phrase;     
+                $network->backup_phrase = $network_meta->backup_phrase;
+                $network->passphrase_length = $network_meta->passphrase_length;
+                $network->security_protocol = $network_meta->security_protocol;
+                $network->passphrase_expiry = $network_meta->passphrase_expiry;     
             }
 
             $nv_mapping = DB::table('network_venue_mapping')->where(['network_id' => $network->network_id, 'org_id' => $network->org_id])->get();
@@ -122,14 +125,16 @@ class NetworkService
                 $count_venue = count($nv_mapping);
             }
 
+            $all_venues = [];
             foreach ($nv_mapping as $venue) {
                 $access_points = DB::table('access_point')->where(['venue_id' => $venue->venue_id, 'org_id' => $network->org_id])->get();
-
+                $all_venues[] = $venue->venue_id;
                 if ($access_points) {
                     $count_ap = $count_ap + count($access_points);
                 }
             }
 
+            $network->all_venues = json_encode($all_venues);
             $network->count_venue = strval($count_venue);
             $network->count_ap = strval($count_ap);
 

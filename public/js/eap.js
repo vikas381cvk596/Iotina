@@ -649,9 +649,14 @@ if (document.getElementById('venue_page'))
     $('#'+flow_class).show();    
   }
 
+  $.fn.toggle_flow_section_edit = function(flow_class) {
+    $('.flow_section_edit').hide();
+    $('#'+flow_class).show();    
+  }
+
   $.fn.create_network = function() {
     var network_venues = [];
-    $('.venue_checkbox').each(function() {
+    $('#venues_network_table .venue_checkbox').each(function() {
       if ($(this).is(':checked')) {
         console.log('ID::::'+$(this).closest('tr').find('.venue_id').val());
         network_venues.push($(this).closest('tr').find('.venue_id').val());
@@ -693,7 +698,57 @@ if (document.getElementById('venue_page'))
       }
     });
   }
-  //$.fn.create_network();
+
+  $.fn.update_network = function() {
+    var network_venues = [];
+    $('#venues_network_table_edit .venue_checkbox').each(function() {
+      if ($(this).is(':checked')) {
+        console.log('ID::::'+$(this).closest('tr').find('.venue_id').val());
+        network_venues.push($(this).closest('tr').find('.venue_id').val());
+      }       
+    });
+    var network_id = $('.network_id_edit_record').val();
+    console.log(network_id);
+    var networkData = {
+      'network_name': $('#network_name_edit').val(),
+      'network_desc': $('#network_desc_edit').val(),
+      'network_type': $('#network_type_edit').val(),
+      'network_vlan': $('#network_vlan_edit').val(),
+      'security_protocol': $('#security_protocol_edit').val(),
+      // 'passphrase_format': $('#passphrase_format_edit').val(),
+      'passphrase_expiry': $('#passphrase_expiry_edit').val(),
+      'backup_passphrase': $('#backup_passphrase_edit').val(),
+      // 'passphrase_length': $('#passphrase_length_edit').val(),
+      'network_venues': JSON.stringify(network_venues),
+    };
+    
+    $.ajax({
+      url: "editWifiNetwork",
+      type: "POST",
+      data: {
+        network_id: network_id,
+        networkData: JSON.stringify(networkData),
+        '_token': window.Laravel.csrfToken
+      },
+      success: function(result) {
+        console.log(result);
+        var wifi_output = JSON.parse(result);
+        if (wifi_output.status == 'success') {
+          $('#error_msg_edit').hide();
+          $('#success_msg_edit').show();
+          $.fn.generate_wifi_table();
+        } else if (wifi_output.status == 'network_name_duplicate') {
+          $('#error_msg_edit').show();
+          $('#error_text').html('Error: Network name already exists!');
+          $('#success_msg_edit').hide();
+        } else {
+          $('#error_msg_edit').show();
+          $('#error_text').html('Some unexpected error occured.');
+          $('#success_msg_edit').hide();
+        }
+      }
+    });
+  }
 
   $.fn.navigate = function(this_object) {
     var navigate_step_form = $(this_object).attr('link');
@@ -750,6 +805,61 @@ if (document.getElementById('venue_page'))
     }
   }
 
+  $.fn.navigate_edit = function(this_object) {
+    var navigate_step_form = $(this_object).attr('link');
+
+    if (navigate_step_form == 'form_submit_edit') {
+      $.fn.update_network();
+    } else {
+
+      $('.form_class_edit').hide();
+      $('.form_class_edit').removeClass('active');
+
+      
+      $('.'+navigate_step_form).show();
+      $('.'+navigate_step_form).addClass('active');
+        //ced853
+      if (navigate_step_form == 'form_step_1_edit') {
+        $('#btn_back_step_edit').hide();
+        $('#btn_next_step_edit').html('Next');
+        if ($('#network_type_edit' == "PSK")) {
+          $('#btn_next_step_edit').attr('link','form_step_2_edit');
+        }
+        else if ($('#network_type_edit' == "CaptivePortal")) {
+          $('#btn_next_step_edit').attr('link','form_step_3_edit');
+        }
+        $('.circle_step_1_edit').css('background-color','#b3b3b3');
+        $('.title_step_1_edit').css('color','#696969');
+        
+        $('.circle_step_2_edit').css('background-color','#b3b3b3');
+        $('.title_step_2_edit').css('color','#696969');
+      } else if (navigate_step_form == 'form_step_2_edit') {
+        $('.circle_step_1_edit').css('background-color','#ced853');
+        $('.title_step_1_edit').css('color','#ced853');
+        
+        $('.circle_step_2_edit').css('background-color','#b3b3b3');
+        $('.title_step_2_edit').css('color','#696969');
+        
+        $('#btn_back_step_edit').show();
+        $('#btn_back_step_edit').attr('link', 'form_step_1_edit');
+        $('#btn_next_step_edit').attr('link', 'form_step_6_edit');
+        $('#btn_next_step_edit').html('Next');
+      } else if (navigate_step_form == 'form_step_6_edit') {
+        $('.circle_step_1_edit').css('background-color','#ced853');
+        $('.title_step_1_edit').css('color','#ced853');
+        
+        $('.circle_step_2_edit').css('background-color','#ced853');
+        $('.title_step_2_edit').css('color','#ced853');
+        
+        $('#btn_back_step_edit').show();
+        $('#btn_back_step_edit').attr('link', 'form_step_2_edit');
+        $('#btn_next_step_edit').attr('link', 'form_submit_edit');
+        $('#btn_next_step_edit').html('Save');
+      }
+      $.fn.reset_btn_states_edit();
+    }
+  }
+
   $.fn.reset_btn_states = function() {
     $('.form_class').each(function() {
       if ($(this).hasClass('active')) {
@@ -778,8 +888,42 @@ if (document.getElementById('venue_page'))
     }*/
   }
 
+  $.fn.reset_btn_states_edit = function() {
+    $('.form_class_edit').each(function() {
+      if ($(this).hasClass('active')) {
+        console.log('111');
+        if ($(this).attr('form-step') == 'form_step_1_edit') {
+          if ($('#network_type_edit').val() && $('#network_name_edit').val()) {
+            $('#btn_next_step_edit').addClass('active');
+            $('#btn_next_step_edit').removeAttr('disabled');
+          } else {
+            $('#btn_next_step_edit').removeClass('active');
+            $('#btn_next_step_edit').attr('disabled', 'disabled');
+          }
+        } else if ($(this).attr('form-step') == 'form_step_2_edit') {
+          console.log($('#security_protocol_edit').val()+"::"+$('#passphrase_format_edit').val() +"::"+ $('#passphrase_expiry_edit').val()+"::"+ $('#backup_passphrase_edit').val()+"::"+ $('#passphrase_length_edit').val())
+          if ($('#security_protocol_edit').val() && $('#passphrase_format_edit').val() && $('#passphrase_expiry_edit').val() && $('#backup_passphrase_edit').val()) {
+            $('#btn_next_step_edit').addClass('active');
+            $('#btn_next_step_edit').removeAttr('disabled');
+          } else {
+            $('#btn_next_step_edit').removeClass('active');
+            $('#btn_next_step_edit').attr('disabled', 'disabled');
+          }
+        }
+      }
+    });
+    
+    /*if (form_step == 'form_step_1') {
+      
+    }*/
+  }
+
   $(".left_section").on('change', '.form-fields', function() {
     $.fn.reset_btn_states();
+  });
+
+  $(".left_section_edit").on('change', '.form-fields', function() {
+    $.fn.reset_btn_states_edit();
   });
 
   $(".dropdown").on('click', '.dropdown-item', function() {
@@ -802,11 +946,34 @@ if (document.getElementById('venue_page'))
     $.fn.reset_btn_states();
   });
 
+  $("#network_type_options_edit").on('click', '.dropdown-item', function() {
+    //$(this).parents(".dropdown").find('.btn').html($(this).find('.title_text_dropdown').text());
+    var network_type = $(this).attr('data-value');
+    $('#network_type_edit').val(network_type);
+    
+    if (network_type == 'PSK') {
+      $.fn.toggle_flow_section_edit('right_flow_1_edit');
+      $('#btn_next_step_edit').attr('link','form_step_2_edit');
+    } else if (network_type == 'CaptivePortal') {
+      $.fn.toggle_flow_section_edit('right_flow_2_edit');
+      $('#btn_next_step_edit').attr('link','form_step_3_edit');
+    }
+
+    $.fn.reset_btn_states_edit();
+  });
+
   $("#sp_dropdown_options").on('click', '.dropdown-item', function() {
     var security_protocol = $(this).attr('data-value');
     $('#security_protocol').val(security_protocol);    
 
     $.fn.reset_btn_states();
+  });
+
+  $("#sp_dropdown_options_edit").on('click', '.dropdown-item', function() {
+    var security_protocol = $(this).attr('data-value');
+    $('#security_protocol_edit').val(security_protocol);    
+
+    $.fn.reset_btn_states_edit();
   });
 
   $("#pf_dropdown_options").on('click', '.dropdown-item', function() {
@@ -823,6 +990,13 @@ if (document.getElementById('venue_page'))
     $.fn.reset_btn_states();
   });
 
+  $("#pe_dropdown_options_edit").on('click', '.dropdown-item', function() {
+    var passphrase_expiry = $(this).attr('data-value');
+    $('#passphrase_expiry_edit').val(passphrase_expiry);    
+
+    $.fn.reset_btn_states_edit();
+  });
+
   $("#wifi_page").on('click', '#btn_next_step', function() {
     if ($(this).hasClass('active')) {
       $.fn.navigate(this);
@@ -831,6 +1005,16 @@ if (document.getElementById('venue_page'))
 
   $("#wifi_page").on('click', '#btn_back_step', function() {
     $.fn.navigate(this);
+  });
+
+  $("#wifi_page").on('click', '#btn_next_step_edit', function() {
+    if ($(this).hasClass('active')) {
+      $.fn.navigate_edit(this);
+    }
+  });
+
+  $("#wifi_page").on('click', '#btn_back_step_edit', function() {
+    $.fn.navigate_edit(this);
   });
 
   $("#wifi_page").on('click', '#btn_add_wifi', function() {
@@ -877,52 +1061,12 @@ if (document.getElementById('venue_page'))
           html_content = html_content+'</tr>';
         }
 
-        $('#venues_network_table tbody').html(html_content);        
+        $('#venues_network_table tbody').html(html_content); 
+        $('#venues_network_table_edit tbody').html(html_content);       
       }
     });
   }
   $.fn.venues_network_table();
-  
-  $("#wifi_page").on('click', '.btn_wifi', function() {
-    var venue_id = $('#venue_id').val();
-    var ap_name = $('#ap_name').val();
-    var ap_desc = $('#ap_desc').val();
-    var ap_serial = $('#ap_serial').val();
-    var ap_tags = $('#ap_tags').val();
-    //alert(venue_id+"::"+ap_name+"::"+ap_serial);
-    if (venue_id == '' || ap_name == '' || ap_serial == '') {
-      $('#error_msg_crt').show();
-      $('#error_text').html('Fields marked with * are mandatory');
-      $('#success_msg_crt').hide();
-    } else {
-      $.ajax({
-        url: "createAccessPoint",
-        type: "POST",
-        data: {
-          venue_id: venue_id,
-          ap_name: ap_name,
-          ap_desc: ap_desc,
-          ap_serial: ap_serial,
-          ap_tags: ap_tags,
-          '_token': window.Laravel.csrfToken
-        },
-        success: function(result) {
-          //alert(result);
-          //alert(result);
-          if (result == 'success') {
-            $('#error_msg_crt').hide();
-            $('#success_msg_crt').show();
-
-            $.fn.generate_ap_table();
-          } else {
-            $('#error_msg_crt').show();
-            $('#error_text').html('Some unexpected error occured.');
-            $('#success_msg_crt').hide();
-          }
-        }
-      });   
-    }
-  });
 
   $("#network_name").on('change', function() {
     if ($(this).val()) {
@@ -1002,6 +1146,22 @@ if (document.getElementById('venue_page'))
           if (all_networks[network]['client_count']) {
             client_count = all_networks[network]['client_count'];
           }
+
+          var network_passphrase_expiry = '';
+          if (all_networks[network]['passphrase_expiry']) {
+            network_passphrase_expiry = all_networks[network]['passphrase_expiry'];
+          }
+
+          var security_protocol = '';
+          if (all_networks[network]['security_protocol']) {
+            security_protocol = all_networks[network]['security_protocol'];
+          }   
+
+          var all_venues = '';
+          if (all_networks[network]['all_venues']) {
+            all_venues = all_networks[network]['all_venues'];
+          }       
+          console.log(all_venues);
           
           html_content = html_content+'<tr>';
           html_content = html_content+'<input type="hidden" class="row_network_id" value='+network+'>';
@@ -1009,6 +1169,13 @@ if (document.getElementById('venue_page'))
           html_content = html_content+'<input type="hidden" class="row_network_desc" value='+network_desc+'>';
           html_content = html_content+'<input type="hidden" class="row_network_type" value='+network_type+'>';
           html_content = html_content+'<input type="hidden" class="row_network_vlan" value='+network_vlan+'>';
+          html_content = html_content+'<input type="hidden" class="row_network_vlan" value='+network_vlan+'>';
+          html_content = html_content+'<input type="hidden" class="row_network_backup_phrase" value='+backup_phrase+'>';
+          html_content = html_content+'<input type="hidden" class="row_network_passphrase_expiry" value='+network_passphrase_expiry+'>';
+          html_content = html_content+'<input type="hidden" class="row_security_protocol" value='+security_protocol+'>';
+          html_content = html_content+'<input type="hidden" class="row_all_venues" value='+all_venues+'>';
+
+          
           
           html_content = html_content+'<td>'+network_name+'</td>';
           html_content = html_content+'<td>'+network_desc+'</td>';
@@ -1072,6 +1239,98 @@ if (document.getElementById('venue_page'))
         $.fn.generate_wifi_table();
       }
     });
+  });
+
+  $("#wifi_page").on('click', '.edit_wifi_record', function() {
+    $('#error_msg_edit').hide();
+    $('#success_msg_edit').hide();
+    $('#wifi_page .edit_network_block').fadeIn();
+    var network_id = $(this).closest('tr').find('.row_network_id').val();
+    var network_name = $(this).closest('tr').find('.row_network_name').val();
+    var network_desc = $(this).closest('tr').find('.row_network_desc').val();
+    var network_type = $(this).closest('tr').find('.row_network_type').val();
+    var network_vlan = $(this).closest('tr').find('.row_network_vlan').val();
+    var backup_phrase = $(this).closest('tr').find('.row_network_backup_phrase').val();
+    var network_passphrase_expiry = $(this).closest('tr').find('.row_network_passphrase_expiry').val();
+    var security_protocol = $(this).closest('tr').find('.row_security_protocol').val();
+    var all_venues = $(this).closest('tr').find('.row_all_venues').val();
+    
+    // console.log(ap_identifier);
+
+    $('html, body').animate({
+      scrollTop: $("#wifi_page .edit_network_block").offset().top-60
+    }, 300);
+
+    $('#wifi_page .network_id_edit_record').val(network_id);
+
+    // $('#venue_dropdown_edit').html(venue_name);
+    // $("#venue_dropdown_options_edit a").each(function() {
+      // console.log($(this).text()+":::"+venue_name);
+      // if ($(this).text() == venue_name) {
+        // $('#venue_id_edit').val($(this).attr('data-value'));
+      // }
+    // });
+
+    $('#network_name_edit').val(network_name);
+    $('#network_desc_edit').val(network_desc);
+    $('#network_type_edit').val(network_type);
+    $('#network_vlan_edit').val(network_vlan);
+    $('#backup_passphrase_edit').val(backup_phrase);
+    $('#passphrase_expiry_edit').val(network_passphrase_expiry);
+
+    $('#network_type_dropdown_edit').html(network_type);
+    $('.sp_dropdown_edit_btn').html(security_protocol);
+    console.log(network_passphrase_expiry);
+    $('#pe_dropdown_edit_btn').html(network_passphrase_expiry);
+
+    
+    
+    if (network_type == 'PSK') {
+      $.fn.toggle_flow_section_edit('right_flow_1_edit');
+      $('#btn_next_step_edit').attr('link','form_step_2_edit');
+    } else if (network_type == 'CaptivePortal') {
+      $.fn.toggle_flow_section_edit('right_flow_2_edit');
+      $('#btn_next_step_edit').attr('link','form_step_3_edit');
+    }
+    $('#btn_next_step_edit').removeAttr('disabled');
+
+
+    all_venues = JSON.parse(all_venues);
+    // console.log(all_venues);
+    $('#venues_network_table_edit .venue_checkbox').prop('checked',false);
+    all_venues.map((venue_id, key) => {
+      $('#venues_network_table_edit tbody .venue_id').each(function() {
+        // console.log($(this).val());
+        if ($(this).val() == venue_id) {
+          $(this).closest('tr').find('.venue_checkbox').prop('checked',true);
+        }
+      });
+    });
+
+    $('.form_step_2_edit').removeClass('active');
+    $('.form_step_6_edit').removeClass('active');
+    $('.form_step_1_edit').addClass('active');
+
+    $('.form_step_2_edit').hide();
+    $('.form_step_6_edit').hide();
+    $('.form_step_1_edit').fadeIn();
+
+    $('#btn_back_step_edit').hide();
+    $('#btn_next_step_edit').attr('link','form_step_2_edit');
+    $('#btn_next_step_edit').html('Next');
+    $.fn.reset_btn_states_edit();
+    // console.log(all_venues.venue_id)
+    // console.log(ap_identifier);
+    // if (ap_identifier == "Serial Number") {
+    //   $('#ap_serial_edit').val(ap_serial);
+    //   // console.log('yesy');  
+    // } else {
+    //   $('#ap_serial_edit').val(ap_mac_address);
+    // }
+    // $('#venue_name_edit').val(venue_name);
+    // $('#venue_desc_edit').val(venue_desc);
+    // $('#venue_add_edit').val(venue_add);
+    // $('#venue_add_notes_edit').val(venue_add_notes);
   });
 
   //$.fn.get_all_networks();
