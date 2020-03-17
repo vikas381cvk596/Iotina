@@ -105,7 +105,7 @@ class CollectionService
         return $results;
     }
 
-    public function getClientsTrafficGraphData($duration_api, $time_interval_api, $page) {
+    public function getClientsTrafficGraphData($input_data, $page) {
         //$client = new Client;
         $setting_time_interval = 5; // default
         $duration = '-60 minutes'; // default
@@ -124,11 +124,13 @@ class CollectionService
         }                    
 
         if ($page == 'api') {
-            if ($time_interval_api != '') {
-                $setting_time_interval = (float)$time_interval_api;    
+            if ($input_data['duration'])
+
+            if ($input_data['time_interval'] != '') {
+                $setting_time_interval = (float)$input_data['time_interval'];    
             }
-            if ($duration != '') {
-                $duration = '-'.$duration_api.' minutes';    
+            if ($input_data['duration'] != '') {
+                $duration = '-'.$input_data['duration'].' minutes';    
             }
         }
 
@@ -140,11 +142,66 @@ class CollectionService
         $time_interval = round(strtotime($duration) * 1000); // Last 6 Minutes
         $current_time = round(microtime(true) * 1000);
 
-        $graph_interval = 
-        $pipeline = [   
-            [
-                '$match' => [
-                    '$and' => [
+        $matchOptions = [];
+        if ($input_data['venue_id'] != '' && $input_data['ap_id'] != '') {
+            $matchOptions = array(
+                '$and' => [
+                        [
+                            'org_id' => $org_id
+                        ], [
+                            'venue_id' => (int)$input_data['venue_id']
+                        ], [
+                            'ap_id' => $input_data['ap_id']
+                        ], [
+                            'timestamp' => [
+                                '$gt' => $time_interval
+                            ]
+                        ], [
+                            'timestamp' => [
+                                '$lt' => $current_time
+                            ]
+                        ]
+                    ]
+                );
+        } else if ($input_data['venue_id'] != '' && $input_data['ap_id'] == '') {
+            $matchOptions = array(
+                '$and' => [
+                        [
+                            'org_id' => $org_id
+                        ], [
+                            'venue_id' => (int)$input_data['venue_id']
+                        ], [
+                            'timestamp' => [
+                                '$gt' => $time_interval
+                            ]
+                        ], [
+                            'timestamp' => [
+                                '$lt' => $current_time
+                            ]
+                        ]
+                    ]
+                );
+        } else if ($input_data['venue_id'] == '' && $input_data['ap_id'] != '') {
+            $matchOptions = array(
+                '$and' => [
+                        [
+                            'org_id' => $org_id
+                        ], [
+                            'ap_id' => $input_data['ap_id'] 
+                        ], [
+                            'timestamp' => [
+                                '$gt' => $time_interval
+                            ]
+                        ], [
+                            'timestamp' => [
+                                '$lt' => $current_time
+                            ]
+                        ]
+                    ]
+                );
+        } else if ($input_data['venue_id'] == '' && $input_data['ap_id'] == '') {
+            $matchOptions = array(
+                '$and' => [
                         [
                             'org_id' => $org_id
                         ], [
@@ -157,7 +214,12 @@ class CollectionService
                             ]
                         ]
                     ]
-                ]
+                );
+        }
+
+        $pipeline = [   
+            [
+                '$match' => $matchOptions
             ], [
                 '$group' => [
                     '_id' => [
@@ -209,8 +271,40 @@ class CollectionService
                     ],
                     'time_stamp' => [
                         '$addToSet' => '$timestamp'
+                    ],
+                    'Tx' => [
+                        '$sum' => [
+                            '$add' => [
+                                '$ucastBytesTx', '$mcastBytesTx', '$bcastBytesTx'
+                            ]
+                        ]
+                    ],
+                    'McastTx' => [
+                        '$sum' => '$mcastBytesTx' 
+                    ],
+                    'McastRx' => [
+                        '$sum' => '$mcastBytesRx' 
+                    ],
+                    'BcastTx' => [
+                        '$sum' => '$bcastBytesTx' 
+                    ],
+                    'BcastRx' => [
+                        '$sum' => '$bcastBytesRx' 
+                    ],
+                    'Rx' => [
+                        '$sum' => [
+                            '$add' => [
+                                '$ucastBytesRx', '$mcastBytesRx', '$bcastBytesRx'
+                            ]
+                        ]
+                    ],
+                    'Total' => [
+                        '$sum' => [
+                            '$add' => [
+                                '$ucastBytesTx', '$ucastBytesRx','$mcastBytesTx', '$mcastBytesRx','$bcastBytesTx', '$bcastBytesRx'
+                            ]
+                        ]
                     ]
-                    
                 ]
             ], [
                 '$sort' => [
@@ -220,6 +314,13 @@ class CollectionService
                 '$project' => [
                     '_id' => 1.0,
                     'count' => 1.0,
+                    'Tx' => 1.0,
+                    'Rx' => 1.0,
+                    'McastTx' => 1.0,
+                    'McastRx' => 1.0,
+                    'BcastTx' => 1.0,
+                    'BcastRx' => 1.0,
+                    'Total' => 1.0,
                     'time_stamp' => 1.0
                 ],
             ]
@@ -267,7 +368,8 @@ class CollectionService
         $results = new \stdClass();
         
 
-        $data_raw = [];
+        $data_display_format = [];
+        $data_date_format = [];
         date_default_timezone_set('Asia/Calcutta');
 
         $current_date = new \DateTime();
@@ -278,12 +380,16 @@ class CollectionService
             
             $current_date_time = strtotime('+5 minute',strtotime($current_date));
             $display_format = date('H:i', strtotime($interval_cycle, $current_date_time));
-            $data_raw[] = $display_format;
+            $date_format = date("Y-m-d H:i:s", strtotime($interval_cycle, $current_date_time));
+            $data_date_format[] = $date_format;
+            $data_display_format[] = $display_format;
         }
 
         $results->count_datapoints = $count;
         $results->clients_count = $data;
-        $results->time_intervals = array_reverse($data_raw);
+        
+        $results->time_intervals = array_reverse($data_display_format);
+        $results->time_intervals_date_time = array_reverse($data_date_format);
         $results->setting_time_interval = $setting_time_interval;
         $results = json_encode($results);
         return $results;

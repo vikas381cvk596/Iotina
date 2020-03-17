@@ -169,10 +169,13 @@ class APIService
         
         $build_query = $build_query->where("org_id", "=", $org_id);
         $build_query->orderBy('created_at','asc');
-        if (is_numeric($page_num)) {
-            $cluster_records = $build_query->paginate(5,['*'],'page',$page_num);
+
+        if ($page_num == -1) {
+            $cluster_records = $build_query->get();
+        } else if (is_numeric($page_num)) {
+            $cluster_records = $build_query->paginate(1,['*'],'page',$page_num);
         } else {
-            $cluster_records = $build_query->paginate(5);
+            $cluster_records = $build_query->paginate(1);
         }
 
         $cluster_raw = [];
@@ -199,9 +202,11 @@ class APIService
         
         $venue_data = new \stdClass();
         $venue_data->return_msg = "success";
-        $venue_data->current_page = $cluster_records->currentPage();
-        $venue_data->total_records = $cluster_records->total();
-        $venue_data->page_size = $cluster_records->perPage();
+        if ($page_num != -1) {
+            $venue_data->current_page = $cluster_records->currentPage();
+            $venue_data->total_records = $cluster_records->total();
+            $venue_data->page_size = $cluster_records->perPage();
+        }
         $venue_data->all_data = $cluster_raw;
 
         $venue_data = json_encode($venue_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
@@ -376,7 +381,7 @@ class APIService
     public function updateAP($ap_id, $input_fields)
     {
         $ap_name = $input_fields->input('ap_name');
-        $ap_description = $input_fields->input('ap_description');
+        $ap_description = $input_fields->input('ap_desc');
         $ap_serial = $input_fields->input('ap_serial');
         $ap_ip_address = $input_fields->input('ap_ip_address');
         $ap_tags = $input_fields->input('ap_tags');
@@ -960,12 +965,16 @@ class APIService
 
     public function getAllConnectedClientsGraph($input_fields)
     {
-        $duration = $input_fields->input('duration');
-        $time_interval = $input_fields->input('time_interval');
+        $input_data = [];
+        $input_data['duration'] = $input_fields->input('duration');
+        $input_data['time_interval'] = $input_fields->input('time_interval');
+        $input_data['venue_id'] = $input_fields->input('venue_id');
+        $input_data['ap_id'] = $input_fields->input('ap_id');
+
         $access_page = 'api';
 
         $collectionService = new CollectionService();
-        $clients = $collectionService->getClientsTrafficGraphData($duration, $time_interval, $access_page);
+        $clients = $collectionService->getClientsTrafficGraphData($input_data, $access_page);
             
         $clients_data = new \stdClass();
         $clients_data->return_msg = "success";

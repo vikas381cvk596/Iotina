@@ -95,5 +95,6 @@ Route::middleware('auth:api')->delete('api/accesspoints/delete/{ap_id}', array('
 
 Route::middleware('auth:api')->delete('api/clusters/delete/{cluster_id}', array('as' => 'deleteCluster', 'uses' => 'AppController@deleteCluster'));
 
+Route::middleware('auth:api')->get('api/count_entities', array('as' => 'getDashboardData', 'uses' => 'AppController@getDashboardData'));
 
 

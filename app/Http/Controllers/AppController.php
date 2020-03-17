@@ -91,10 +91,14 @@ class AppController extends Controller
     
     public function getClientsTrafficGraphData() {
         $collectionService = new CollectionService();
-        $duration = '';
-        $time_interval = '';
+        $input_data = [];
+        $input_data['duration'] = '';
+        $input_data['time_interval'] = '';
+        $input_data['venue_id'] = '';
+        $input_data['ap_id'] = '';
+
         $page = 'web';
-        $result = $collectionService->getClientsTrafficGraphData($duration, $time_interval, $page);
+        $result = $collectionService->getClientsTrafficGraphData($input_data, $page);
         return $result;    
     }
 
@@ -342,16 +346,6 @@ class AppController extends Controller
 
     public function editWifiNetwork() {
         $networkService = new NetworkService();
-        // $network_data_list = {
-        //     network_type: $_POST['network_id'],
-        //     network_name: $_POST['network_name'],
-        //     network_desc: $_POST['network_desc'],
-        //     network_vlan: $_POST['network_vlan'],
-        //     security_protocol: $_POST['security_protocol'],
-        //     passphrase_expiry: $_POST['passphrase_expiry'],
-        //     backup_phrase: $_POST['backup_phrase']
-        // };
-
         $result = $networkService->updateNetwork($_POST['network_id'], $_POST['networkData']);
         return $result; 
     }
