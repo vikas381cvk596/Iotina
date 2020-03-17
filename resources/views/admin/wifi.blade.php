@@ -280,7 +280,7 @@
         </div>
       </div>
 
-      <div class="edit_network_block" class="row" style="display: block;">
+      <div class="edit_network_block" class="row" style="display: none;">
         <input type="hidden" class="network_id_edit_record">
         <div class="col-lg-12">
           <div class="card mb-3">
