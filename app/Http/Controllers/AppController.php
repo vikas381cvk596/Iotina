@@ -349,4 +349,22 @@ class AppController extends Controller
         $result = $networkService->updateNetwork($_POST['network_id'], $_POST['networkData']);
         return $result; 
     }
+
+    public function getTrafficByClients(Request $request) {
+        $apiService = new APIService();
+        $result = $apiService->getTrafficByClients($request);
+        return response($result)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+            ]);  
+    }
+
+    public function getTrafficByAccessPoints(Request $request) {
+        $apiService = new APIService();
+        $result = $apiService->getTrafficByAccessPoints($request);
+        return response($result)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+            ]);  
+    }
 }

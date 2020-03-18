@@ -12,7 +12,7 @@ use App\Services\OrganisationService;
 
 class CollectionService
 {
-    public function getCollectionsData() {
+    public function getCollectionsData($input_data) {
         //$client = new Client;
         $organisationService = new OrganisationService();
         $org_id = $organisationService->getOrganisationID();
@@ -21,35 +21,69 @@ class CollectionService
         $collection = $client->eapDb->staTable;
 
         $time_interval = round(strtotime('-5 minutes') * 1000); // Last 5 Minutes
+        // $time_interval = 1584426282000;
 
-        /*$manager = new MongoDB\Driver\Manager("mongodb://localhost:27017");
-        //$connect = connect();
-        //$document = $collection->findOne(['_id' => '123']);
-
-        //$mongoId = '5dad7d014d17a5393a0991ff';
-
-        //$document = $collection->find(['_id'=> ObjectId("$mongoId")]);*/
-        /*$cursor = $collection->find(['IPV4Add' => '192.168.76.1']);
-        $docs = [];
-        foreach ($cursor as $document) {
-            $docs[] = $document['_id'];
-        }*/
-
-        /*$cursor = $collection->aggregate([
-            ['$group' => ['_id' => '$state', 'count' => ['$sum' => 1]]],
-            ['$sort' => ['count' => -1]],
-            ['$limit' => 5],
-        ]);*/
-
+        if ($input_data['venue_id'] != '' && $input_data['ap_id'] != '') {
+            $matchOptions = array(
+                '$and' => [
+                        [
+                            'org_id' => $org_id
+                        ], [
+                            'venue_id' => (int)$input_data['venue_id']
+                        ], [
+                            'ap_id' => $input_data['ap_id']
+                        ], [
+                            'timestamp' => [
+                                '$gt' => $time_interval
+                            ]
+                        ]
+                    ]
+                );
+        } else if ($input_data['venue_id'] != '' && $input_data['ap_id'] == '') {
+            $matchOptions = array(
+                '$and' => [
+                        [
+                            'org_id' => $org_id
+                        ], [
+                            'venue_id' => (int)$input_data['venue_id']
+                        ], [
+                            'timestamp' => [
+                                '$gt' => $time_interval
+                            ]
+                        ]
+                    ]
+                );
+        } else if ($input_data['venue_id'] == '' && $input_data['ap_id'] != '') {
+            $matchOptions = array(
+                '$and' => [
+                        [
+                            'org_id' => $org_id
+                        ], [
+                            'ap_id' => $input_data['ap_id']
+                        ], [
+                            'timestamp' => [
+                                '$gt' => $time_interval
+                            ]
+                        ]
+                    ]
+                );
+        } else if ($input_data['venue_id'] == '' && $input_data['ap_id'] == '') {
+            $matchOptions = array(
+                '$and' => [
+                        [
+                            'org_id' => $org_id
+                        ], [
+                            'timestamp' => [
+                                '$gt' => $time_interval
+                            ]
+                        ]
+                    ]
+                );
+        }
+        
         $pipeline = [ 
             [ 
-                '$match' => [ 
-                    'org_id' => $org_id,
-                    'timestamp' => [ 
-                        '$gt' => $time_interval
-                    ] 
- 
-                ] 
+                '$match' => $matchOptions
             ], [ 
                 '$sort' => [ 
                     'timestamp' => -1.0 
@@ -63,6 +97,7 @@ class CollectionService
                 ] 
             ] 
         ]; 
+
 
         $options = [];
         $results = new \stdClass();
@@ -100,7 +135,7 @@ class CollectionService
         
         $results->count = sizeof($data);
         $results->sta_data = $data;
-        $results->dhfdf = $time_interval;
+        // $results->time_interval = $time_interval;
         $results = json_encode($results, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
         return $results;
     }
@@ -124,8 +159,6 @@ class CollectionService
         }                    
 
         if ($page == 'api') {
-            if ($input_data['duration'])
-
             if ($input_data['time_interval'] != '') {
                 $setting_time_interval = (float)$input_data['time_interval'];    
             }
@@ -685,6 +718,322 @@ class CollectionService
 
 
         return $clients_count;
+    }
+
+    public function getTrafficByClients($input_data) {
+        //$client = new Client;
+        $organisationService = new OrganisationService();
+        $org_id = $organisationService->getOrganisationID();
+        
+        $client = new Client("mongodb://3.6.250.97:27017");
+        $collection = $client->eapDb->staTable;
+
+        $time_interval = round(strtotime('-24 hours') * 1000); // Last 5 Minutes
+        if ($input_data['duration'] != '') {
+            $duration = '-'.$input_data['duration'].' minutes';
+            $time_interval = round(strtotime($duration) * 1000);   
+        }
+        // $time_interval = 1584426282000;
+
+        $limit = 10;
+        if ($input_data['limit'] != '') {
+            $limit = (int)$input_data['limit'];   
+        }
+
+        if ($input_data['venue_id'] != '' && $input_data['ap_id'] != '') {
+            $matchOptions = array(
+                '$and' => [
+                        [
+                            'org_id' => $org_id
+                        ], [
+                            'venue_id' => (int)$input_data['venue_id']
+                        ], [
+                            'ap_id' => $input_data['ap_id']
+                        ], [
+                            'timestamp' => [
+                                '$gt' => $time_interval
+                            ]
+                        ]
+                    ]
+                );
+        } else if ($input_data['venue_id'] != '' && $input_data['ap_id'] == '') {
+            $matchOptions = array(
+                '$and' => [
+                        [
+                            'org_id' => $org_id
+                        ], [
+                            'venue_id' => (int)$input_data['venue_id']
+                        ], [
+                            'timestamp' => [
+                                '$gt' => $time_interval
+                            ]
+                        ]
+                    ]
+                );
+        } else if ($input_data['venue_id'] == '' && $input_data['ap_id'] != '') {
+            $matchOptions = array(
+                '$and' => [
+                        [
+                            'org_id' => $org_id
+                        ], [
+                            'ap_id' => $input_data['ap_id']
+                        ], [
+                            'timestamp' => [
+                                '$gt' => $time_interval
+                            ]
+                        ]
+                    ]
+                );
+        } else if ($input_data['venue_id'] == '' && $input_data['ap_id'] == '') {
+            $matchOptions = array(
+                '$and' => [
+                        [
+                            'org_id' => $org_id
+                        ], [
+                            'timestamp' => [
+                                '$gt' => $time_interval
+                            ]
+                        ]
+                    ]
+                );
+        }
+
+
+        $pipeline = [ 
+            [ 
+                '$match' => $matchOptions
+            ], [ 
+                '$sort' => [ 
+                    'Total' => -1.0 
+                ] 
+            ], [ 
+                '$group' => [ 
+                    '_id' => '$sta_id', 
+                    'Tx' => [
+                        '$sum' => '$BytesSent'
+                    ],
+                    'Rx' => [
+                        '$sum' => '$BytesReceived'
+                    ],
+                    'Total' => [
+                        '$sum' => [
+                            '$add' => ['$BytesSent', '$BytesReceived']
+                        ]
+                    ]
+                ] 
+            ], [
+                '$limit' => $limit
+            ], [
+                '$project' => [
+                    '_id' => 1.0,
+                    'Tx'  => 1.0,
+                    'Rx'  => 1.0,
+                    'Total'  => 1.0,
+                    'STA'  => 1.0
+                ]
+            ] 
+        ]; 
+
+        $options = [];
+        $results = new \stdClass();
+        $data = [];
+        
+        try {
+            $cursor = $collection->aggregate($pipeline, $options); 
+        } catch (ConnectionException $e) {
+            $results->count = sizeof($data);
+            $results->sta_data = $data;
+            $results = json_encode($results);
+            return $results;
+        } catch (ConnectionTimeoutException $e) {
+            $results->count = sizeof($data);
+            $results->sta_data = $data;
+            $results = json_encode($results);
+            return $results;
+        }
+        foreach ($cursor as $document) { 
+            // $data[$document['_id']] = $document['Tx'];
+            $trafficData = new \stdClass();
+            $trafficData->Tx = json_decode($document['Tx']);
+            $trafficData->Rx = json_decode($document['Rx']);
+            $trafficData->mac_address = $document['_id'];
+            if (isset($document['STA'])) {
+                $trafficData->STA = json_decode($document['STA']);    
+            }
+            $trafficData->Total = json_decode($document['Total']);
+            $data[] = $trafficData; 
+        }
+        
+        $results->count = sizeof($data);
+        $results->sta_data = $data;
+        // $results->time_interval = $time_interval;
+        $results = json_encode($results, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+        return $results;
+    }
+
+    public function getTrafficByAccessPoints($input_data) {
+        $organisationService = new OrganisationService();
+        $org_id = $organisationService->getOrganisationID();
+        
+        $client = new Client("mongodb://3.6.250.97:27017");
+        $collection = $client->eapDb->apTable;
+
+        $time_interval = round(strtotime('-24 hours') * 1000); // Last 5 Minutes
+        if ($input_data['duration'] != '') {
+            $duration = '-'.$input_data['duration'].' minutes';
+            $time_interval = round(strtotime($duration) * 1000);   
+        }
+        // $time_interval = 1584426282000;
+
+        $limit = 10;
+        if ($input_data['limit'] != '') {
+            $limit = (int)$input_data['limit'];   
+        }
+
+        if ($input_data['venue_id'] != '' && $input_data['ap_id'] != '') {
+            $matchOptions = array(
+                '$and' => [
+                        [
+                            'org_id' => $org_id
+                        ], [
+                            'venue_id' => (int)$input_data['venue_id']
+                        ], [
+                            'ap_id' => $input_data['ap_id']
+                        ], [
+                            'timestamp' => [
+                                '$gt' => $time_interval
+                            ]
+                        ]
+                    ]
+                );
+        } else if ($input_data['venue_id'] != '' && $input_data['ap_id'] == '') {
+            $matchOptions = array(
+                '$and' => [
+                        [
+                            'org_id' => $org_id
+                        ], [
+                            'venue_id' => (int)$input_data['venue_id']
+                        ], [
+                            'timestamp' => [
+                                '$gt' => $time_interval
+                            ]
+                        ]
+                    ]
+                );
+        } else if ($input_data['venue_id'] == '' && $input_data['ap_id'] != '') {
+            $matchOptions = array(
+                '$and' => [
+                        [
+                            'org_id' => $org_id
+                        ], [
+                            'ap_id' => $input_data['ap_id']
+                        ], [
+                            'timestamp' => [
+                                '$gt' => $time_interval
+                            ]
+                        ]
+                    ]
+                );
+        } else if ($input_data['venue_id'] == '' && $input_data['ap_id'] == '') {
+            $matchOptions = array(
+                '$and' => [
+                        [
+                            'org_id' => $org_id
+                        ], [
+                            'timestamp' => [
+                                '$gt' => $time_interval
+                            ]
+                        ]
+                    ]
+                );
+        }
+
+
+        $pipeline = [ 
+            [ 
+                '$match' => $matchOptions
+            ], [ 
+                '$sort' => [ 
+                    'Total' => -1.0 
+                ] 
+            ], [ 
+                '$group' => [ 
+                    '_id' => '$ap_id', 
+                    'Tx' => [
+                        '$sum' => [
+                            '$add' => ['$ucastBytesTx', '$mcastBytesTx', '$bcastBytesTx']
+                        ]
+                    ],
+                    'Rx' => [
+                        '$sum' => [
+                            '$add' => ['$ucastBytesRx', '$mcastBytesRx', '$bcastBytesRx']
+                        ]
+                    ],
+                    'McastTx' => [
+                        '$sum' => '$mcastBytesTx'
+                    ],
+                    'McastRx' => [
+                        '$sum' => '$mcastBytesRx'
+                    ],
+                    'BcastTx' => [
+                        '$sum' => '$bcastBytesTx'
+                    ],
+                    'BcastRx' => [
+                        '$sum' => '$bcastBytesRx'
+                    ],
+                    'Total' => [
+                        '$sum' => [
+                            '$add' => ['$ucastBytesTx', '$ucastBytesRx']
+                        ]
+                    ]
+                ] 
+            ], [
+                '$limit' => $limit
+            ], [
+                '$project' => [
+                    '_id' => 1.0,
+                    'Tx'  => 1.0,
+                    'Rx'  => 1.0,
+                    'Total'  => 1.0
+                ]
+            ] 
+        ]; 
+
+        $options = [];
+        $results = new \stdClass();
+        $data = [];
+        
+        try {
+            $cursor = $collection->aggregate($pipeline, $options); 
+        } catch (ConnectionException $e) {
+            $results->count = sizeof($data);
+            $results->sta_data = $data;
+            $results = json_encode($results);
+            return $results;
+        } catch (ConnectionTimeoutException $e) {
+            $results->count = sizeof($data);
+            $results->sta_data = $data;
+            $results = json_encode($results);
+            return $results;
+        }
+        foreach ($cursor as $document) { 
+            // $data[$document['_id']] = $document['Tx'];
+            $trafficData = new \stdClass();
+            $trafficData->Tx = json_decode($document['Tx']);
+            $trafficData->Rx = json_decode($document['Rx']);
+            $trafficData->mac_address = $document['_id'];
+            if (isset($document['STA'])) {
+                $trafficData->STA = json_decode($document['STA']);    
+            }
+            $trafficData->Total = json_decode($document['Total']);
+            $data[] = $trafficData; 
+        }
+        
+        $results->count = sizeof($data);
+        $results->sta_data = $data;
+        // $results->time_interval = $time_interval;
+        $results = json_encode($results, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+        return $results;
     }
 
     public function testAPData() {

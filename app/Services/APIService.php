@@ -449,17 +449,25 @@ class APIService
     public function getAllAPs($input_filters)
     {
         $page_num = $input_filters->input('page_num');
+        $cluster_id = $input_filters->input('cluster_id');
 
         $build_query = AccessPoint::query();
         $organisationService = new OrganisationService();
         $org_id = $organisationService->getOrganisationID();
         
         $build_query = $build_query->where("org_id", "=", $org_id);
+        if ($cluster_id != '') {
+            $build_query = $build_query->where("venue_id", "=", $cluster_id);
+        }
         $build_query->orderBy('created_at','asc');
-        if (is_numeric($page_num)) {
-            $ap_records = $build_query->paginate(5,['*'],'page',$page_num);
+        if ($page_num == -1) {
+            $ap_records = $build_query->get();
         } else {
-            $ap_records = $build_query->paginate(5);
+            if (is_numeric($page_num)) {
+                $ap_records = $build_query->paginate(5,['*'],'page',$page_num);
+            } else {
+                $ap_records = $build_query->paginate(5);
+            }
         }
 
         $ap_raw = [];
@@ -495,9 +503,11 @@ class APIService
         
         $ap_data = new \stdClass();
         $ap_data->return_msg = "success";
-        $ap_data->current_page = $ap_records->currentPage();
-        $ap_data->total_records = $ap_records->total();
-        $ap_data->page_size = $ap_records->perPage();
+        if ($page_num != -1) {
+            $ap_data->current_page = $ap_records->currentPage();
+            $ap_data->total_records = $ap_records->total();
+            $ap_data->page_size = $ap_records->perPage();
+        }
         $ap_data->all_data = $ap_raw;
 
         $ap_data = json_encode($ap_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
@@ -947,10 +957,14 @@ class APIService
 
     }
     
-    public function getAllConnectedClients($input_filters)
+    public function getAllConnectedClients($input_fields)
     {
+        $input_data = [];
+        $input_data['venue_id'] = $input_fields->input('cluster_id');
+        $input_data['ap_id'] = $input_fields->input('ap_id');
+
         $collectionService = new CollectionService();
-        $clients = $collectionService->getCollectionsData();
+        $clients = $collectionService->getCollectionsData($input_data);
         $clients = json_decode($clients);
 
         $clients_data = new \stdClass();
@@ -968,7 +982,7 @@ class APIService
         $input_data = [];
         $input_data['duration'] = $input_fields->input('duration');
         $input_data['time_interval'] = $input_fields->input('time_interval');
-        $input_data['venue_id'] = $input_fields->input('venue_id');
+        $input_data['venue_id'] = $input_fields->input('cluster_id');
         $input_data['ap_id'] = $input_fields->input('ap_id');
 
         $access_page = 'api';
@@ -979,6 +993,50 @@ class APIService
         $clients_data = new \stdClass();
         $clients_data->return_msg = "success";
         $clients_data->all_data = json_decode($clients);
+
+        $clients_data = json_encode($clients_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+        return $clients_data;
+    }
+
+    public function getTrafficByClients($input_fields)
+    {
+        $input_data = [];
+        $input_data['venue_id'] = $input_fields->input('cluster_id');
+        $input_data['ap_id'] = $input_fields->input('ap_id');
+        $input_data['limit'] = $input_fields->input('limit');
+        $input_data['duration'] = $input_fields->input('duration');
+        
+        $collectionService = new CollectionService();
+        $clients = $collectionService->getTrafficByClients($input_data);
+        $clients = json_decode($clients);
+
+        $clients_data = new \stdClass();
+        $clients_data->return_msg = "success";
+        $clients_data->count = $clients->count;
+        $clients_data->all_data = $clients->sta_data;
+
+
+        $clients_data = json_encode($clients_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+        return $clients_data;
+    }
+
+    public function getTrafficByAccessPoints($input_fields)
+    {
+        $input_data = [];
+        $input_data['venue_id'] = $input_fields->input('cluster_id');
+        $input_data['ap_id'] = $input_fields->input('ap_id');
+        $input_data['limit'] = $input_fields->input('limit');
+        $input_data['duration'] = $input_fields->input('duration');
+        
+        $collectionService = new CollectionService();
+        $clients = $collectionService->getTrafficByAccessPoints($input_data);
+        $clients = json_decode($clients);
+
+        $clients_data = new \stdClass();
+        $clients_data->return_msg = "success";
+        $clients_data->count = $clients->count;
+        $clients_data->all_data = $clients->sta_data;
+
 
         $clients_data = json_encode($clients_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
         return $clients_data;
