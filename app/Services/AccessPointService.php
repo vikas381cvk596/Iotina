@@ -94,7 +94,7 @@ class AccessPointService
         return $ap_data;
     }    
 
-    public function getAllAccessPoints () {
+    /*public function getAllAccessPointsOld () {
         $organisationService = new OrganisationService();
         $org_id = $organisationService->getOrganisationID();
 
@@ -171,6 +171,114 @@ class AccessPointService
             $ap_raw[$ap->ap_id] = $ap;
         }
         return $ap_raw;       
+    }*/
+
+    public function getAllAccessPoints($input_filters)
+    {
+        $page_num = $input_filters['page_num'];
+        $cluster_id = $input_filters['cluster_id'];
+        $limit = 5;
+        if ($input_filters['limit'] != '') {
+            $limit = (int)$input_filters['limit'];
+        }
+
+
+        $build_query = AccessPoint::query();
+        $organisationService = new OrganisationService();
+        $org_id = $organisationService->getOrganisationID();
+        
+        $build_query = $build_query->where("org_id", "=", $org_id);
+        if ($cluster_id != '') {
+            $build_query = $build_query->where("venue_id", "=", $cluster_id);
+        }
+        $build_query->orderBy('created_at','asc');
+        if ($page_num == -1) {
+            $ap_records = $build_query->get();
+        } else {
+            if (is_numeric($page_num)) {
+                $ap_records = $build_query->paginate($limit,['*'],'page',$page_num);
+            } else {
+                $ap_records = $build_query->paginate($limit);
+            }
+        }
+
+        $ap_raw = [];
+        foreach ($ap_records as $row){
+            $row = json_decode($row);
+            $ap_record = new \stdClass();
+            
+            $ap_record->ap_id = $row->ap_id;
+            $ap_record->ap_name = $row->ap_name;
+            $ap_record->ap_description = $row->ap_description;
+            $ap_record->ap_ip_address = $row->ap_ip_address;
+            $ap_record->ap_serial = $row->ap_serial;
+            $ap_record->ap_mac_address = $row->ap_mac_address;
+            $ap_record->ap_identifier = $row->ap_identifier;
+            $ap_record->ap_tags = $row->ap_tags;
+            $ap_record->ap_mesh_role = $row->ap_mesh_role;
+            
+            $venueService = new VenueService();
+            $cluster_name = $venueService->getVenueNameByID($row->venue_id);
+
+            $ap_record->cluster_id = $row->venue_id;
+            $ap_record->cluster_name = $cluster_name;
+
+            $collectionService = new CollectionService();
+            $input_fields['ap_identifier'] = $row->ap_identifier;
+            $input_fields['ap_serial'] = $row->ap_serial;
+            $input_fields['ap_mac_address'] = $row->ap_mac_address;
+            $input_fields['ap_current_status'] = $row->ap_status;
+            
+            $output = $collectionService->getAccessPointStatus($input_fields);
+            $output = json_decode($output);
+
+            $ap_record->ap_status = $output->ap_status;
+            if ($output->ap_ip_address != '') {
+                $ap_record->ap_ip_address = $output->ap_ip_address;
+            } 
+
+            if ($output->ap_serial != '') {
+                $ap_record->ap_serial = $output->ap_serial;
+            } 
+
+            if ($output->ap_mac_address != '') {
+                $ap_record->ap_mac_address = $output->ap_mac_address;
+            } 
+
+            $apUpdate = [];
+            $apUpdate['ap_id'] = $ap_record->ap_id;
+            $apUpdate['ap_ip_address'] = $ap_record->ap_ip_address;
+            $apUpdate['ap_serial'] = $ap_record->ap_serial;
+            $apUpdate['ap_mac_address'] = $ap_record->ap_mac_address;
+            $apUpdate['ap_status'] = $ap_record->ap_status;
+            
+            DB::table('access_point')->where(['ap_id' => $ap_record->ap_id])->update($apUpdate);
+
+            $input_filters = new \stdClass();
+            $input_filters->org_id = $org_id;
+            $input_filters->ap_mac_address = $row->ap_mac_address;
+            $input_filters->ap_status = $output->ap_status;
+            $clients_connected = $collectionService->getAllClientsConnected(json_encode($input_filters),'ap_page');
+
+            $ap_record->clients_connected = $clients_connected;
+
+            $ap_record->created_at = $row->created_at;
+            $ap_record->updated_at = $row->updated_at;
+
+            $ap_raw[$ap_record->ap_id] = $ap_record;
+        }
+        
+        $ap_data = new \stdClass();
+        $ap_data->return_msg = "success";
+        if ($page_num != -1) {
+            $ap_data->current_page = $ap_records->currentPage();
+            $ap_data->total_records = $ap_records->total();
+            $ap_data->page_size = $ap_records->perPage();
+        }
+        $ap_data->all_data = $ap_raw;
+
+        $ap_data = json_encode($ap_data, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);
+        return $ap_data;
     }
 
     public function getAccessPointDetails ($ap_id) {

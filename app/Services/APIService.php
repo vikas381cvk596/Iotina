@@ -488,18 +488,48 @@ class APIService
             $ap_record->cluster_id = $row->venue_id;
             $ap_record->ap_name = $row->ap_name;
             $ap_record->ap_description = $row->ap_description;
-            $ap_record->ap_status = $row->ap_status;
+            $ap_record->ap_ip_address = $row->ap_ip_address;
             $ap_record->ap_serial = $row->ap_serial;
             $ap_record->ap_mac_address = $row->ap_mac_address;
             $ap_record->ap_identifier = $row->ap_identifier;
             $ap_record->ap_tags = $row->ap_tags;
-            $ap_record->ap_ip_address = $row->ap_ip_address;
             $ap_record->ap_mesh_role = $row->ap_mesh_role;
             
+            $collectionService = new CollectionService();
+            $input_fields['ap_identifier'] = $row->ap_identifier;
+            $input_fields['ap_serial'] = $row->ap_serial;
+            $input_fields['ap_mac_address'] = $row->ap_mac_address;
+            $input_fields['ap_current_status'] = $row->ap_status;
+            
+            $output = $collectionService->getAccessPointStatus($input_fields);
+            $output = json_decode($output);
+
+            $ap_record->ap_status = $output->ap_status;
+            if ($output->ap_ip_address != '') {
+                $ap_record->ap_ip_address = $output->ap_ip_address;
+            } 
+
+            if ($output->ap_serial != '') {
+                $ap_record->ap_serial = $output->ap_serial;
+            } 
+
+            if ($output->ap_mac_address != '') {
+                $ap_record->ap_mac_address = $output->ap_mac_address;
+            } 
+
+            $apUpdate = [];
+            $apUpdate['ap_id'] = $ap_record->ap_id;
+            $apUpdate['ap_ip_address'] = $ap_record->ap_ip_address;
+            $apUpdate['ap_serial'] = $ap_record->ap_serial;
+            $apUpdate['ap_mac_address'] = $ap_record->ap_mac_address;
+            $apUpdate['ap_status'] = $ap_record->ap_status;
+            
+            DB::table('access_point')->where(['ap_id' => $ap_record->ap_id])->update($apUpdate);
+
             $input_filters = new \stdClass();
             $input_filters->org_id = $org_id;
             $input_filters->ap_mac_address = $row->ap_mac_address;
-            $collectionService = new CollectionService();
+            $input_filters->ap_status = $output->ap_status;
             $clients_connected = $collectionService->getAllClientsConnected(json_encode($input_filters),'ap_page');
 
             $ap_record->clients_connected = $clients_connected;

@@ -428,6 +428,132 @@ class CollectionService
         return $results;
     }
 
+    function checkAPStatus($ap_identifier, $ap_key, $org_id, $current_status) {
+        $output = new \stdClass();
+        $output->final_status = 'not_yet_connected';
+        $output->ip_address = '';
+        $output->ap_serial = '';
+        $output->ap_mac_address = '';
+        
+        $cursor = [];
+        $client = new Client("mongodb://3.6.250.97:27017");
+        $collection = $client->eapDb->apTable;
+
+        if ($current_status == 'not_yet_connected') {
+            $output->final_status = 'not_yet_connected';
+            if ($ap_identifier == "MAC Address") {
+                try {
+                    $cursor = $collection->find(['ap_id' => $ap_key, 'org_id' => $org_id], ['sort' => ['timestamp' => -1]]);
+                } catch (ConnectionException $e) {
+                    // return $clients_count;
+                } catch (ConnectionTimeoutException $e) {
+                    // return $clients_count;
+                }
+            } else {
+                try {
+                    $cursor = $collection->find(['SerialNo' => $ap_key, 'org_id' => $org_id], ['sort' => ['timestamp' => -1]]);
+                } catch (ConnectionException $e) {
+                } catch (ConnectionTimeoutException $e) {
+                }
+            }
+
+            foreach ($cursor as $document) { 
+                // $output_intermediate = checkStatus($ap_identifier, $ap_key, $org_id, 'disconnected');
+                $output->final_status = 'disconnected';
+                $output->ip_address = $document['IPV4Add'];
+                if (array_key_exists('SerialNo', $document)) {
+                    $output->ap_serial = $document['SerialNo'];
+                }
+                if (array_key_exists('ap_id', $document)) {
+                    $output->ap_mac_address = $document['ap_id'];
+                }
+                break;
+            }
+        } else if ($current_status == 'connected' || $current_status == 'disconnected') {
+            $output->final_status = 'disconnected';
+            
+            //$time_interval = round(microtime(true) * 1000); //Right Now
+            $time_interval = round(strtotime('-5 minutes') * 1000); // Last 10 Minutes
+            // $time_interval = 1584426282000;
+            if ($ap_identifier == "MAC Address") {
+                $cursor = $collection->find(['ap_id' => $ap_key, 'org_id' => $org_id, 'timestamp' => ['$gt' => $time_interval]]);
+            } else {
+                $cursor = $collection->find(['SerialNo' => $ap_key, 'org_id' => $org_id, 'timestamp' => ['$gt' => $time_interval]], ['sort' => ['timestamp' => -1]]);
+            }
+            
+            foreach ($cursor as $document) { 
+                $output->final_status = "connected";
+                $output->ip_address = $document['IPV4Add'];
+                if (array_key_exists('SerialNo', $document)) {
+                    $output->ap_serial = $document['SerialNo'];
+                }
+                if (array_key_exists('ap_id', $document)) {
+                    $output->ap_mac_address = $document['ap_id'];
+                }
+                break;
+            }
+        }
+
+        $output = json_encode($output);
+        return $output;
+    }
+
+    public function getAccessPointStatus($input_fields) {
+        $organisationService = new OrganisationService();
+        $org_id = $organisationService->getOrganisationID();
+        $ap_identifier = $input_fields['ap_identifier'];
+        $ap_serial = $input_fields['ap_serial']; 
+        $ap_mac_address = $input_fields['ap_mac_address']; 
+        $ap_current_status = $input_fields['ap_current_status'];
+
+        $ap_key = $ap_serial; 
+        if ($ap_identifier == 'MAC Address') {
+            $ap_key = $ap_mac_address;
+        }
+
+        $final_status = '';
+        $ip_address = '';
+        $ap_serial = '';
+        $ap_mac_address = '';
+
+        $output = new \stdClass();
+        if ($ap_current_status == 'not_yet_connected') {
+            $output_check = $this->checkAPStatus($ap_identifier, $ap_key, $org_id, $ap_current_status);
+            $output_check = json_decode($output_check);
+
+            $final_status = $output_check->final_status;
+            $ip_address = $output_check->ip_address;
+            $ap_serial = $output_check->ap_serial;
+            $ap_mac_address = $output_check->ap_mac_address;
+
+            if ($output_check->final_status == 'disconnected') {
+                $output = $this->checkAPStatus($ap_identifier, $ap_key, $org_id, $output_check->final_status);
+
+                $output = json_decode($output);
+                $final_status = $output->final_status;
+            } 
+        } else {
+            $output = $this->checkAPStatus($ap_identifier, $ap_key, $org_id, $ap_current_status);  
+            $output = json_decode($output);
+
+            $final_status = $output->final_status;
+            $ip_address = $output->ip_address;
+            $ap_serial = $output->ap_serial;
+            $ap_mac_address = $output->ap_mac_address;  
+        }
+
+        
+        $ap = new \stdClass();
+
+        $ap->ap_status = $final_status;
+        $ap->ap_ip_address = $ip_address;
+        $ap->ap_serial = $ap_serial;
+        $ap->ap_mac_address = $ap_mac_address;
+
+        $ap = json_encode($ap);
+        return $ap;
+    }
+
     public function getAPStatus($org_id, $ap_identifier, $ap_search, $time_status) {
         $status = '';
         $org_id = (int)$org_id;
@@ -556,53 +682,56 @@ class CollectionService
             
             $org_id = (int)$input_filters->org_id;
             $ap_id = $input_filters->ap_mac_address; 
-            $time_interval = round(strtotime('-5 minutes') * 1000); // Last 6 Minutes
-            $current_time = round(microtime(true) * 1000);
+            $ap_status = $input_filters->ap_status;
+            $count = 0;
+            if ($ap_status == 'connected') {
+                $time_interval = round(strtotime('-5 minutes') * 1000); // Last 6 Minutes
+                $current_time = round(microtime(true) * 1000);
 
-            $query = [
-                '$and' => [
-                    [
-                        'org_id' => $org_id
-                    ], [
-                        'ap_id' => $ap_id
-                    ], [
-                        'timestamp' => [
-                            '$gte' => $time_interval
-                        ]
-                    ], [
-                        'timestamp' => [
-                            '$lte' => $current_time
+                $query = [
+                    '$and' => [
+                        [
+                            'org_id' => $org_id
+                        ], [
+                            'ap_id' => $ap_id
+                        ], [
+                            'timestamp' => [
+                                '$gte' => $time_interval
+                            ]
+                        ], [
+                            'timestamp' => [
+                                '$lte' => $current_time
+                            ]
                         ]
                     ]
-                ]
-            ];
+                ];
 
-            $options = [
-                'projection' => [
-                    'NumberOfSTA' => 1.0,
-                    '_id' => 0.0
-                ],
-                'sort' => [
-                    'timestamp' => -1.0
-                ],
-                'limit' => 1
-            ];
-            
-            $options = [];
-            $cursor = [];
-            //$clients_count = $collection->count($query, $options);
-            try {
-                $cursor = $collection->find($query, $options);
-            } catch (ConnectionException $e) {
-                return "0";
-            } catch (ConnectionTimeoutException $e) {
-                return "0";
-            }
-            $count = 0;
-            foreach ($cursor as $document) { 
-                $status = "connected";
-                if (array_key_exists('NumberOfSTA', $document)) {
-                    $count = $count + (int)$document['NumberOfSTA'];
+                $options = [
+                    'projection' => [
+                        'NumberOfSTA' => 1.0,
+                        '_id' => 0.0
+                    ],
+                    'sort' => [
+                        'timestamp' => -1.0
+                    ],
+                    'limit' => 1
+                ];
+                
+                $options = [];
+                $cursor = [];
+                //$clients_count = $collection->count($query, $options);
+                try {
+                    $cursor = $collection->find($query, $options);
+                } catch (ConnectionException $e) {
+                    return "0";
+                } catch (ConnectionTimeoutException $e) {
+                    return "0";
+                }
+                foreach ($cursor as $document) { 
+                    $status = "connected";
+                    if (array_key_exists('NumberOfSTA', $document)) {
+                        $count = $count + (int)$document['NumberOfSTA'];
+                    }
                 }
             }
             $clients_count = strval($count);

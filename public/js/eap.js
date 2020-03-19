@@ -357,44 +357,56 @@ if (document.getElementById('venue_page'))
   $.fn.generate_ap_table = function() {
     $('#ap_table tbody').html('');
     $.fn.spin_on('spin-area');
+
+    var page_num = -1;
+    var limit = '';
+    var cluster_id = '';
+
     //alert();
     $.ajax({
       url: "getAllAccessPoints",
       type: "POST",
       data: {
+        page_num: page_num,
+        limit: limit,
+        cluster_id: cluster_id,
         '_token': window.Laravel.csrfToken
       },
       success: function(all_aps) {
-        // console.log(all_aps);
+        var all_aps = JSON.parse(all_aps);
+        var all_data = all_aps.all_data;
+        console.log(all_data);
         //console.log(all_aps);
         var html_content = '';
-        for (var ap in all_aps) {
-          var venue_name = all_aps[ap]['venue_name'];
-          var ap_crt_date = all_aps[ap]['created_at'];
+        for (var key in all_data) {
+          // console.log(all_data[key].cluster_name);
+          var ap_id = all_data[key].ap_id;
+          var venue_name = all_data[key].cluster_name;
+          var ap_crt_date = all_data[key].created_at;
           
           var ap_name = '';
-          if (all_aps[ap]['ap_name']) {
-            ap_name = all_aps[ap]['ap_name'];
+          if (all_data[key].ap_name) {
+            ap_name = all_data[key].ap_name;
           }
 
           var ap_description = '';
-          if (all_aps[ap]['ap_description']) {
-            ap_description = all_aps[ap]['ap_description'];
+          if (all_data[key].ap_description) {
+            ap_description = all_data[key].ap_description;
           }
 
           var ap_identifier = '';
-          if (all_aps[ap]['ap_identifier']) {
-            ap_identifier = all_aps[ap]['ap_identifier'];
+          if (all_data[key].ap_identifier) {
+            ap_identifier = all_data[key].ap_identifier;
           }
 
           var ap_serial = '';
-          if (all_aps[ap]['ap_serial']) {
-            ap_serial = all_aps[ap]['ap_serial'];
+          if (all_data[key].ap_serial) {
+            ap_serial = all_data[key].ap_serial;
           }
 
           var ap_mac_address = '';
-          if (all_aps[ap]['ap_mac_address']) {
-            ap_mac_address = all_aps[ap]['ap_mac_address'];
+          if (all_data[key].ap_mac_address) {
+            ap_mac_address = all_data[key].ap_mac_address;
           }
 
           /*if (ap_identifier == "MAC Address") {
@@ -404,45 +416,45 @@ if (document.getElementById('venue_page'))
           }*/
 
           var ap_tags = '';
-          if (all_aps[ap]['ap_tags']) {
-            ap_tags = all_aps[ap]['ap_tags'];
+          if (all_data[key].ap_tags) {
+            ap_tags = all_data[key].ap_tags;
           }
 
           var ap_status = 'Not Yet Connected';
-          if (all_aps[ap]['ap_status']) {
-            if (all_aps[ap]['ap_status'] == "not_yet_connected") {
+          if (all_data[key].ap_status) {
+            if (all_data[key].ap_status == "not_yet_connected") {
               ap_status = "Not Yet Connected";
-            } else if (all_aps[ap]['ap_status'] == "connected") {
+            } else if (all_data[key].ap_status == "connected") {
               ap_status = "Connected";
-            } else if (all_aps[ap]['ap_status'] == "disconnected") {
+            } else if (all_data[key].ap_status == "disconnected") {
               ap_status = "Disconnected";
             } else {
-              ap_status = all_aps[ap]['ap_status'];
+              ap_status = all_data[key].ap_status;
             }
           }
 
           var ap_model = '';
-          if (all_aps[ap]['ap_model']) {
-            ap_model = all_aps[ap]['ap_model'];
+          if (all_data.ap_model) {
+            ap_model = all_data[key].ap_model;
           }
 
           var ap_ip_address = '';
-          if (all_aps[ap]['ap_ip_address']) {
-            ap_ip_address = all_aps[ap]['ap_ip_address'];
+          if (all_data[key].ap_ip_address) {
+            ap_ip_address = all_data[key].ap_ip_address;
           }
 
           var ap_mesh_role = '';
-          if (all_aps[ap]['ap_mesh_role']) {
-            ap_mesh_role = all_aps[ap]['ap_mesh_role'];
+          if (all_data[key].ap_mesh_role) {
+            ap_mesh_role = all_data[key].ap_mesh_role;
           }
 
           var client_count = '0';
-          if (all_aps[ap]['client_count']) {
-            client_count = all_aps[ap]['client_count'];
+          if (all_data[key].clients_connected) {
+            client_count = all_data[key].clients_connected;
           }
 
           html_content = html_content+'<tr>';
-          html_content = html_content+'<input type="hidden" class="row_ap_id" value='+ap+'>';
+          html_content = html_content+'<input type="hidden" class="row_ap_id" value='+ap_id+'>';
           html_content = html_content+'<input type="hidden" class="row_ap_name" value='+ap_name+'>';
           html_content = html_content+'<input type="hidden" class="row_ap_desc" value='+ap_description+'>';
           // html_content = html_content+'<input type="hidden" class="row_ap_status" value='+ap_status+'>';
@@ -469,7 +481,7 @@ if (document.getElementById('venue_page'))
           html_content = html_content+'</tr>';
         }
         $('#ap_table tbody').html(html_content);   
-        $.fn.spin_off('spin-area');    
+        $.fn.spin_off('spin-area');  
       }
     }); 
   };

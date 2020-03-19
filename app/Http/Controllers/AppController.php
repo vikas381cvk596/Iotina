@@ -50,8 +50,13 @@ class AppController extends Controller
 
     public function getAllAccessPoints()
     {
+        $input_filters = [];
+        $input_filters['page_num'] = $_POST['page_num'];
+        $input_filters['cluster_id'] = $_POST['cluster_id'];
+        $input_filters['limit'] = $_POST['limit'];
+
         $apService = new AccessPointService();
-        $result = $apService->getAllAccessPoints();
+        $result = $apService->getAllAccessPoints($input_filters);
         return $result;
     }      
 
