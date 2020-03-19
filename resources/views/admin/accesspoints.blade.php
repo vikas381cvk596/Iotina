@@ -226,6 +226,17 @@
         <div class="card-header">
           <i class="fa fa-table"></i>&nbsp;&nbsp;Access Points</div>
         <div class="card-body">
+          <div class="form-group" style="">
+            <input type="hidden" id="venue_filter" name="venue_filter">
+            <div class="dropdown venue_filter_dropdown" style="width: 15vw;">
+              <button class="btn btn-default dropdown-toggle" type="button" id="venue_filter_dropdown_btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size: 14px; background-color: #f2f2f2; border: 1px solid #c3c3c3; width: 10vw; color: #696969; width: 15vw; text-align: left;">
+                Select Venue
+              </button>
+              <div class="dropdown-menu" id="venue_filter_options" aria-labelledby="venue_filter_dropdown">
+              </div>
+            </div>
+                
+          </div> 
           <div class="table-responsive">
             <table id="ap_table" class="table table-bordered" id="dataTable" width="100%" cellspacing="0" style="font-size: 13px;">
               <thead>

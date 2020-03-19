@@ -487,6 +487,14 @@ footer.sticky-footer {
   top: 40%;
 }
 
+#ap_page .dropdown a {
+  cursor: pointer;
+}
+
+#ap_page .dropdown a:hover {
+  cursor: pointer;
+}
+
 #wifi_page .dropdown .dropdown-toggle::after {
   position: absolute;
   right: 10px;
@@ -500,6 +508,12 @@ footer.sticky-footer {
 }
 
 #ap_page #ap_identifier_dropdown_edit::after {
+  position: absolute!important;
+  right: 10px!important;
+  top: 40%!important;
+}
+
+#ap_page #venue_filter_dropdown_btn::after {
   position: absolute!important;
   right: 10px!important;
   top: 40%!important;

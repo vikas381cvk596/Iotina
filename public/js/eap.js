@@ -273,6 +273,14 @@ if (document.getElementById('venue_page'))
     $('#venue_id').val(venue_id);
   });
 
+  $("#ap_page").on('click', '#venue_filter_options .dropdown-item', function() {
+    $(this).parents(".dropdown").find('.btn').html($(this).text());
+    var venue_id = $(this).attr('data-value');
+    $('#venue_filter').val(venue_id);
+    $.fn.generate_ap_table();
+  });
+
+
   $("#ap_page").on('click', '#ap_identifier_options .dropdown-item', function() {
     $(this).parents(".dropdown").find('.btn').html($(this).text());
     var ap_identifier = $(this).attr('data-value');
@@ -361,7 +369,10 @@ if (document.getElementById('venue_page'))
     var page_num = -1;
     var limit = '';
     var cluster_id = '';
-
+    if ($('#venue_filter').val() != '') {
+      cluster_id = $('#venue_filter').val();
+    }
+    
     //alert();
     $.ajax({
       url: "getAllAccessPoints",
@@ -506,6 +517,7 @@ if (document.getElementById('venue_page'))
 
         $("#venue_dropdown_options").html(html_content);
         $("#venue_dropdown_options_edit").html(html_content);
+        $("#venue_filter_options").html('<a class="dropdown-item" data-value="">All</a>'+html_content);
       }
     });
   }
