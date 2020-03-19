@@ -162,6 +162,10 @@ class APIService
     public function getAllClusters($input_filters)
     {
         $page_num = $input_filters->input('page_num');
+        $limit = 5;
+        if ($input_filters->input('limit') != '') {
+            $limit = (int)$input_filters->input('limit');
+        }
 
         $build_query = Venue::query();
         $organisationService = new OrganisationService();
@@ -173,9 +177,9 @@ class APIService
         if ($page_num == -1) {
             $cluster_records = $build_query->get();
         } else if (is_numeric($page_num)) {
-            $cluster_records = $build_query->paginate(1,['*'],'page',$page_num);
+            $cluster_records = $build_query->paginate($limit,['*'],'page',$page_num);
         } else {
-            $cluster_records = $build_query->paginate(1);
+            $cluster_records = $build_query->paginate($limit);
         }
 
         $cluster_raw = [];
@@ -450,6 +454,11 @@ class APIService
     {
         $page_num = $input_filters->input('page_num');
         $cluster_id = $input_filters->input('cluster_id');
+        $limit = 5;
+        if ($input_filters->input('limit') != '') {
+            $limit = (int)$input_filters->input('limit');
+        }
+
 
         $build_query = AccessPoint::query();
         $organisationService = new OrganisationService();
@@ -464,9 +473,9 @@ class APIService
             $ap_records = $build_query->get();
         } else {
             if (is_numeric($page_num)) {
-                $ap_records = $build_query->paginate(5,['*'],'page',$page_num);
+                $ap_records = $build_query->paginate($limit,['*'],'page',$page_num);
             } else {
-                $ap_records = $build_query->paginate(5);
+                $ap_records = $build_query->paginate($limit);
             }
         }
 
@@ -640,6 +649,10 @@ class APIService
     public function getAllWifiNetworksAPI($input_filters)
     {
         $page_num = $input_filters->input('page_num');
+        $limit = 5;
+        if ($input_filters->input('limit') != '') {
+            $limit = (int)$input_filters->input('limit');
+        }
 
         $build_query = Network::query();
         $organisationService = new OrganisationService();
@@ -648,9 +661,9 @@ class APIService
         $build_query = $build_query->where("org_id", "=", $org_id);
         $build_query->orderBy('created_at','asc');
         if (is_numeric($page_num)) {
-            $network_records = $build_query->paginate(5,['*'],'page',$page_num);
+            $network_records = $build_query->paginate($limit,['*'],'page',$page_num);
         } else {
-            $network_records = $build_query->paginate(5);
+            $network_records = $build_query->paginate($limit);
         }
 
         $network_raw = [];
