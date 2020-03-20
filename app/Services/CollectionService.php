@@ -21,7 +21,7 @@ class CollectionService
         $collection = $client->eapDb->staTable;
 
         $time_interval = round(strtotime('-5 minutes') * 1000); // Last 5 Minutes
-        $time_interval = 1584426282000;
+        // $time_interval = 1584426282000;
 
         if ($input_data['venue_id'] != '' && $input_data['ap_id'] != '') {
             $matchOptions = array(

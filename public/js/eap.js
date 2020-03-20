@@ -1683,7 +1683,7 @@ if (document.getElementById('users_page'))
           html_content = html_content+'<a class="dropdown-item" data-value="'+venue_id+'">'+venue_name+'</a>';
         }
 
-        $(".venue_filter_options").html('<a class="dropdown-item" data-value="">All</a>'+html_content);
+        $(".venue_filter_options").html('<a class="dropdown-item" data-value="">All Venues</a>'+html_content);
       }
     });
   }
@@ -1722,7 +1722,7 @@ if (document.getElementById('users_page'))
           html_content = html_content+'<a class="dropdown-item" data-value="'+ap_mac_address+'">'+ap_name+'</a>';
         }
 
-        $(".ap_filter_options").html('<a class="dropdown-item" data-value="">All</a>'+html_content);
+        $(".ap_filter_options").html('<a class="dropdown-item" data-value="">All APs</a>'+html_content);
         // console.log('test1::'+$('#ap_filter').val());
       }
     });
