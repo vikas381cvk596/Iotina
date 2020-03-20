@@ -142,12 +142,12 @@ class CollectionService
 
     public function getClientsTrafficGraphData($input_data, $page) {
         //$client = new Client;
-        $setting_time_interval = 5; // default
+        $setting_time_interval = 5; // default last 5 minutes
         $duration = '-60 minutes'; // default
         $organisationService = new OrganisationService();
         $org_id = $organisationService->getOrganisationID();
         
-        $org_interval = $organisationService->getTimeInterval();
+        /*$org_interval = $organisationService->getTimeInterval();
 
         if ($org_interval != '') {
             $org_interval = (float)$org_interval/60;
@@ -156,16 +156,16 @@ class CollectionService
             if ($org_interval > 0) {
                 $setting_time_interval = $org_interval;
             }
-        }                    
+        }     */               
 
-        if ($page == 'api') {
+        // if ($page == 'api') {
             if ($input_data['time_interval'] != '') {
                 $setting_time_interval = (float)$input_data['time_interval'];    
             }
             if ($input_data['duration'] != '') {
                 $duration = '-'.$input_data['duration'].' minutes';    
             }
-        }
+        // }
 
         $client = new Client("mongodb://3.6.250.97:27017");
         
@@ -399,7 +399,11 @@ class CollectionService
             //$count[] = $document['_count'];
         }
         $results = new \stdClass();
-        
+
+        while ($count <= 12) {
+            $data[] = 0;
+            $count = $count + 1;
+        }
 
         $data_display_format = [];
         $data_date_format = [];

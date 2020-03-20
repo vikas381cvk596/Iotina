@@ -1493,7 +1493,7 @@ if (document.getElementById('users_page'))
 
 } else if (document.getElementById('analytics_page'))
 {
-  $("#analytics_page").on('click', '.btn_save_setting_class', function() {
+  /*$("#analytics_page").on('click', '.btn_save_setting_class', function() {
     var setting_time_interval = $("#setting_time_interval").val();
     //alert(setting_time_interval);
 
@@ -1509,9 +1509,9 @@ if (document.getElementById('users_page'))
       }
     });
     
-  });
+  });*/
   
-  $.fn.get_time_interval_setting = function() {
+  /*$.fn.get_time_interval_setting = function() {
     //var setting_time_interval = $("#setting_time_interval").val();
 
     $.ajax({
@@ -1530,13 +1530,31 @@ if (document.getElementById('users_page'))
       }
     });
   }
-  $.fn.get_time_interval_setting();
+  $.fn.get_time_interval_setting();*/
 
   $.fn.get_clients_graph_data = function() {
+
+    $.fn.spin_on('spin-area-1');
+
+    $canvas_id = "clientTrafficGraph";
+    $html = '<canvas id=' + $canvas_id + ' width="50%" height="10"></canvas>';
+
+    $('#chart_area').html("");
+    $('#chart_area').html($html);
+
+    var venue_id = $('#charts_card').find('.venue_filter').val();
+    var ap_id = $('#charts_card').find('.ap_filter').val();
+    var duration = $('#charts_card').find('.duration_field').val();
+    var time_interval = $('#charts_card').find('.time_interval_field').val();
+    console.log(venue_id+"::"+ap_id+"::"+duration+"::"+time_interval);
     $.ajax({
       url: "getClientsTrafficGraphData",
       type: "POST",
       data: {
+        venue_id: venue_id,
+        ap_id: ap_id,
+        duration: duration,
+        time_interval: time_interval,
         '_token': window.Laravel.csrfToken
       },
       success: function(graph_data) {
@@ -1561,6 +1579,11 @@ if (document.getElementById('users_page'))
           maxDataPoint = Math.ceil(maxDataPoint / 1000) * 1000;
         }
 
+        if (maxDataPoint == 0) {
+          maxDataPoint = 5;
+        }
+        console.log(maxDataPoint);
+
         var dataPointsTime = [];
         var today = new Date();
         var current_time = today.getHours() + ":" + today.getMinutes();
@@ -1579,7 +1602,7 @@ if (document.getElementById('users_page'))
         temp_today.setMinutes(today.getMinutes() - 5);*/
         
 
-        var ctx2 = document.getElementById("clientTrafficGraph");
+        var ctx2 = document.getElementById($canvas_id);
         var myLineChart = new Chart(ctx2, {
           type: 'line',
           data: {
@@ -1628,13 +1651,14 @@ if (document.getElementById('users_page'))
             }
           }
         });
+        $.fn.spin_off('spin-area-1');
       }
     });
   }
   $.fn.get_clients_graph_data();
 
   $("#clients_card").on('click', '.dropdown-menu .dropdown-item', function() {
-    console.log('111');
+    // console.log('111');
     $(this).parents(".dropdown").find('.btn').html($(this).text());
     var id = $(this).attr('data-value');
     $(this).closest('.form-group').find('.hidden_field').val(id);
@@ -1643,13 +1667,21 @@ if (document.getElementById('users_page'))
   });
 
   $("#ap_card").on('click', '.dropdown-menu .dropdown-item', function() {
-    console.log('222');
+    // console.log('222');
     $(this).parents(".dropdown").find('.btn').html($(this).text());
     var id = $(this).attr('data-value');
     $(this).closest('.form-group').find('.hidden_field').val(id);
     $.fn.get_clients_by_ap();
   });
 
+  $("#charts_card").on('click', '.dropdown-menu .dropdown-item', function() {
+    // console.log('222');
+    $(this).parents(".dropdown").find('.btn').html($(this).text());
+    var id = $(this).attr('data-value');
+    $(this).closest('.form-group').find('.hidden_field').val(id);
+    $.fn.get_clients_graph_data();
+  });
+  
   $("#clients_card").on('change', '.duration_field', function() {
     $.fn.get_clients_by_traffic();
   });
@@ -1664,6 +1696,14 @@ if (document.getElementById('users_page'))
 
   $("#ap_card").on('change', '.limit_field', function() {
     $.fn.get_clients_by_ap();
+  });
+
+  $("#charts_card").on('change', '.duration_field', function() {
+    $.fn.get_clients_graph_data();
+  });
+
+  $("#charts_card").on('change', '.time_interval_field', function() {
+    $.fn.get_clients_graph_data();
   });
 
   $.fn.get_all_venues = function() {

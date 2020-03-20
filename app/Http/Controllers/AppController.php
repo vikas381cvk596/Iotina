@@ -101,11 +101,11 @@ class AppController extends Controller
     public function getClientsTrafficGraphData() {
         $collectionService = new CollectionService();
         $input_data = [];
-        $input_data['duration'] = '';
-        $input_data['time_interval'] = '';
-        $input_data['venue_id'] = '';
-        $input_data['ap_id'] = '';
-
+        $input_data['venue_id'] = $_POST['venue_id'];
+        $input_data['ap_id'] = $_POST['ap_id'];
+        $input_data['duration'] = $_POST['duration'];
+        $input_data['time_interval'] = $_POST['time_interval'];
+        
         $page = 'web';
         $result = $collectionService->getClientsTrafficGraphData($input_data, $page);
         return $result;    
