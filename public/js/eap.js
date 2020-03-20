@@ -1,5 +1,4 @@
-
-var spinner = false;
+var spinner;
 
 $.fn.spin_on = function(element_id) {
     var opts = {
@@ -22,19 +21,20 @@ $.fn.spin_on = function(element_id) {
       // shadow: '0 0 1px transparent', // Box-shadow for the lines
       // position: 'absolute' // Element positioning
     };
-    console.log('spin called');
-    if (!spinner) {
-        spinner = new Spinner(opts).spin(document.getElementById(element_id));
-    }
-
-    spinner.spin(document.getElementById(element_id));
+    // console.log('spin called');
+    // if (!spinner) {
+      spinner = new Spinner(opts).spin(document.getElementById(element_id));
+    // }
+    // spinner.spin(document.getElementById(element_id));
+    $('#'+element_id).data('spinner', spinner);
     // $(".page-content > div").css('opacity', '0.75');
 };
 
-$.fn.spin_off = function() {
-    if (spinner) {
-        spinner.stop();
-    }
+$.fn.spin_off = function(element_id) {
+    // if (spinner) {
+      // spinner.stop();
+      $('#'+element_id).data('spinner').stop();
+    // }
 
     // $(".page-content > div").css('opacity', '1.0');
 }
@@ -858,6 +858,7 @@ if (document.getElementById('venue_page'))
         $('.circle_step_2_edit').css('background-color','#b3b3b3');
         $('.title_step_2_edit').css('color','#696969');
       } else if (navigate_step_form == 'form_step_2_edit') {
+        console.log('test');
         $('.circle_step_1_edit').css('background-color','#ced853');
         $('.title_step_1_edit').css('color','#ced853');
         
@@ -1301,7 +1302,8 @@ if (document.getElementById('venue_page'))
     $('#network_vlan_edit').val(network_vlan);
     $('#backup_passphrase_edit').val(backup_phrase);
     $('#passphrase_expiry_edit').val(network_passphrase_expiry);
-
+    $('#security_protocol_edit').val(security_protocol);
+    
     $('#network_type_dropdown_edit').html(network_type);
     $('.sp_dropdown_edit_btn').html(security_protocol);
     console.log(network_passphrase_expiry);
@@ -1363,10 +1365,18 @@ if (document.getElementById('venue_page'))
 if (document.getElementById('users_page'))
 {
   $.fn.get_collections_data = function() {
+    $('#users_table tbody').html('');
+    $.fn.spin_on('spin-area');
+
+    var venue_id = $('#venue_filter').val();
+    var ap_id = $('#ap_filter').val();
+    console.log(venue_id+"::"+ap_id);
     $.ajax({
       url: "getCollectionsData",
       type: "POST",
       data: {
+        venue_id: venue_id,
+        ap_id: ap_id,
         '_token': window.Laravel.csrfToken
       },
       success: function(sta_data) {
@@ -1403,11 +1413,84 @@ if (document.getElementById('users_page'))
           html_content = html_content+'</tr>';
           
         }
+        $.fn.spin_off('spin-area'); 
         $('#users_table tbody').html(html_content);
       }
     });
   }
   $.fn.get_collections_data();
+
+  $("#users_page").on('click', '.dropdown-menu .dropdown-item', function() {
+    $(this).parents(".dropdown").find('.btn').html($(this).text());
+    var id = $(this).attr('data-value');
+    $(this).closest('.form-group').find('.hidden_field').val(id);
+    // $('#venue_filter').val(venue_id);
+    $.fn.get_collections_data();
+  });
+
+  $.fn.get_all_venues = function() {
+    $.ajax({
+      url: "getAllVenues",
+      type: "POST",
+      data: {
+        '_token': window.Laravel.csrfToken
+      },
+      success: function(all_venues) {
+        var html_content = '';
+        //alert(all_venues);
+        for (var venue in all_venues) {
+          var venue_name = all_venues[venue]['venue_name'];
+          var venue_id = all_venues[venue]['venue_id'];
+
+          html_content = html_content+'<a class="dropdown-item" data-value="'+venue_id+'">'+venue_name+'</a>';
+        }
+
+        $("#venue_filter_options").html('<a class="dropdown-item" data-value="">All</a>'+html_content);
+      }
+    });
+  }
+  $.fn.get_all_venues();
+
+  $.fn.get_all_ap = function() {
+    var page_num = -1;
+    var limit = '';
+    var cluster_id = '';
+
+    $.ajax({
+      url: "getAllAccessPoints",
+      type: "POST",
+      data: {
+        page_num: page_num,
+        limit: limit,
+        cluster_id: cluster_id,
+        '_token': window.Laravel.csrfToken
+      },
+      success: function(all_aps) {
+        var all_aps = JSON.parse(all_aps);
+        var all_data = all_aps.all_data;
+        // console.log(all_data);
+        var html_content = '';
+        for (var key in all_data) {
+          // console.log(all_data[key].cluster_name);
+          var ap_id = all_data[key].ap_id;
+          var ap_name = all_data[key].ap_name;
+
+          var ap_mac_address = null;
+          if (all_data[key].ap_mac_address != '') {
+            ap_mac_address = all_data[key].ap_mac_address;
+          }
+
+          // console.log(ap_id+"::"+ap_name+"::"+ap_mac_address);
+          html_content = html_content+'<a class="dropdown-item" data-value="'+ap_mac_address+'">'+ap_name+'</a>';
+        }
+
+        $("#ap_filter_options").html('<a class="dropdown-item" data-value="">All</a>'+html_content);
+        // console.log('test1::'+$('#ap_filter').val());
+      }
+    });
+  }
+  $.fn.get_all_ap();
+
 } else if (document.getElementById('analytics_page'))
 {
   $("#analytics_page").on('click', '.btn_save_setting_class', function() {
@@ -1549,6 +1632,203 @@ if (document.getElementById('users_page'))
     });
   }
   $.fn.get_clients_graph_data();
+
+  $("#clients_card").on('click', '.dropdown-menu .dropdown-item', function() {
+    console.log('111');
+    $(this).parents(".dropdown").find('.btn').html($(this).text());
+    var id = $(this).attr('data-value');
+    $(this).closest('.form-group').find('.hidden_field').val(id);
+    // $('#venue_filter').val(venue_id);
+    $.fn.get_clients_by_traffic();
+  });
+
+  $("#ap_card").on('click', '.dropdown-menu .dropdown-item', function() {
+    console.log('222');
+    $(this).parents(".dropdown").find('.btn').html($(this).text());
+    var id = $(this).attr('data-value');
+    $(this).closest('.form-group').find('.hidden_field').val(id);
+    $.fn.get_clients_by_ap();
+  });
+
+  $("#clients_card").on('change', '.duration_field', function() {
+    $.fn.get_clients_by_traffic();
+  });
+
+  $("#clients_card").on('change', '.limit_field', function() {
+    $.fn.get_clients_by_traffic();
+  });
+
+  $("#ap_card").on('change', '.duration_field', function() {
+    $.fn.get_clients_by_ap();
+  });
+
+  $("#ap_card").on('change', '.limit_field', function() {
+    $.fn.get_clients_by_ap();
+  });
+
+  $.fn.get_all_venues = function() {
+    $.ajax({
+      url: "getAllVenues",
+      type: "POST",
+      data: {
+        '_token': window.Laravel.csrfToken
+      },
+      success: function(all_venues) {
+        var html_content = '';
+        //alert(all_venues);
+        for (var venue in all_venues) {
+          var venue_name = all_venues[venue]['venue_name'];
+          var venue_id = all_venues[venue]['venue_id'];
+
+          html_content = html_content+'<a class="dropdown-item" data-value="'+venue_id+'">'+venue_name+'</a>';
+        }
+
+        $(".venue_filter_options").html('<a class="dropdown-item" data-value="">All</a>'+html_content);
+      }
+    });
+  }
+  $.fn.get_all_venues();
+
+  $.fn.get_all_ap = function() {
+    var page_num = -1;
+    var limit = '';
+    var cluster_id = '';
+
+    $.ajax({
+      url: "getAllAccessPoints",
+      type: "POST",
+      data: {
+        page_num: page_num,
+        limit: limit,
+        cluster_id: cluster_id,
+        '_token': window.Laravel.csrfToken
+      },
+      success: function(all_aps) {
+        var all_aps = JSON.parse(all_aps);
+        var all_data = all_aps.all_data;
+        // console.log(all_data);
+        var html_content = '';
+        for (var key in all_data) {
+          // console.log(all_data[key].cluster_name);
+          var ap_id = all_data[key].ap_id;
+          var ap_name = all_data[key].ap_name;
+
+          var ap_mac_address = null;
+          if (all_data[key].ap_mac_address != '') {
+            ap_mac_address = all_data[key].ap_mac_address;
+          }
+
+          // console.log(ap_id+"::"+ap_name+"::"+ap_mac_address);
+          html_content = html_content+'<a class="dropdown-item" data-value="'+ap_mac_address+'">'+ap_name+'</a>';
+        }
+
+        $(".ap_filter_options").html('<a class="dropdown-item" data-value="">All</a>'+html_content);
+        // console.log('test1::'+$('#ap_filter').val());
+      }
+    });
+  }
+  $.fn.get_all_ap();
+
+  $.fn.get_clients_by_traffic = function() {
+    $('#clients_traffic_table tbody').html('');
+    $.fn.spin_on('spin-area-2');
+
+    var venue_id = $('#clients_card').find('.venue_filter').val();
+    var ap_id = $('#clients_card').find('.ap_filter').val();
+    var duration = $('#clients_card').find('.duration_field').val();
+    var limit = $('#clients_card').find('.limit_field').val();
+
+    $.ajax({
+      url: "getTrafficByClientsWeb",
+      type: "POST",
+      data: {
+        venue_id: venue_id,
+        ap_id: ap_id,
+        duration: duration,
+        limit: limit,
+        '_token': window.Laravel.csrfToken
+      },
+      success: function(traffic_data) {
+        var traffic_data = JSON.parse(traffic_data);
+        // console.log(traffic_data);
+        var html_content = '';
+        var all_data = traffic_data.sta_data;
+        // console.log(all_data);
+        var count = 1;
+        //console.log(all_aps);
+        var html_content = '';
+        for (var key in all_data) {
+          var tx = all_data[key]['Tx'];
+          var rx = all_data[key]['Rx'];
+          var mac_address = all_data[key]['mac_address'];
+          var total = all_data[key]['Total'];
+
+          html_content = html_content+'<tr>';
+          html_content = html_content+'<td>'+count+'</td>';
+          html_content = html_content+'<td>'+mac_address+'</td>';
+          html_content = html_content+'<td>'+tx+'</td>';
+          html_content = html_content+'<td>'+rx+'</td>';
+          html_content = html_content+'<td>'+total+'</td>';
+          html_content = html_content+'</tr>';
+          count = count + 1;
+        }
+        $.fn.spin_off('spin-area-2'); 
+        $('#clients_traffic_table tbody').html(html_content);
+      }
+    });
+  }
+  $.fn.get_clients_by_traffic();
+
+  $.fn.get_clients_by_ap = function() {
+    $('#clients_ap_table tbody').html('');
+    $.fn.spin_on('spin-area-3');
+
+    var venue_id = $('#ap_card').find('.venue_filter').val();
+    var ap_id = $('#ap_card').find('.ap_filter').val();
+    var duration = $('#ap_card').find('.duration_field').val();
+    var limit = $('#ap_card').find('.limit_field').val();
+
+    $.ajax({
+      url: "getTrafficByAccessPointsWeb",
+      type: "POST",
+      data: {
+        venue_id: venue_id,
+        ap_id: ap_id,
+        duration: duration,
+        limit: limit,
+        '_token': window.Laravel.csrfToken
+      },
+      success: function(traffic_data) {
+        var traffic_data = JSON.parse(traffic_data);
+        console.log(traffic_data)
+        // console.log(traffic_data);
+        var html_content = '';
+        var all_data = traffic_data.sta_data;
+        console.log(all_data);
+        var count = 1;
+        //console.log(all_aps);
+        var html_content = '';
+        for (var key in all_data) {
+          var tx = all_data[key]['Tx'];
+          var rx = all_data[key]['Rx'];
+          var mac_address = all_data[key]['mac_address'];
+          var total = all_data[key]['Total'];
+
+          html_content = html_content+'<tr>';
+          html_content = html_content+'<td>'+count+'</td>';
+          html_content = html_content+'<td>'+mac_address+'</td>';
+          html_content = html_content+'<td>'+tx+'</td>';
+          html_content = html_content+'<td>'+rx+'</td>';
+          html_content = html_content+'<td>'+total+'</td>';
+          html_content = html_content+'</tr>';
+          count = count + 1;
+        }
+        $.fn.spin_off('spin-area-3'); 
+        $('#clients_ap_table tbody').html(html_content);
+      }
+    });
+  }
+  $.fn.get_clients_by_ap();
 } else if (document.getElementById('dashboard_page'))
 {
   $.fn.get_live_dashboard_data = function() {

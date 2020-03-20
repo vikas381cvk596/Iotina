@@ -15,6 +15,31 @@
         <div class="card-header">
           <i class="fa fa-users"></i>&nbsp;&nbsp;Clients Connected&nbsp;<span class="clients_count"></span></div>
         <div class="card-body">
+          <div style="display: flex; flex-direction: row; align-items: center; justify-content: flex-start;">
+            <div class="form-group" style="padding-right: 20px;">
+              <input type="hidden" id="venue_filter" name="venue_filter"  class="hidden_field">
+              <div class="dropdown venue_filter_dropdown" style="width: 10vw;">
+                <button class="btn btn-default dropdown-toggle" type="button" id="venue_filter_dropdown_btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size: 14px; background-color: #f2f2f2; border: 1px solid #c3c3c3; width: 10vw; color: #2b2b2b; width: 10vw; text-align: left;">
+                  Venue
+                </button>
+                <div class="dropdown-menu" id="venue_filter_options" aria-labelledby="venue_filter_dropdown">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" style="padding-right: 20px;">
+              <input type="hidden" id="ap_filter" name="ap_filter"  class="hidden_field">
+              <div class="dropdown ap_filter_dropdown" style="width: 10vw;">
+                <button class="btn btn-default dropdown-toggle" type="button" id="ap_filter_dropdown_btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size: 14px; background-color: #f2f2f2; border: 1px solid #c3c3c3; width: 10vw; color: #2b2b2b; width: 10vw; text-align: left;">
+                  Access Point
+                </button>
+                <div class="dropdown-menu" id="ap_filter_options" aria-labelledby="ap_filter_dropdown">
+                </div>
+              </div>
+            </div>
+          </div>
+                
+
           <div class="table-responsive">
             <table id="users_table" class="table table-bordered" id="dataTable" width="100%" cellspacing="0" style="font-size: 13px;">
               <thead>
@@ -33,6 +58,7 @@
               </tbody>
             </table>
           </div>
+          <div id="spin-area" style="margin-top: 10px; margin-bottom: 10px;"></div>
         </div>
         <!--<div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div> -->
       </div>

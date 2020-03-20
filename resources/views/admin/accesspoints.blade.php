@@ -229,7 +229,7 @@
           <div class="form-group" style="">
             <input type="hidden" id="venue_filter" name="venue_filter">
             <div class="dropdown venue_filter_dropdown" style="width: 15vw;">
-              <button class="btn btn-default dropdown-toggle" type="button" id="venue_filter_dropdown_btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size: 14px; background-color: #f2f2f2; border: 1px solid #c3c3c3; width: 10vw; color: #696969; width: 15vw; text-align: left;">
+              <button class="btn btn-default dropdown-toggle" type="button" id="venue_filter_dropdown_btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size: 14px; background-color: #f2f2f2; border: 1px solid #c3c3c3; width: 10vw; color: #2b2b2b; width: 15vw; text-align: left;">
                 Select Venue
               </button>
               <div class="dropdown-menu" id="venue_filter_options" aria-labelledby="venue_filter_dropdown">

@@ -21,7 +21,7 @@ class CollectionService
         $collection = $client->eapDb->staTable;
 
         $time_interval = round(strtotime('-5 minutes') * 1000); // Last 5 Minutes
-        // $time_interval = 1584426282000;
+        $time_interval = 1584426282000;
 
         if ($input_data['venue_id'] != '' && $input_data['ap_id'] != '') {
             $matchOptions = array(
@@ -857,7 +857,7 @@ class CollectionService
         $client = new Client("mongodb://3.6.250.97:27017");
         $collection = $client->eapDb->staTable;
 
-        $time_interval = round(strtotime('-24 hours') * 1000); // Last 5 Minutes
+        $time_interval = round(strtotime('-24 hours') * 1000); // Last 24 hours
         if ($input_data['duration'] != '') {
             $duration = '-'.$input_data['duration'].' minutes';
             $time_interval = round(strtotime($duration) * 1000);   

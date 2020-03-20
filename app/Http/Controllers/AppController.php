@@ -68,7 +68,11 @@ class AppController extends Controller
 
     public function getCollectionsData() {
         $collectionService = new CollectionService();
-        $result = $collectionService->getCollectionsData();
+        $input_data = [];
+        $input_data['venue_id'] = $_POST['venue_id'];
+        $input_data['ap_id'] = $_POST['ap_id'];
+        
+        $result = $collectionService->getCollectionsData($input_data);
         return $result;    
     }
 
@@ -371,5 +375,29 @@ class AppController extends Controller
             ->withHeaders([
                 'Content-Type' => 'application/json',
             ]);  
+    }
+
+    public function getTrafficByClientsWeb() {
+        $collectionService = new CollectionService();
+        $input_data = [];
+        $input_data['venue_id'] = $_POST['venue_id'];
+        $input_data['ap_id'] = $_POST['ap_id'];
+        $input_data['duration'] = $_POST['duration'];
+        $input_data['limit'] = $_POST['limit'];
+
+        $result = $collectionService->getTrafficByClients($input_data);
+        return $result; 
+    }
+
+    public function getTrafficByAccessPointsWeb() {
+        $collectionService = new CollectionService();
+        $input_data = [];
+        $input_data['venue_id'] = $_POST['venue_id'];
+        $input_data['ap_id'] = $_POST['ap_id'];
+        $input_data['duration'] = $_POST['duration'];
+        $input_data['limit'] = $_POST['limit'];
+
+        $result = $collectionService->getTrafficByAccessPoints($input_data);
+        return $result;  
     }
 }

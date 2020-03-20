@@ -51,6 +51,9 @@ Route::post('/admin/updateAccessPoint', array('as' => 'updateAccessPoint', 'uses
 Route::post('/admin/delWifiNetwork', array('as' => 'delWifiNetwork', 'uses' => 'AppController@delWifiNetwork'));
 Route::post('/admin/editWifiNetwork', array('as' => 'editWifiNetwork', 'uses' => 'AppController@editWifiNetwork'));
 
+Route::post('/admin/getTrafficByClientsWeb', array('as' => 'getTrafficByClientsWeb', 'uses' => 'AppController@getTrafficByClientsWeb'));
+
+Route::post('/admin/getTrafficByAccessPointsWeb', array('as' => 'getTrafficByAccessPointsWeb', 'uses' => 'AppController@getTrafficByAccessPointsWeb'));
 
 
 //Route::get('/api/organisation/{token?}', array('as' => 'getOrganisationDetails', 'uses' => 'AppController@getOrganisationDetails'));

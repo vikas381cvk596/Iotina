@@ -20,12 +20,153 @@
 
       <div class="card mb-3">
         <div class="card-header">
-          <i class="fa fa-area-chart"></i> Connected Clients (<span class="interval_time_heading"></span> Seconds Interval)</div>
+          <i class="fa fa-chart-line"></i>&nbsp;&nbsp;Connected Clients (<span class="interval_time_heading"></span> Seconds Interval)</div>
         <div class="card-body">
           <canvas id="clientTrafficGraph" width="80%" height="20"></canvas>
         </div>
         <div class="card-footer small text-muted"></div>
       </div>
+
+      <div class="card mb-3" id="clients_card">
+        <div class="card-header">
+          <i class="fa fa-exchange-alt"></i>&nbsp;&nbsp;Top Clients By Traffic&nbsp;<span class="clients_count"></span></div>
+        <div class="card-body">
+          <div style="display: flex; flex-direction: row; align-items: center; justify-content: center;">
+            <div class="form-group" style="padding-right: 20px;">
+              <input type="hidden" class="venue_filter hidden_field" name="venue_filter">
+              <div class="dropdown venue_filter_dropdown" style="width: 10vw;">
+                <button class="btn btn-default dropdown-toggle venue_filter_dropdown_btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size: 14px; background-color: #f2f2f2; border: 1px solid #c3c3c3; width: 10vw; color: #2b2b2b; width: 10vw; text-align: left;">
+                  Venue
+                </button>
+                <div class="dropdown-menu venue_filter_options" aria-labelledby="venue_filter_dropdown">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" style="padding-right: 20px;">
+              <input type="hidden" name="ap_filter" class="hidden_field ap_filter">
+              <div class="dropdown ap_filter_dropdown" style="width: 10vw;">
+                <button class="btn btn-default dropdown-toggle ap_filter_dropdown_btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size: 14px; background-color: #f2f2f2; border: 1px solid #c3c3c3; width: 10vw; color: #2b2b2b; width: 10vw; text-align: left;">
+                  Access Point
+                </button>
+                <div class="dropdown-menu ap_filter_options" aria-labelledby="ap_filter_dropdown">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" style="padding-right: 20px;">
+              <div class='input-group'>
+                <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
+                  <div style="font-size: 12px; color: #696969;">Duration (minutes)</div>
+                  <div style="padding-left: 10px;">
+                    <input type="text" class="form-control duration_field" class="form-control" placeholder="" style="font-size: 14px; width: 5vw;" value="1440"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" style="padding-right: 20px;">
+              <div class='input-group'>
+                <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
+                  <div style="font-size: 12px; color: #696969;">Limit</div>
+                  <div style="padding-left: 10px;">
+                    <input type="text" class="form-control limit_field" class="form-control" placeholder="" style="font-size: 14px; width: 3vw;" value="10"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+          <div class="table-responsive">
+            <table id="clients_traffic_table" class="table table-bordered" id="dataTable" cellspacing="0" style="font-size: 13px; margin: 0 auto; width: 50vw;">
+              <thead>
+                <tr>
+                  <th>S.No.</th>
+                  <th>MAC Address</th>
+                  <th>Tx</th>
+                  <th>Rx</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+          <div id="spin-area-2" style="margin-top: 20px; margin-bottom: 10px;"></div>
+        </div>
+        <div class="card-footer small text-muted"></div>
+      </div>
+
+      <div class="card mb-3" id="ap_card">
+        <div class="card-header">
+          <i class="fa fa-network-wired"></i>&nbsp;&nbsp;Top Clients By Access Points&nbsp;<span class="clients_count"></span></div>
+        <div class="card-body">
+          <div style="display: flex; flex-direction: row; align-items: center; justify-content: center;">
+            <div class="form-group" style="padding-right: 20px;">
+              <input type="hidden" class="venue_filter hidden_field" name="venue_filter">
+              <div class="dropdown venue_filter_dropdown" style="width: 10vw;">
+                <button class="btn btn-default dropdown-toggle venue_filter_dropdown_btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size: 14px; background-color: #f2f2f2; border: 1px solid #c3c3c3; width: 10vw; color: #2b2b2b; width: 10vw; text-align: left;">
+                  Venue
+                </button>
+                <div class="dropdown-menu venue_filter_options" aria-labelledby="venue_filter_dropdown">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" style="padding-right: 20px;">
+              <input type="hidden" name="ap_filter" class="hidden_field ap_filter">
+              <div class="dropdown ap_filter_dropdown" style="width: 10vw;">
+                <button class="btn btn-default dropdown-toggle ap_filter_dropdown_btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size: 14px; background-color: #f2f2f2; border: 1px solid #c3c3c3; width: 10vw; color: #2b2b2b; width: 10vw; text-align: left;">
+                  Access Point
+                </button>
+                <div class="dropdown-menu ap_filter_options" aria-labelledby="ap_filter_dropdown">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" style="padding-right: 20px;">
+              <div class='input-group'>
+                <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
+                  <div style="font-size: 12px; color: #696969;">Duration (minutes)</div>
+                  <div style="padding-left: 10px;">
+                    <input type="text" class="form-control duration_field" class="form-control" placeholder="" style="font-size: 14px; width: 5vw;" value="1440"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" style="padding-right: 20px;">
+              <div class='input-group'>
+                <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
+                  <div style="font-size: 12px; color: #696969;">Limit</div>
+                  <div style="padding-left: 10px;">
+                    <input type="text" class="form-control limit_field" class="form-control" placeholder="" style="font-size: 14px; width: 3vw;" value="10"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+          <div class="table-responsive">
+            <table id="clients_ap_table" class="table table-bordered" id="dataTable" cellspacing="0" style="font-size: 13px; margin: 0 auto; width: 50vw;">
+              <thead>
+                <tr>
+                  <th>S.No.</th>
+                  <th>MAC Address</th>
+                  <th>Tx</th>
+                  <th>Rx</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+          <div id="spin-area-3" style="margin-top: 20px; margin-bottom: 10px;"></div>
+        </div>
+        <div class="card-footer small text-muted"></div>
+      </div>
+
     </div>
     <!-- /.container-fluid-->
     <!-- /.content-wrapper-->

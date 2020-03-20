@@ -513,7 +513,7 @@ footer.sticky-footer {
   top: 40%!important;
 }
 
-#ap_page #venue_filter_dropdown_btn::after {
+.dropdown-toggle::after {
   position: absolute!important;
   right: 10px!important;
   top: 40%!important;
@@ -543,4 +543,20 @@ footer.sticky-footer {
 
 #venue_page .edit_venue_record: hover, #ap_page .edit_ap_record: hover, #wifi_page .edit_wifi_record: hover {
   cursor: pointer;
+}
+
+.card-header {
+  font-size: 14px;
+  color: #808080;
+  font-weight: 600;
+}
+.btn-default.dropdown-toggle {
+  font-size: 13px!important;
+}
+.table-responsive table {
+  font-size: 11px!important;
+}
+
+input {
+  font-size: 13px!important;
 }
