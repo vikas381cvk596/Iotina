@@ -55,8 +55,9 @@ class APIService
             $ap_data->network_name = $network_names;
             $ap_data->stats_collection_interval = $setting_time_interval;
             $ap_data->stats_publish_interval = $setting_time_interval;
-            $ap_data->stats_publish_url = 'ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:9092';
-            $ap_data->schema_server_url = 'http://ec2-15-206-63-2.ap-south-1.compute.amazonaws.com:8081';
+            $ap_data->stats_publish_url = 'ec2-3-7-15-136.ap-south-1.compute.amazonaws.com:9092';
+            $ap_data->schema_server_url = 'http://ec2-3-6-72-0.ap-south-1.compute.amazonaws.com:8081';
+            $ap_data->topic = "EAP_PERODIC1";
 
 
             
