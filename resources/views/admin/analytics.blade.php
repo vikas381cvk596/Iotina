@@ -147,7 +147,7 @@
 
       <div class="card mb-3" id="ap_card">
         <div class="card-header">
-          <i class="fa fa-network-wired"></i>&nbsp;&nbsp;Top Clients By Access Points&nbsp;<span class="clients_count"></span></div>
+          <i class="fa fa-network-wired"></i>&nbsp;&nbsp;Top Access Points By Traffic&nbsp;<span class="clients_count"></span></div>
         <div class="card-body">
           <div style="display: flex; flex-direction: row; align-items: center; justify-content: center;">
             <div class="form-group" style="padding-right: 20px;">

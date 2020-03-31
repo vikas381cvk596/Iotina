@@ -936,10 +936,6 @@ class CollectionService
             [ 
                 '$match' => $matchOptions
             ], [ 
-                '$sort' => [ 
-                    'Total' => -1.0 
-                ] 
-            ], [ 
                 '$group' => [ 
                     '_id' => '$sta_id', 
                     'Tx' => [
@@ -954,7 +950,12 @@ class CollectionService
                         ]
                     ]
                 ] 
-            ], [
+            ], [ 
+                '$sort' => [ 
+                    'Total' => -1.0 
+                ] 
+            ],
+             [
                 '$limit' => $limit
             ], [
                 '$project' => [
@@ -1086,10 +1087,6 @@ class CollectionService
             [ 
                 '$match' => $matchOptions
             ], [ 
-                '$sort' => [ 
-                    'Total' => -1.0 
-                ] 
-            ], [ 
                 '$group' => [ 
                     '_id' => '$ap_id', 
                     'Tx' => [
@@ -1119,6 +1116,10 @@ class CollectionService
                             '$add' => ['$ucastBytesTx', '$ucastBytesRx']
                         ]
                     ]
+                ] 
+            ], [ 
+                '$sort' => [ 
+                    'Total' => -1.0 
                 ] 
             ], [
                 '$limit' => $limit
