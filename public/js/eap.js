@@ -1892,24 +1892,39 @@ if (document.getElementById('users_page'))
   }
 
   $.fn.get_clients_graph_data = function() {
+    $.fn.spin_on('spin-area-1');
+
+    $canvas_id = "clientTrafficGraph";
+    $html = '<canvas id=' + $canvas_id + ' width="50%" height="10"></canvas>';
+
+    $('#chart_area').html("");
+    $('#chart_area').html($html);
+
+    var venue_id = $('#charts_card').find('.venue_filter').val();
+    var ap_id = $('#charts_card').find('.ap_filter').val();
+    var duration = $('#charts_card').find('.duration_field').val();
+    var time_interval = $('#charts_card').find('.time_interval_field').val();
+    console.log(venue_id+"::"+ap_id+"::"+duration+"::"+time_interval);
     $.ajax({
-      url: "getClientsTrafficGraphData",
+      url: "admin/getClientsTrafficGraphData",
       type: "POST",
       data: {
+        venue_id: venue_id,
+        ap_id: ap_id,
+        duration: duration,
+        time_interval: time_interval,
         '_token': window.Laravel.csrfToken
       },
       success: function(graph_data) {
-        console.log("original_data_mongo"+graph_data);
+        console.log(graph_data);
         var graph_data = JSON.parse(graph_data);
-        //var finalArray = graph_data['finalArray'];
-        //console.log("data_final_array::"+finalArray);
         var dataPointsCount = graph_data['count_datapoints'];
-        //console.log(dataPointsCount);
+        console.log(dataPointsCount);
         var dataPoints = graph_data['clients_count'];
         console.log(dataPoints);
-        //console.log(graph_data);
+
         var setting_time_interval = graph_data['setting_time_interval'];
-        
+        //console.log(graph_data);
         var maxDataPoint = Math.max.apply(null, dataPoints);
         maxDataPoint = maxDataPoint*(3/2);
         var digits_cnt = digits_count(maxDataPoint);
@@ -1922,36 +1937,30 @@ if (document.getElementById('users_page'))
           maxDataPoint = Math.ceil(maxDataPoint / 1000) * 1000;
         }
 
-        /*var dataPointsTime = [];
+        if (maxDataPoint == 0) {
+          maxDataPoint = 5;
+        }
+        console.log(maxDataPoint);
+
+        var dataPointsTime = [];
         var today = new Date();
         var current_time = today.getHours() + ":" + today.getMinutes();
         var interval = parseInt(setting_time_interval);
-
+        
         for (i=0; i<dataPointsCount; i++) {
           dataPointsTime[i] = current_time;
           today.setMinutes(today.getMinutes() - interval);
           current_time = today.getHours() + ":" + today.getMinutes();
         }
-        
-        dataPointsTime.reverse();*/
-        
+
+        //dataPoints.reverse();
+        dataPointsTime.reverse();
+        console.log(dataPointsTime);
         /*var temp_today = new Date();
         temp_today.setMinutes(today.getMinutes() - 5);*/
-        /*var dataPointsTime = [];
-        var dataPointsTimeArray = JSON.parse(graph_data['time_intervals']);
-        console.log(dataPointsTimeArray);
-        dataPointsTimeArray.forEach(function (item, index) {
-          console.log(item, index);
-        });*/
-        var dataPointsTime = graph_data['time_intervals'];
-        console.log(dataPointsTime);
         
-        /*dataPointsTimeArray.forEach(function(value, index) {
-            dataPointsTime[0] = value;
-        });
-        console.log(dataPointsTime);*/
-        
-        var ctx2 = document.getElementById("clientTrafficGraph");
+
+        var ctx2 = document.getElementById($canvas_id);
         var myLineChart = new Chart(ctx2, {
           type: 'line',
           data: {
@@ -2000,11 +2009,94 @@ if (document.getElementById('users_page'))
             }
           }
         });
+        $.fn.spin_off('spin-area-1');
+      },
+      error: function(err) {
+        console.log(err);
       }
     });
   }
   $.fn.get_clients_graph_data();
   $.fn.get_live_dashboard_data();
+
+  $("#charts_card").on('click', '.dropdown-menu .dropdown-item', function() {
+    // console.log('222');
+    $(this).parents(".dropdown").find('.btn').html($(this).text());
+    var id = $(this).attr('data-value');
+    $(this).closest('.form-group').find('.hidden_field').val(id);
+    $.fn.get_clients_graph_data();
+  });
+  
+  $("#charts_card").on('change', '.duration_field', function() {
+    $.fn.get_clients_graph_data();
+  });
+
+  $("#charts_card").on('change', '.time_interval_field', function() {
+    $.fn.get_clients_graph_data();
+  });
+
+  $.fn.get_all_venues = function() {
+    $.ajax({
+      url: "admin/getAllVenues",
+      type: "POST",
+      data: {
+        '_token': window.Laravel.csrfToken
+      },
+      success: function(all_venues) {
+        var html_content = '';
+        //alert(all_venues);
+        for (var venue in all_venues) {
+          var venue_name = all_venues[venue]['venue_name'];
+          var venue_id = all_venues[venue]['venue_id'];
+
+          html_content = html_content+'<a class="dropdown-item" data-value="'+venue_id+'">'+venue_name+'</a>';
+        }
+
+        $(".venue_filter_options").html('<a class="dropdown-item" data-value="">All Venues</a>'+html_content);
+      }
+    });
+  }
+  $.fn.get_all_venues();
+
+  $.fn.get_all_ap = function() {
+    var page_num = -1;
+    var limit = '';
+    var cluster_id = '';
+
+    $.ajax({
+      url: "admin/getAllAccessPoints",
+      type: "POST",
+      data: {
+        page_num: page_num,
+        limit: limit,
+        cluster_id: cluster_id,
+        '_token': window.Laravel.csrfToken
+      },
+      success: function(all_aps) {
+        var all_aps = JSON.parse(all_aps);
+        var all_data = all_aps.all_data;
+        // console.log(all_data);
+        var html_content = '';
+        for (var key in all_data) {
+          // console.log(all_data[key].cluster_name);
+          var ap_id = all_data[key].ap_id;
+          var ap_name = all_data[key].ap_name;
+
+          var ap_mac_address = null;
+          if (all_data[key].ap_mac_address != '') {
+            ap_mac_address = all_data[key].ap_mac_address;
+          }
+
+          // console.log(ap_id+"::"+ap_name+"::"+ap_mac_address);
+          html_content = html_content+'<a class="dropdown-item" data-value="'+ap_mac_address+'">'+ap_name+'</a>';
+        }
+
+        $(".ap_filter_options").html('<a class="dropdown-item" data-value="">All APs</a>'+html_content);
+        // console.log('test1::'+$('#ap_filter').val());
+      }
+    });
+  }
+  $.fn.get_all_ap();
 
   $.fn.get_time_interval_setting = function() {
     //var setting_time_interval = $("#setting_time_interval").val();

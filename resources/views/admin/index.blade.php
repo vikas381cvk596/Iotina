@@ -81,9 +81,57 @@
       </div>
       <div class="card mb-3">
         <div class="card-header">
-          <i class="fa fa-area-chart"></i> Connected Clients (<span class="interval_time_heading"></span> Seconds Interval)</div>
-        <div class="card-body">
-          <canvas id="clientTrafficGraph" width="80%" height="20"></canvas>
+          <i class="fa fa-chart-line"></i>&nbsp;&nbsp;Connected Clients</div>
+        <div class="card-body" id="charts_card">
+          <div style="display: flex; flex-direction: row; align-items: center; justify-content: center;">
+            <div class="form-group" style="padding-right: 20px;">
+              <input type="hidden" class="venue_filter hidden_field" name="venue_filter">
+              <div class="dropdown venue_filter_dropdown" style="width: 10vw;">
+                <button class="btn btn-default dropdown-toggle venue_filter_dropdown_btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size: 14px; background-color: #f2f2f2; border: 1px solid #c3c3c3; width: 10vw; color: #2b2b2b; width: 10vw; text-align: left;">
+                  Venue
+                </button>
+                <div class="dropdown-menu venue_filter_options" aria-labelledby="venue_filter_dropdown">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" style="padding-right: 20px;">
+              <input type="hidden" name="ap_filter" class="hidden_field ap_filter">
+              <div class="dropdown ap_filter_dropdown" style="width: 10vw;">
+                <button class="btn btn-default dropdown-toggle ap_filter_dropdown_btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size: 14px; background-color: #f2f2f2; border: 1px solid #c3c3c3; width: 10vw; color: #2b2b2b; width: 10vw; text-align: left;">
+                  Access Point
+                </button>
+                <div class="dropdown-menu ap_filter_options" aria-labelledby="ap_filter_dropdown">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" style="padding-right: 20px;">
+              <div class='input-group'>
+                <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
+                  <div style="font-size: 12px; color: #696969;">Time Interval (minutes)</div>
+                  <div style="padding-left: 10px;">
+                    <input type="text" class="form-control time_interval_field" class="form-control" placeholder="" style="font-size: 14px; width: 5vw;" value="5"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" style="padding-right: 20px;">
+              <div class='input-group'>
+                <div style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
+                  <div style="font-size: 12px; color: #696969;">Duration (minutes)</div>
+                  <div style="padding-left: 10px;">
+                    <input type="text" class="form-control duration_field" class="form-control" placeholder="" style="font-size: 14px; width: 5vw;" value="60"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+          <div id="spin-area-1" style="margin-top: 20px; margin-bottom: 10px;"></div>
+          <div id="chart_area">
+          </div>
         </div>
         <div class="card-footer small text-muted"></div>
       </div>
